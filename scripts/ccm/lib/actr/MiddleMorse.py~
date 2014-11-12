@@ -1,0 +1,2 @@
+#MiddleMorse
+from pyMorse import Morse

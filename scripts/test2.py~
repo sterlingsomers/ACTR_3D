@@ -1,0 +1,4 @@
+from pymorse import Morse
+
+
+simu = Morse()
