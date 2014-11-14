@@ -66,6 +66,7 @@ class Torso(morse.core.actuator.Actuator):
  
         #self._rib.rotation_euler = (1,1,1)
         self._target_count = 0 # dummy internal variable, for testing purposes
+        self._target_count2 = 0
 
         logger.info('Component initialized')
         
@@ -172,6 +173,12 @@ class Torso(morse.core.actuator.Actuator):
 
         return self.local_data['counter']
 
+    @interruptible
+    @async_service
+    def async_test2(self,value):
+        self._target_count2 = value
+    
+    
     @interruptible
     @async_service
     def async_test(self, value):

@@ -9,6 +9,7 @@
 import ccm
 from ccm.lib.actr import *
 #log=ccm.log()
+import ccm.morserobots as morserobots
 
 
 
@@ -86,7 +87,7 @@ class MyModel(ACTR):
         
 
 model=MyModel()
-model.r=test2.simu.robot
+#model.r=test2.simu.robot
 #x = dir(model)
 #print(model,"model1")
 #model.geo = geo
@@ -106,9 +107,9 @@ print("Pre-run")
 #with Morse() as simulation:
 #print(ccm.middle)
 import time
-test2.simu.tick()
-print(test2.simu.time(),"TIME1")
-test2.simu.tick() 
+morserobots.tick()
+print(morserobots.time(),"TIME1")
+morserobots.tick()
 while model.keepAlive:
 
         #simulation.tick()
@@ -117,7 +118,7 @@ while model.keepAlive:
     print("TICK...................")
     #time.sleep(2)
     #pdb.set_trace()
-    test2.simu.tick()
+    morserobots.tick()
     #print ("TIMEajfalfa;", test2.simu.time().result())
 
     #print (test.x.time())
@@ -133,8 +134,8 @@ while model.keepAlive:
 	
     
 print("Post run")
-print(test2.simu.time(),'TIME2')
-test2.simu.tick()    
+print(morserobots.time(),'TIME2')
+morserobots.tick()    
 #model.run(2)
 #print ("post run")
 #ccm.finished()

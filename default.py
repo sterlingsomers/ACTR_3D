@@ -19,7 +19,7 @@ from morse.builder import *
 from morse.core.morse_time import TimeStrategies
 
 bpymorse.set_speed(10, 1, 1)
-xxx = bpymorse.set_speed
+
 # Add the MORSE mascott, MORSY.
 # Out-the-box available robots are listed here:
 # http://www.openrobots.org/morse/doc/stable/components_library.html

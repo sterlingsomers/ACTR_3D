@@ -4,9 +4,10 @@
 try:
     from pymorse import Morse
 except ImportError:
-    raise Exception("pymorse not properly installed")
+    robot_simulation = None
 
-robot_simulation = Morse()
+else:
+    robot_simulation = Morse()
 
 
 
