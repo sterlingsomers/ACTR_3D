@@ -35,6 +35,6 @@ class BlenderMotorModule(ccm.Model):
 
     def move_forward(self,distance=0.01):
         '''Move forward by some distance'''
-        x = robo.move(distance)
+        x = robo.move(distance).result()
         
 

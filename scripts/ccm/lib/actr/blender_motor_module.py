@@ -5,7 +5,8 @@ import ccm
 #from ccm.pattern import Pattern
 
 import re
-from test2 import simu
+
+from ccm.morserobots import middleware
 
 torso = simu.robot.armature
 robo = simu.robot

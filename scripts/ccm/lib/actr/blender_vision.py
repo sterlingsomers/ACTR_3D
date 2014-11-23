@@ -15,9 +15,9 @@ import re
 
 #vision_cam = ccm.middle.robot.GeometricCamerav1
 #from test2 import simu
-from ccm.morserobots import connection
-vision_cam = connection.robot.GeometricCamerav1
-#vision_cam = test.x.robot.GeometricCamerav1
+
+from ccm.morserobots import middleware
+
 
 
 
