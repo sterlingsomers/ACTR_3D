@@ -9,6 +9,7 @@ import pdb
 import bpy
 import math
 from ACTR_3D.builder.robots import Manny
+from ACTR_3D.builder.sensors import GeometricCamera
 #from ACT_v1.builder.actuators import Mannyactuator
 #from ACT_v1.builder.sensors.Collision import Collision as LocalCollision
 #from ACT_v1.builder.actuators import Torso
@@ -109,7 +110,7 @@ armature.add_service('socket')
 
 
 #Geometric camera
-GeometricCamerav1 = SemanticCamera()
+GeometricCamerav1 = GeometricCamera()
 
 GeometricCamerav1.translate(x=0.11,y=-0.0,z=0.52)
 GeometricCamerav1.properties(Object=False)
