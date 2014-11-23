@@ -8,9 +8,9 @@ import pdb
 
 import bpy
 import math
-from ACT_v1.builder.robots import Manny
+from ACTR_3D.builder.robots import Manny
 #from ACT_v1.builder.actuators import Mannyactuator
-from ACT_v1.builder.sensors.Collision import Collision as LocalCollision
+#from ACT_v1.builder.sensors.Collision import Collision as LocalCollision
 #from ACT_v1.builder.actuators import Torso
 
 from morse.builder import *
@@ -40,9 +40,9 @@ robot = Manny()
 robot.translate(-1.0, 0.0, 0.0)
 
 
-armature = Armature(model_name='ACT_v1/actuators/Torso.blend', armature_name='Armature')
+armature = Armature(model_name='ACTR_3D/actuators/Torso.blend', armature_name='Armature')
 
-armature.properties(classpath = "ACT_v1.actuators.Torso.Torso")
+armature.properties(classpath = "ACTR_3D.actuators.Torso.Torso")
 armature.translate(0,0,-1.2)
 armature.rotate(z=math.radians(90))
 
@@ -153,7 +153,7 @@ robot.add_default_interface('socket')
 
 
 # set 'fastmode' to True to switch to wireframe mode
-env = Environment('../projects/ACT-R-Robotics/my_house.blend')
+env = Environment('../projects/ACTR_3D/my_house.blend')
 
 env.set_camera_location([10.0, -10.0, 10.0])
 env.set_camera_rotation([1.05, 0, 0.78])

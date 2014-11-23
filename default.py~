@@ -153,7 +153,7 @@ robot.add_default_interface('socket')
 
 
 # set 'fastmode' to True to switch to wireframe mode
-env = Environment('../projects/ACT_v1/my_house.blend')
+env = Environment('../projects/ACT-R-Robotics/my_house.blend')
 
 env.set_camera_location([10.0, -10.0, 10.0])
 env.set_camera_rotation([1.05, 0, 0.78])
