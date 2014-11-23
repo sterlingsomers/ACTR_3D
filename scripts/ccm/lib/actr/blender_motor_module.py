@@ -8,8 +8,7 @@ import re
 
 from ccm.morserobots import middleware
 
-torso = simu.robot.armature
-robo = simu.robot
+
 
 class BlenderMotorModule(ccm.Model):
     def __init__(self,buffer1,delay=0.0,log=None,delay_sd=None):

@@ -119,7 +119,7 @@ GeometricCamerav1.properties(cam_focal=18)
 GeometricCamerav1.rotate(math.radians(00),0,0)
 robot.append(GeometricCamerav1)
 #geometric1.add_stream('socket')
-
+GeometricCamerav1.add_service('socket')
 #Face the wall
 robot.rotate(z=math.radians(90))
 

@@ -13,24 +13,32 @@ class morse_middleware():
         self.mustTick = False
         self.request_dict = {'scan_image':True}
             
-        self.action_dict = {'scan_image':['robot_simulation.robot.GeometricCamerav1.scan_image',[]],}
+        self.action_dict = {'scan_image':['self.robot_simulation.robot.GeometricCamerav1.scan_image',[]],}
         #{function_name:['absolute path to function', ['args', 'list']]}
 
-        self.cue = []
+        self.now_queue = []
+        self.later_queue = []
         
 
     def request_data(self, datastr):
         '''Passive data, no cue required.'''
         pass
 
-    def request_action(self, datastr, argslist):
+    def request(self, datastr, argslist):
         '''Action request. Most actions require a tick. Parallel actions will occur in random order, in following cycles.'''
         if not type(argslist) == list:
             raise Exception("argslist parameter must be a list")
+        if not all(isinstance(x,str) for x in argslist):
+            raise Exception("All arguments have to be strings")
         if datastr in self.request_dict:
             if self.request_dict[datastr]:
-                pass
                 #That's the indication that it can be run now.
+                
+                rStr = self.action_dict[datastr][0] + '(' + ','.join(argslist) + ')'
+                result = eval(rStr)
+                return result.result()
+                #exec('return self.' + datastr + '(' + ','.join(argslist) + ')')
+                #return result
             else:
                 pass#can't be run now, something already has, putting in cue. (timing will be off)
         else:
@@ -41,12 +49,23 @@ class morse_middleware():
             
         pass
 
+    def scan_image(self):
+        '''This will scan the image from the camera. There is not cycle cost.'''
+        print('Scan image called... obviously')
+        camera = self.robot_simulation.robot.GeometricCamerav1
+        return camera.scan_image().result()
+
     def tick(self):
         print("Middleware Tick")
+        for item in self.now_queue:
+            toCall, argument = item
+            exec('self.' + toCall + '(' + argument + ')')
+
         pass
         
 
-middleware = morse_middleware()               
+middleware = morse_middleware()
+middleware.tick()               
 
 #connection = robot_simulation
 

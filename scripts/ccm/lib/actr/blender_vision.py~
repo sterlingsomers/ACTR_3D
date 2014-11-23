@@ -15,9 +15,9 @@ import re
 
 #vision_cam = ccm.middle.robot.GeometricCamerav1
 #from test2 import simu
+
 from ccm.morserobots import middleware
-vision_cam = connection.robot.GeometricCamerav1
-#vision_cam = test.x.robot.GeometricCamerav1
+
 
 
 
@@ -38,7 +38,7 @@ class BlenderVision(ccm.Model):
         #print(ccm.middle)
         import time
         now = time.time()
-        self._objects = vision_cam.scan_image().result()
+        self._objects = middleware.request('scan_image')
         print("Time:")
         print(time.time() - now)
         print(self._objects)
