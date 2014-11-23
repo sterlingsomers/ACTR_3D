@@ -110,7 +110,7 @@ armature.add_service('socket')
 
 
 #Geometric camera
-GeometricCamerav1 = SemanticCamera()
+GeometricCamerav1 = GeometricCamera()
 
 GeometricCamerav1.translate(x=0.11,y=-0.0,z=0.52)
 GeometricCamerav1.properties(Object=False)

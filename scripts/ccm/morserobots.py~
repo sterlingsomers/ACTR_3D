@@ -36,7 +36,7 @@ class morse_middleware():
                 
                 rStr = self.action_dict[datastr][0] + '(' + ','.join(argslist) + ')'
                 result = eval(rStr)
-                return result
+                return result.result()
                 #exec('return self.' + datastr + '(' + ','.join(argslist) + ')')
                 #return result
             else:
