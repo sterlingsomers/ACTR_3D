@@ -27,7 +27,10 @@ class Manny(morse.core.robot.Robot):
 
         # Do here robot specific initializations
         logger.info('Component initialized')
-    
+
+
+
+    @interruptible 
     @async_service
     def set_speed(self, xValue):
         self._speed = xValue

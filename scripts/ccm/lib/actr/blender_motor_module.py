@@ -33,6 +33,9 @@ class BlenderMotorModule(ccm.Model):
         '''Move forward @speed in m/s'''
         middleware.request('set_speed',[speed])
 
+    def async_test2(self,value):
+        middleware.request('async_test2',[value])
+
     def move_forward(self,distance=0.01):
         '''Move forward by some distance'''
         x = robo.move(distance).result()

@@ -12,10 +12,12 @@ class morse_middleware():
         self.robot_simulation = robot_simulation
         self.mustTick = False
         self.request_dict = {'scan_image':True,
-				'set_speed':True}
+				'set_speed':True,
+                'async_test2':True}
             
         self.action_dict = {'scan_image':['self.robot_simulation.robot.GeometricCamerav1.scan_image',[]],
-				'set_speed':['self.robot_simulation.robot.set_speed']}
+				'set_speed':['self.robot_simulation.robot.set_speed'],
+                'async_test2':['self.robot_simulation.robot.armature.async_test2']}
         #{function_name:['absolute path to function', ['args', 'list']]}
 #    def set_speed(self,speed=0.01):
 #        '''Move forward @speed in m/s'''
@@ -65,7 +67,7 @@ class morse_middleware():
         
 
 middleware = morse_middleware()
-middleware.tick()               
+#middleware.tick()               
 
 #connection = robot_simulation
 

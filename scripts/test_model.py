@@ -52,12 +52,14 @@ class MyModel(ACTR):
         goal.set('action:four')
 
     def four(goal='action:four'):
+        motor_module.async_test2('2')        
         motor_module.set_speed('0.01')
+        print('motor set, doing vision')
         vision_module.scan()
-	#motor_module.set_speed(0.01)
-	#vision_module.scan()
-        
-        vision_module.scan()
+        print('vision sent')
+        #vision_module.scan()
+
+
         #print(x)
         #print(self.geo.scan_image())
         #print(self.geo.get_some_data())
@@ -94,7 +96,8 @@ model.run(0)
 model.keepAlive = True
 print("Pre-run")
 
-
+#initial sync
+middleware.tick(sync=True)
 
 while model.keepAlive:
 
@@ -104,7 +107,7 @@ while model.keepAlive:
     print("TICK...................")
     #time.sleep(2)
     #pdb.set_trace()
-    middleware.tick(sync=False)
+    middleware.tick(sync=True)
     #print ("TIMEajfalfa;", test2.simu.time().result())
 
     #print (test.x.time())
@@ -117,8 +120,8 @@ while model.keepAlive:
             
         #print(simulation.time())
 
-	
-    
+print("post run")
+  
    
 #model.run(2)
 #print ("post run")
