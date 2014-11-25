@@ -3,6 +3,7 @@ import morse.core.robot
 from morse.helpers.components import add_data, add_property
 
 from morse.core.services import service, async_service, interruptible
+from morse.core import status
 class Manny(morse.core.robot.Robot):
     """ 
     Class definition for the Manny robot.
@@ -27,7 +28,7 @@ class Manny(morse.core.robot.Robot):
         # Do here robot specific initializations
         logger.info('Component initialized')
     
-    @service
+    @async_service
     def set_speed(self, xValue):
         self._speed = xValue
         return 
@@ -49,6 +50,8 @@ class Manny(morse.core.robot.Robot):
         vx = self._speed
         
         self.apply_speed('Position', [vx,vy,vz], [rx,ry,rz /2.0])
+        self.completed(status.SUCCESS, "Moving Forward")
+        
         
         # This is usually not used (responsibility of the actuators
         # and sensors). But you can add here robot-level actions.

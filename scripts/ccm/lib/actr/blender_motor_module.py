@@ -31,7 +31,7 @@ class BlenderMotorModule(ccm.Model):
 
     def set_speed(self,speed=0.01):
         '''Move forward @speed in m/s'''
-        x = robo.set_speed(speed).result()
+        middleware.request('set_speed',[speed])
 
     def move_forward(self,distance=0.01):
         '''Move forward by some distance'''

@@ -11,11 +11,15 @@ class morse_middleware():
         
         self.robot_simulation = robot_simulation
         self.mustTick = False
-        self.request_dict = {'scan_image':True}
+        self.request_dict = {'scan_image':True,
+				'set_speed':True}
             
-        self.action_dict = {'scan_image':['self.robot_simulation.robot.GeometricCamerav1.scan_image',[]],}
+        self.action_dict = {'scan_image':['self.robot_simulation.robot.GeometricCamerav1.scan_image',[]],
+				'set_speed':['self.robot_simulation.robot.set_speed']}
         #{function_name:['absolute path to function', ['args', 'list']]}
-
+#    def set_speed(self,speed=0.01):
+#        '''Move forward @speed in m/s'''
+#        x = robo.set_speed(speed).result()
         self.now_queue = []
         self.later_queue = []
         
@@ -49,19 +53,15 @@ class morse_middleware():
             
         pass
 
-    def scan_image(self):
-        '''This will scan the image from the camera. There is not cycle cost.'''
-        print('Scan image called... obviously')
-        camera = self.robot_simulation.robot.GeometricCamerav1
-        return camera.scan_image().result()
 
-    def tick(self):
+
+    def tick(self,sync=False):
         print("Middleware Tick")
-        for item in self.now_queue:
-            toCall, argument = item
-            exec('self.' + toCall + '(' + argument + ')')
-
-        pass
+        if sync:
+            print("sync")
+            self.robot_simulation.tick()
+        else:
+            pass
         
 
 middleware = morse_middleware()
