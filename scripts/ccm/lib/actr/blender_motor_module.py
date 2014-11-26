@@ -31,10 +31,13 @@ class BlenderMotorModule(ccm.Model):
 
     def set_speed(self,speed=0.01):
         '''Move forward @speed in m/s'''
-        middleware.request('set_speed',[speed])
+        middleware.send('set_speed',[speed])
 
+    def get_time(self):
+        print (middleware.request('get_time',[]))
+    
     def async_test2(self,value):
-        middleware.request('async_test2',[value])
+        middleware.send('async_test2',[value])
 
     def move_forward(self,distance=0.01):
         '''Move forward by some distance'''

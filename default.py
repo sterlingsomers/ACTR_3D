@@ -19,7 +19,7 @@ from morse.builder import *
 #from ACT_v1.builder.sensors import SemanticCamera#Geometriccamerav1
 from morse.core.morse_time import TimeStrategies
 
-bpymorse.set_speed(1000, 1, 1)
+bpymorse.set_speed(1000, 2, 2)
 
 # Add the MORSE mascott, MORSY.
 # Out-the-box available robots are listed here:

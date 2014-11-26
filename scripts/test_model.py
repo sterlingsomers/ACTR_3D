@@ -31,8 +31,8 @@ class MyModel(ACTR):
     #Morser=MorseRunner()
         
     def greeting(goal='action:greet'):
-        import math
-        
+        #import math
+        motor_module.get_time()
         print ("Hello")
         
         #motor_module.rotate_shoulders_to(math.radians(20))
@@ -41,6 +41,18 @@ class MyModel(ACTR):
         goal.set('action:meet')
 
     def meet(goal='action:meet'):
+        print ("Scan1")
+        vision_module.scan()
+        print("scan1 complete, set_speed")
+        motor_module.set_speed('0.01')
+        print("set_speed complete, sync_test2")
+        motor_module.async_test2('1')
+        #print("time?")
+        #motor_module.get_time()
+        #print("time complete, scan2")
+        vision_module.scan()
+        print("scan2 complete")
+        #motor_module.get_time()
         #print(self.geo.use_keys_for_stuff())
         #vision_module.refresh()
         #vision_module.get_visible_angles('RightWall')
@@ -48,15 +60,17 @@ class MyModel(ACTR):
         goal.set('action:three')
 
     def three(goal='action:three'):
+        motor_module.get_time()
         #vision_module.request('obj0:RightWall distance:?')
         goal.set('action:four')
 
     def four(goal='action:four'):
-        motor_module.async_test2('2')        
-        motor_module.set_speed('0.01')
-        print('motor set, doing vision')
-        vision_module.scan()
-        print('vision sent')
+        motor_module.get_time()
+        #motor_module.async_test2('2')        
+        #motor_module.set_speed('0.01')
+        #print('motor set, doing vision')
+        #vision_module.scan()
+        #print('vision sent')
         #vision_module.scan()
 
 
@@ -71,6 +85,7 @@ class MyModel(ACTR):
         goal.set('action:five')
 
     def five(goal='action:five'):
+        motor_module.get_time()
         #motor_module.rotate_shoulder(0.1)
         #x = vision_module.scan()
         #y = vision_module.scan()
@@ -96,8 +111,12 @@ model.run(0)
 model.keepAlive = True
 print("Pre-run")
 
+middleware.set_mode('best_effort',10)
+#best effort will try to clear the stack
+#will tick 10 times for every tick. the defaul py must be set right.
+
 #initial sync
-middleware.tick(sync=True)
+middleware.tick()
 
 while model.keepAlive:
 
