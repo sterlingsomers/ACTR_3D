@@ -11,7 +11,8 @@ class GeometricCamera(VideoCamera):
     
     def __init__(self, name=None):
         VideoCamera.__init__(self,name)
-        self.properties(cam_width=512,cam_height=512, Vertical_Flip=True)
+
+        self.properties(Vertical_Flip=True)#cam_width=512,cam_height=512, Vertical_Flip=False)
         self.properties(classpath="ACTR_3D.sensors.GeometricCamera.GeometricCamera")
   
 

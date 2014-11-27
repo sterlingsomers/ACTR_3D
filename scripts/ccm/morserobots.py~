@@ -40,7 +40,7 @@ class morse_middleware():
         if datastr in self.send_dict:
             if not self.mustTick:
             #Can run it now, but must block future
-                if self.send_dict[datastr]:
+                if not self.send_dict[datastr]:
                     #It is non-blocking
                     rStr = self.action_dict[datastr][0] + '(' + ','.join(argslist) + ')'
                     eval(rStr)
@@ -52,6 +52,7 @@ class morse_middleware():
                     #no return, it's a command being sent. Assume it worked.
             else:
                 if self.mode == 'best_effort':
+                    print("!!!!!! Adding", datastr, "to QUEUE")
                     self.send_queue.append([datastr,argslist])
                 else:
                     raise Exception(datastr + " dropped. Use best_effort mode to use multiple blocking sends.")
@@ -71,8 +72,8 @@ class morse_middleware():
             raise Exception("argslist parameter must be a list")
         if not all(isinstance(x,str) for x in argslist):
             raise Exception("All arguments have to be strings")
-        #if self.mustTick:#blocking command send/request has been made already
-        #    raise Exception("A blocking even has already occured.")
+        if self.mustTick:#blocking command send/request has been made already
+            raise Exception("A blocking even has already occured.")
 
         if datastr in self.request_dict:
             if self.request_dict[datastr]:#is it blocking?
@@ -108,10 +109,12 @@ class morse_middleware():
         if self.mode == 'best_effort':
             self.mustTick = False
             for rate in range(self.rate):
+                print("Middleware Tick!")
                 self.robot_simulation.tick()
                 if self.send_queue:
                     snd = self.send_queue.pop(0)
-                    rStr = self.action_dict[snd][0] + '(' + ','.join(snd[1]) + ')'
+                    print(self.action_dict[snd[0]], "!@#$!@#$", snd[1])
+                    rStr = self.action_dict[snd[0]][0]  +'(' + ','.join(snd[1]) + ')'
                     eval(rStr)
                 
             if self.send_queue:

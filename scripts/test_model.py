@@ -49,9 +49,11 @@ class MyModel(ACTR):
         motor_module.async_test2('1')
         #print("time?")
         #motor_module.get_time()
-        #print("time complete, scan2")
+        print("time complete, scan2")
         vision_module.scan()
-        print("scan2 complete")
+        #print("scan2 complete")
+        
+
         #motor_module.get_time()
         #print(self.geo.use_keys_for_stuff())
         #vision_module.refresh()
@@ -111,7 +113,7 @@ model.run(0)
 model.keepAlive = True
 print("Pre-run")
 
-middleware.set_mode('best_effort',10)
+middleware.set_mode('best_effort',2)
 #best effort will try to clear the stack
 #will tick 10 times for every tick. the defaul py must be set right.
 

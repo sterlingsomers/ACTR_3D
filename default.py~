@@ -19,7 +19,7 @@ from morse.builder import *
 #from ACT_v1.builder.sensors import SemanticCamera#Geometriccamerav1
 from morse.core.morse_time import TimeStrategies
 
-bpymorse.set_speed(1000, 100, 100)
+bpymorse.set_speed(1000, 5, 5)
 
 # Add the MORSE mascott, MORSY.
 # Out-the-box available robots are listed here:
@@ -116,7 +116,8 @@ GeometricCamerav1.translate(x=0.11,y=-0.0,z=0.52)
 GeometricCamerav1.properties(Object=False)
 GeometricCamerav1.properties(cam_width=2048,cam_height=2048)
 GeometricCamerav1.properties(cam_focal=18)
-GeometricCamerav1.rotate(math.radians(00),0,0)
+
+GeometricCamerav1.rotate(math.radians(180),math.radians(180),math.radians(00))
 robot.append(GeometricCamerav1)
 #geometric1.add_stream('socket')
 GeometricCamerav1.add_service('socket')
