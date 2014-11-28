@@ -37,10 +37,10 @@ class Manny(morse.core.robot.Robot):
         return 
         
     @service
-    def move(self, amount):
+    def move_forward(self, amount):
         parent = self.bge_object
         parent.applyMovement([amount,0,0],True)
-        return
+        return amount
         
     def default_action(self):
         """ Main loop of the robot

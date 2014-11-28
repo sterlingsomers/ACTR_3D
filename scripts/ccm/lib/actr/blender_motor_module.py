@@ -41,6 +41,10 @@ class BlenderMotorModule(ccm.Model):
 
     def move_forward(self,distance=0.01):
         '''Move forward by some distance'''
-        x = robo.move(distance).result()
+        middleware.send('move_forward',[distance])
+
+    def set_rotation(self,bone,axis,radians):
+        '''Rotate bone on axis by radians'''
+        middleware.send('set_rotation',[repr(bone),axis,radians])
         
 

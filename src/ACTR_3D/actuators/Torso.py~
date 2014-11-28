@@ -175,7 +175,7 @@ class Torso(morse.core.actuator.Actuator):
 
     #@interruptible
     @async_service
-    def async_test(self,value):
+    def async_test2(self,value):
         self._target_count2 = value
     
     

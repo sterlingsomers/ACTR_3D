@@ -27,17 +27,20 @@ class Manny(morse.core.robot.Robot):
 
         # Do here robot specific initializations
         logger.info('Component initialized')
-    @interruptable 
+
+
+
+    @interruptible 
     @async_service
     def set_speed(self, xValue):
         self._speed = xValue
         return 
         
     @service
-    def move(self, amount):
+    def move_forward(self, amount):
         parent = self.bge_object
         parent.applyMovement([amount,0,0],True)
-        return
+        return 2
         
     def default_action(self):
         """ Main loop of the robot

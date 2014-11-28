@@ -99,7 +99,7 @@ class Torso(morse.core.actuator.Actuator):
         tmp = channel.joint_rotation
         tmp[axis] = radians
         channel.joint_rotation = tmp 
-        return   
+        return radians   
 
 
     @service
