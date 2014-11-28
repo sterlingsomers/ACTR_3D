@@ -42,7 +42,7 @@ class BlenderVision(ccm.Model):
         print("Time:")
         print(time.time() - now)
         print(self._objects)
-        yield 1.3
+        #yield 1.3
 
     def refresh(self):
         print ("refresh")

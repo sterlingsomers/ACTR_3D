@@ -1,5 +1,5 @@
 from .morseconnection import *
-
+import time
 
 
 class morse_middleware():
@@ -34,6 +34,7 @@ class morse_middleware():
         self.request_queue = []
         
     def send(self, datastr, argslist):
+        print("Trying to send", datastr)
         if not type(argslist) == list:
             raise Exception("arglist parameter must be a list")
         if not all(isinstance(x,str) for x in argslist):
@@ -92,6 +93,9 @@ class morse_middleware():
         
         
     def request(self, datastr, argslist):
+       
+        print("Trying to request", datastr)
+        result = None
         if not type(argslist) == list:
             raise Exception("argslist parameter must be a list")
         if not all(isinstance(x,str) for x in argslist):
@@ -101,10 +105,14 @@ class morse_middleware():
         if self.mustTick:
             raise Exception("Blocking request already made.")#make something more informative        
         self.mustTick = True
+        print("Sending...")
         rStr = self.action_dict[datastr][0] + self.action_dict[datastr][1] + '(' + ','.join(argslist) + ').result()'
         result = eval(rStr)
+        print("Recieved")
         #if 'return' in dir(result):
         #    result = result.result()
+        while result == None:
+           time.sleep(0.0001)
         return result
 
 
@@ -156,6 +164,7 @@ class morse_middleware():
                 print("Middleware tick!")
                 self.robot_simulation.tick()
                 if self.send_queue:
+                    print("Popping send queue")
                     snd = self.send_queue.pop(0)
                     self.send(snd[0],snd[1])
             if self.send_queue:

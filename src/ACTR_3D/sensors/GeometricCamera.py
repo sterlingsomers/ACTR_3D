@@ -254,6 +254,7 @@ class GeometricCamera(morse.sensors.camera.Camera):
 
             y+=grain
             rowY+=1#a counter for the objects[hit][rowY]
+        print(repr(time.time() - beginning) +  " TIME ASDFADFAD")    
         return objects
                                
 

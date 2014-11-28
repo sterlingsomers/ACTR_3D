@@ -41,7 +41,7 @@ class BlenderVision(ccm.Model):
         self._objects = middleware.request('scan_image',[])
         print("Time:")
         print(time.time() - now)
-        print(self._objects)
+        print(self._objects, "objects")
         #yield 1.3
 
     def refresh(self):
