@@ -105,8 +105,10 @@ class morse_middleware():
         if self.mustTick:
             raise Exception("Blocking request already made.")#make something more informative        
         self.mustTick = True
+        print("Sending...")
         rStr = self.action_dict[datastr][0] + self.action_dict[datastr][1] + '(' + ','.join(argslist) + ').result()'
         result = eval(rStr)
+        print("Recieved")
         #if 'return' in dir(result):
         #    result = result.result()
         while result == None:
@@ -154,7 +156,7 @@ class morse_middleware():
         self.rate = rate
 
     def tick(self,sync=False):
-        import time
+        #import time
         if self.mode == 'best_effort':
             self.mustTick = False
             self.modules_in_use = {}
