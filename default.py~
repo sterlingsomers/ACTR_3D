@@ -19,7 +19,7 @@ from morse.builder import *
 #from ACT_v1.builder.sensors import SemanticCamera#Geometriccamerav1
 from morse.core.morse_time import TimeStrategies
 
-bpymorse.set_speed(10, 5, 5)
+bpymorse.set_speed(10, 1, 1)
 
 # Add the MORSE mascott, MORSY.
 # Out-the-box available robots are listed here:
@@ -38,7 +38,7 @@ robot = Manny()
 
 # The list of the main methods to manipulate your components
 # is here: http://www.openrobots.org/morse/doc/stable/user/builder_overview.html
-robot.translate(-1.0, 0.0, 0.0)
+robot.translate(5.0, 0.0, 0.0)
 
 
 armature = Armature(model_name='ACTR_3D/actuators/Torso.blend', armature_name='Armature')
@@ -115,14 +115,14 @@ GeometricCamerav1 = GeometricCamera()
 GeometricCamerav1.translate(x=0.13,y=-0.0,z=0.52)
 GeometricCamerav1.properties(Object=False)
 GeometricCamerav1.properties(cam_width=2048,cam_height=2048)
-GeometricCamerav1.properties(cam_focal=18)
+GeometricCamerav1.properties(cam_focal=4)
 
 GeometricCamerav1.rotate(math.radians(180),math.radians(180),math.radians(00))
 robot.append(GeometricCamerav1)
 #geometric1.add_stream('socket')
 GeometricCamerav1.add_service('socket')
 #Face the wall
-robot.rotate(z=math.radians(90))
+robot.rotate(z=math.radians(180))
 
 motion = MotionVW()
 robot.append(motion)
@@ -155,10 +155,10 @@ robot.add_default_interface('socket')
 
 
 # set 'fastmode' to True to switch to wireframe mode
-env = Environment('../projects/ACTR_3D/my_house.blend')
-
-env.set_camera_location([10.0, -10.0, 10.0])
-env.set_camera_rotation([1.05, 0, 0.78])
+env = Environment('../projects/ACTR_3D/room2.blend')
+import math
+env.set_camera_location([15.0, 0, 10.0])
+env.set_camera_rotation([math.radians(50), 0, math.radians(90)])
 env.select_display_camera(GeometricCamerav1)
 #pdb.set_trace()
 env.set_time_strategy(TimeStrategies.FixedSimulationStepExternalTrigger)

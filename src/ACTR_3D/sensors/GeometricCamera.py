@@ -136,8 +136,25 @@ class GeometricCamera(morse.sensors.camera.Camera):
         return None
 
     @service
+    def getScreenVector(self,x,y):
+        normal = numpy.array(self.blender_cam.getScreenVect(0.5,0.5))
+        dif = numpy.array(self.blender_cam.getScreenVect(x,y))
+        dot = numpy.dot(normal,dif)
+        x_modulus = numpy.sqrt((normal*normal).sum())
+        y_modulus = numpy.sqrt((dif*dif).sum())
+        cos_angle = dot / x_modulus / y_modulus
+        angle = numpy.arccos(cos_angle)
+        return math.degrees(angle)        
+        #cosang = numpy.dot(normal,dif)
+        #sinang = numpy.linalg.norm(numpy.cross(normal,dif))
+        #return numpy.arctan2(sinang,cosang)
+        #return math.degrees(math.acos(numpy.dot(normal,dif)))
+            
+    @service
     def scan_image(self):
-        '''Scans carefully from the Screen'''
+        '''Scans carefully from the Screen. Any object tagged to be skipped, is skipped.
+            args:
+                    ignoreTage: list of tags to ignore'''
         beginning = time.time()
         objects = {} #{objlable:[inside_angle,outside_angle,highest,lowest]}
         normal = self.blender_cam.getScreenVect(0.5,0.5)
@@ -165,6 +182,10 @@ class GeometricCamera(morse.sensors.camera.Camera):
                 #    input("continue?")
                 stepBack=BigGrain
                 hit = self.blender_cam.getScreenRay(x,y,100)#distance of 100#I assume meters.
+                #print(ignoreTags)                
+                #if repr(hit) == 'None':
+                #    x += BigGrain
+                #    continue
                 #FDOprint("Hit is", hit)
                 if lastHit == -1:
                     stepBack=0.0

@@ -21,7 +21,8 @@ class VisionMethods(ccm.ProductionSystem):
         fake_buffer.set('fake')
 
     def repeat(fake_buffer='fake'):
-        self.parent.vision_module.scan()    
+        #self.parent.vision_module.scan("['None']")
+        self.parent.vision_module.getScreenVector('0.4999','0.5')    
 
 
 # define the model
@@ -53,7 +54,8 @@ class MyModel(ACTR):
         
         b_plan_unit.set('planning_unit:estimate_passability')
         b_unit_task.set('unit_task:get_task')
-        b_operator.set('operator:get_task')    
+        b_operator.set('operator:get_task')
+        goal.set('stop')    
 
 
     def estimate_passability_one(b_plan_unit='planning_unit:estimate_passability', b_unit_task='unit_task:get_task'):

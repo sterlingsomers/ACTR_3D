@@ -17,12 +17,14 @@ class morse_middleware():
                         'set_rotation':False} #{function_name:blocking?}
 
         self.request_dict = {'scan_image':True,
+                'getScreenVector':True,
                 'get_time':True}
             
         self.action_dict = {'scan_image':['self.robot_simulation.robot.GeometricCamerav1', '.scan_image'],
 				'set_speed':['self.robot_simulation.robot','.set_speed'],
                 'move_forward':['self.robot_simulation.robot','.move_forward'],
-                'set_rotation':['self.robot_simulation.robot.armature','.set_rotation']}
+                'set_rotation':['self.robot_simulation.robot.armature','.set_rotation'].
+                'getScreenVector':['self.robot_simulation.robot.GeometricCamerav1', '.getScreenVector']}
 
         self.danger_list = ['get_time']
         self.modules_in_use = {}
@@ -105,7 +107,7 @@ class morse_middleware():
         if self.mustTick:
             raise Exception("Blocking request already made.")#make something more informative        
         self.mustTick = True
-        print("Sending...")
+        print("Sending...", self.action_dict[datastr][1], argslist)
         rStr = self.action_dict[datastr][0] + self.action_dict[datastr][1] + '(' + ','.join(argslist) + ').result()'
         result = eval(rStr)
         print("Recieved")
@@ -156,7 +158,7 @@ class morse_middleware():
         self.rate = rate
 
     def tick(self,sync=False):
-        #import time
+        #eimport time
         if self.mode == 'best_effort':
             self.mustTick = False
             self.modules_in_use = {}

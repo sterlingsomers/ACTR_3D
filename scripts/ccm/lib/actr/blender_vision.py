@@ -9,8 +9,8 @@ import re
 #from ccm.pattern import *
 
 #vision_cam = Morse().robot.GeometricCamerav1
-
-
+import numpy
+import math
 
 
 #vision_cam = ccm.middle.robot.GeometricCamerav1
@@ -34,6 +34,13 @@ class BlenderVision(ccm.Model):
         self.busy=False
         #self.blender_camera = Morse().robot.GeometricCamerav1
     
+    def getScreenVector(self,x,y):
+        x = middleware.request('getScreenVector',[x,y])
+        print(x)
+        #print(math.sqrt(x[0]**2 + x[1]**2 + x[2]**2))
+        #x = numpy.array(middleware.request('getScreenVector',[x,y]))
+        #print(numpy.linalg.norm(x))
+    
     def scan(self,delay=0.00):
         #print(ccm.middle)
         #import time
@@ -41,7 +48,7 @@ class BlenderVision(ccm.Model):
         self._objects = middleware.request('scan_image',[])
         #print("Time:")
         #print(time.time() - now)
-        #print(self._objects, "objects")
+        print(self._objects, "objects")
         #yield 1.3
 
     def refresh(self):
