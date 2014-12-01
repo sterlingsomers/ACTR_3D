@@ -38,7 +38,7 @@ robot = Manny()
 
 # The list of the main methods to manipulate your components
 # is here: http://www.openrobots.org/morse/doc/stable/user/builder_overview.html
-robot.translate(5.0, 0.0, 0.0)
+robot.translate(5.131, 0.0, 0.0)
 
 
 armature = Armature(model_name='ACTR_3D/actuators/Torso.blend', armature_name='Armature')

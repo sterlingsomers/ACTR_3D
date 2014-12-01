@@ -136,12 +136,17 @@ class GeometricCamera(morse.sensors.camera.Camera):
         return None
 
     @service
+    def cScan(self):
+        '''Scan's from the centre, organizing based on distances'''
+        pass
+
+    @service
     def getScreenVector(self,x,y):
         normal = numpy.array(self.blender_cam.getScreenVect(0.5,0.5))
         dif = numpy.array(self.blender_cam.getScreenVect(x,y))
         dot = numpy.dot(normal,dif)
-        x_modulus = numpy.sqrt((x*x).sum())
-        y_modulus = numpy.sqrt((y*y).sum())
+        x_modulus = numpy.sqrt((normal*normal).sum())
+        y_modulus = numpy.sqrt((dif*dif).sum())
         cos_angle = dot / x_modulus / y_modulus
         angle = numpy.arccos(cos_angle)
         return math.degrees(angle)        

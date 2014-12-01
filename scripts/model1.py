@@ -21,8 +21,9 @@ class VisionMethods(ccm.ProductionSystem):
         fake_buffer.set('fake')
 
     def repeat(fake_buffer='fake'):
-        #self.parent.vision_module.scan("['None']")
-        self.parent.vision_module.getScreenVector('0.4999','0.5')    
+        #self.parent.vision_module.scan()
+        #self.parent.vision_module.getScreenVector('0.4999','0.5')    
+        self.parent.vision_module.cScan()
 
 
 # define the model

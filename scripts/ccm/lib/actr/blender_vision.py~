@@ -36,9 +36,14 @@ class BlenderVision(ccm.Model):
     
     def getScreenVector(self,x,y):
         x = middleware.request('getScreenVector',[x,y])
-        print(math.sqrt(x[0]**2 + x[1]**2 + x[2]**2))
+        print(x)
+        #print(math.sqrt(x[0]**2 + x[1]**2 + x[2]**2))
         #x = numpy.array(middleware.request('getScreenVector',[x,y]))
         #print(numpy.linalg.norm(x))
+    
+    def cScan(self):
+        x  = middleware.requset('cScan', [])
+        print(x)
     
     def scan(self,delay=0.00):
         #print(ccm.middle)

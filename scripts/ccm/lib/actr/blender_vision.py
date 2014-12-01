@@ -41,6 +41,10 @@ class BlenderVision(ccm.Model):
         #x = numpy.array(middleware.request('getScreenVector',[x,y]))
         #print(numpy.linalg.norm(x))
     
+    def cScan(self):
+        x  = middleware.request('cScan', [])
+        print(x)
+    
     def scan(self,delay=0.00):
         #print(ccm.middle)
         #import time
