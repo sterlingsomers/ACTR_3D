@@ -112,7 +112,7 @@ class morse_middleware():
         print("Sending...", self.action_dict[datastr][1], argslist)
         rStr = self.action_dict[datastr][0] + self.action_dict[datastr][1] + '(' + ','.join(argslist) + ').result()'
         result = eval(rStr)
-        print("Recieved")
+        print("Recieved", result)
         #if 'return' in dir(result):
         #    result = result.result()
         while result == None:

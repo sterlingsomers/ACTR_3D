@@ -133,12 +133,96 @@ class GeometricCamera(morse.sensors.camera.Camera):
             if hit:
                 return minD
             minD+=grainSize#1cm?
-        return None
+        return maxD
 
     @service
-    def cScan(self):
+    def yScan(self,openingDepth,y):
+        import time
+        now = time.time()       
+        
+        xPartsBig = 250
+        maxD = 35.0
+        x2s = []
+        Edge1 = None
+        Edge2 = None
+        
+        switch = 0
+        for x in range(0,100): #250,always test 1, then the neighbour
+            switch = not switch
+            d3d4 = [None,None]
+            d1 = self.distance_to_xy(x/100.0,y,0.10,maxD,grainSize=0.15)
+            d2 = self.distance_to_xy((x+1)/100.0,y,0.10,maxD,grainSize=0.15)
+            print ("at first if",x,y, x/100.0,(x+1)/100.0, d1, d2, abs(d1-d2))
+            if abs(d1-d2) > 1.00: #Just chose a threshold that might work, (1m)... actually does the openingDepth make sense?
+                #then it's probably a different object, at a different distance
+                print("at second if", self.blender_cam.getScreenRay(x/100.,y,maxD), self.blender_cam.getScreenRay((x+1)/100.,y,35))
+                if self.blender_cam.getScreenRay(x/100.,y,maxD) != self.blender_cam.getScreenRay((x+1)/100.,y,maxD):
+                    #Are they different blender objects? Then:
+                    #even more likely
+                    #fine search starting at x
+                    print("x2 loop")
+#WHY DID I * 10? x2*10 or (x2+1) * 10
+                    for x2 in range(x-1,100000):
+                        print("in x2 loop")
+                        #if (x2*10)/1000. > 1.0:
+                        if (x2*5)/500. > 1.0:    
+                            break
+                        d3d4[0] = self.distance_to_xy((x2*5)/500.,y,d1-5,maxD,0.01)
+                        d3d4[1] = self.distance_to_xy(((x2*5)+1)/500.,y,d1-5,maxD,0.01)
+                        
+                        print("x2 if", x2,(x2*5)/500.,((x2*5)+1)/500,d3d4[0],d3d4[1],abs(d3d4[0]-d3d4[1]))
+                        if abs(d3d4[0]-d3d4[1]) > openingDepth:
+                            x2s.append([(x2*5)/500.0,y,d3d4[switch]])
+                            break
+        print(time.time() - now)
+        print("x2s",x2s)        
+        return x2s
+
+
+
+
+    @service
+    def cScan(self,openingDepth):
         '''Scan's from the centre, organizing based on distances'''
-        pass
+        #hit = self.blender_cam.getScreenRay(0.5,0.5,100)
+        #normals = set()
+        #for nVerts in range(hit.meshes[0].getVertexArrayLength(0)):
+        #    normals.add(repr(hit.meshes[0].getVertex(0,nVerts).normal))
+        #    
+        #return repr(normals)
+        #return self.distance_to_xy(0.5,0.5,0.10,50)
+        #using the normals won't work because all cubes are going to have the same set of normals.
+        #I will have to assume that different 
+        #import time
+        #now = time.time()
+        #distances = []
+        #for i in range(0,500): #250, always test 1, then neighbour
+        #    distances.append(self.distance_to_xy(i/500.,0.52,0.05,35.0,grainSize=0.20))#purpose large grainsize 
+        #        
+        #print('cscan', time.time() - now)
+        #
+        #return repr(distances)
+        spots = []
+        for y in range(1):
+            print("y",y/20)
+            spots.append(self.yScan(openingDepth,0.5))
+        print(spots)
+        for x in spots:
+            if x:
+                v1 = numpy.array(self.blender_cam.getScreenVect(x[0][0],x[0][1]))
+                v2 = numpy.array(self.blender_cam.getScreenVect(x[1][0],x[1][1]))
+                dot = numpy.dot(v1,v2)
+                v1_modulus = numpy.sqrt((v1*v1).sum())
+                v2_modulus = numpy.sqrt((v2*v2).sum())
+                cos_angle = dot / v1_modulus / v2_modulus
+                angle = numpy.arccos(cos_angle)
+                c = x[0][2]
+                b = x[1][2]
+                a = numpy.sqrt((-2*b*c*numpy.cos(angle)) + b**2 + c**2)
+                print(a)
+                
+                    
+                    
 
     @service
     def getScreenVector(self,x,y):

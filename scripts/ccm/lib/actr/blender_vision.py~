@@ -42,7 +42,7 @@ class BlenderVision(ccm.Model):
         #print(numpy.linalg.norm(x))
     
     def cScan(self):
-        x  = middleware.requset('cScan', [])
+        x  = middleware.request('cScan', [])
         print(x)
     
     def scan(self,delay=0.00):
