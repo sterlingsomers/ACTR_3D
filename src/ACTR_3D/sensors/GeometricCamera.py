@@ -128,6 +128,7 @@ class GeometricCamera(morse.sensors.camera.Camera):
     def distance_to_xy(self,x,y,minD,maxD,grainSize=0.01):
         '''The x,y (screen) should be current.  
         This finds the distance to an object, given x,y coordinate. None if empty space'''
+        #print("x",x,"y",y,"minD",minD,"maxD",maxD,"grainSize",grainSize)
         while minD <= maxD:
             hit = self.blender_cam.getScreenRay(x,y,minD)
             if hit:
@@ -137,8 +138,8 @@ class GeometricCamera(morse.sensors.camera.Camera):
 
     @service
     def yScan(self,openingDepth,y):
-        import time
-        now = time.time()       
+        #import time
+        #now = time.time()       
         
         xPartsBig = 250
         maxD = 35.0
@@ -152,30 +153,40 @@ class GeometricCamera(morse.sensors.camera.Camera):
             d3d4 = [None,None]
             d1 = self.distance_to_xy(x/100.0,y,0.10,maxD,grainSize=0.15)
             d2 = self.distance_to_xy((x+1)/100.0,y,0.10,maxD,grainSize=0.15)
-            print ("at first if",x,y, x/100.0,(x+1)/100.0, d1, d2, abs(d1-d2))
+            #print ("at first if",x,y, x/100.0,(x+1)/100.0, d1, d2, abs(d1-d2))
             if abs(d1-d2) > 1.00: #Just chose a threshold that might work, (1m)... actually does the openingDepth make sense?
                 #then it's probably a different object, at a different distance
-                print("at second if", self.blender_cam.getScreenRay(x/100.,y,maxD), self.blender_cam.getScreenRay((x+1)/100.,y,35))
+                #print("at second if", self.blender_cam.getScreenRay(x/100.,y,maxD), self.blender_cam.getScreenRay((x+1)/100.,y,35))
                 if self.blender_cam.getScreenRay(x/100.,y,maxD) != self.blender_cam.getScreenRay((x+1)/100.,y,maxD):
                     #Are they different blender objects? Then:
                     #even more likely
                     #fine search starting at x
-                    print("x2 loop")
+                    #print("x2 loop")
 #WHY DID I * 10? x2*10 or (x2+1) * 10
-                    for x2 in range(x-1,100000):
-                        print("in x2 loop")
-                        #if (x2*10)/1000. > 1.0:
-                        if (x2*5)/500. > 1.0:    
-                            break
-                        d3d4[0] = self.distance_to_xy((x2*5)/500.,y,d1-5,maxD,0.01)
-                        d3d4[1] = self.distance_to_xy(((x2*5)+1)/500.,y,d1-5,maxD,0.01)
-                        
-                        print("x2 if", x2,(x2*5)/500.,((x2*5)+1)/500,d3d4[0],d3d4[1],abs(d3d4[0]-d3d4[1]))
+                    x2 = x# - 1
+                    for bit in range(1000):
+                        addend = [(x2/100.)+(bit/1000.),(x2/100.)+(bit/1000.)+(1/1000.)]
+                        d3d4[0] = self.distance_to_xy(addend[0],y,0.1,maxD,0.01)
+                        d3d4[1] = self.distance_to_xy(addend[1],y,0.1,maxD,0.01)
+                        #print("X2", (x2/100.)+(bit/1000.), (x2/100.)+(bit/1000.)+(1/1000.),d3d4[0],d3d4[1],abs(d3d4[0]-d3d4[1]))
                         if abs(d3d4[0]-d3d4[1]) > openingDepth:
-                            x2s.append([(x2*5)/500.0,y,d3d4[switch]])
+                            x2s.append([addend[switch],y,d3d4[switch]])
+                            #print ("BREAK BREAK BREAK")
                             break
-        print(time.time() - now)
-        print("x2s",x2s)        
+                        
+                        #print("in x2 loop")
+                        #if (x2*10)/1000. > 1.0:
+                        #if (x2*5)/500. > 1.0:    
+                        #    break
+                        #d3d4[0] = self.distance_to_xy((x2*5)/500.,y,d1-5,maxD,0.01)
+                        #d3d4[1] = self.distance_to_xy(((x2*5)+1)/500.,y,d1-5,maxD,0.01)
+                        #
+                        #print("x2 if", x2,(x2*5)/500.,((x2*5)+1)/500,d3d4[0],d3d4[1],abs(d3d4[0]-d3d4[1]))
+                        #if abs(d3d4[0]-d3d4[1]) > openingDepth:
+                        #    x2s.append([(x2*5)/500.0,y,d3d4[switch]])
+                        #    break
+        #print(time.time() - now)
+        #print("x2s",x2s)        
         return x2s
 
 
@@ -202,24 +213,27 @@ class GeometricCamera(morse.sensors.camera.Camera):
         #print('cscan', time.time() - now)
         #
         #return repr(distances)
+        import time
+        now = time.time()
         spots = []
-        for y in range(1):
-            print("y",y/20)
-            spots.append(self.yScan(openingDepth,0.5))
-        print(spots)
-        for x in spots:
-            if x:
-                v1 = numpy.array(self.blender_cam.getScreenVect(x[0][0],x[0][1]))
-                v2 = numpy.array(self.blender_cam.getScreenVect(x[1][0],x[1][1]))
-                dot = numpy.dot(v1,v2)
-                v1_modulus = numpy.sqrt((v1*v1).sum())
-                v2_modulus = numpy.sqrt((v2*v2).sum())
-                cos_angle = dot / v1_modulus / v2_modulus
-                angle = numpy.arccos(cos_angle)
-                c = x[0][2]
-                b = x[1][2]
-                a = numpy.sqrt((-2*b*c*numpy.cos(angle)) + b**2 + c**2)
-                print(a)
+        for y in range(30):
+            #print("y",y/20)
+            spots.append(self.yScan(openingDepth,y/30))
+        print(time.time() - now)
+        return spots
+        #for x in spots:
+        #    if x:
+        #        v1 = numpy.array(self.blender_cam.getScreenVect(x[0][0],x[0][1]))
+        #        v2 = numpy.array(self.blender_cam.getScreenVect(x[1][0],x[1][1]))
+        #        dot = numpy.dot(v1,v2)
+        #        v1_modulus = numpy.sqrt((v1*v1).sum())
+        #        v2_modulus = numpy.sqrt((v2*v2).sum())
+        #        cos_angle = dot / v1_modulus / v2_modulus
+        #        angle = numpy.arccos(cos_angle)
+        #        c = x[0][2]
+        #        b = x[1][2]
+        #        a = numpy.sqrt((-2*b*c*numpy.cos(angle)) + b**2 + c**2)
+        #        print(a)
                 
                     
                     
