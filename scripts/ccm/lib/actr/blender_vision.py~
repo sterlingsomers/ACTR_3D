@@ -41,8 +41,8 @@ class BlenderVision(ccm.Model):
         #x = numpy.array(middleware.request('getScreenVector',[x,y]))
         #print(numpy.linalg.norm(x))
     
-    def cScan(self):
-        x  = middleware.request('cScan', [])
+    def cScan(self,openingDepth):
+        x  = middleware.request('cScan', [openingDepth])
         print(x)
     
     def scan(self,delay=0.00):

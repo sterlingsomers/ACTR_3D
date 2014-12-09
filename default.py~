@@ -38,7 +38,7 @@ robot = Manny()
 
 # The list of the main methods to manipulate your components
 # is here: http://www.openrobots.org/morse/doc/stable/user/builder_overview.html
-robot.translate(5.14, 0.0, 0.0)
+robot.translate(5.131, 0.0, 0.0)
 
 
 armature = Armature(model_name='ACTR_3D/actuators/Torso.blend', armature_name='Armature')
@@ -115,7 +115,7 @@ GeometricCamerav1 = GeometricCamera()
 GeometricCamerav1.translate(x=0.13,y=-0.0,z=0.52)
 GeometricCamerav1.properties(Object=False)
 GeometricCamerav1.properties(cam_width=2048,cam_height=2048)
-GeometricCamerav1.properties(cam_focal=8)
+GeometricCamerav1.properties(cam_focal=12)
 
 GeometricCamerav1.rotate(math.radians(180),math.radians(180),math.radians(00))
 robot.append(GeometricCamerav1)

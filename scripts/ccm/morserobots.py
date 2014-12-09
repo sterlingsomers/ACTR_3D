@@ -19,14 +19,16 @@ class morse_middleware():
         self.request_dict = {'scan_image':True,
                 'getScreenVector':True,
                 'cScan':True,
-                'get_time':True}
+                'get_time':True,
+                'xScan':True}
             
         self.action_dict = {'scan_image':['self.robot_simulation.robot.GeometricCamerav1', '.scan_image'],
 				'set_speed':['self.robot_simulation.robot','.set_speed'],
                 'move_forward':['self.robot_simulation.robot','.move_forward'],
                 'set_rotation':['self.robot_simulation.robot.armature','.set_rotation'],
                 'getScreenVector':['self.robot_simulation.robot.GeometricCamerav1', '.getScreenVector'],
-                'cScan':['self.robot_simulation.robot.GeometricCamerav1', '.cScan']}
+                'cScan':['self.robot_simulation.robot.GeometricCamerav1', '.cScan'],
+                'xScan':['self.robot_simulation.robot.GeometricCamerav1', '.xScan']}
 
         self.danger_list = ['get_time']
         self.modules_in_use = {}

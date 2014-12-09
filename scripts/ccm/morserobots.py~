@@ -19,7 +19,8 @@ class morse_middleware():
         self.request_dict = {'scan_image':True,
                 'getScreenVector':True,
                 'cScan':True,
-                'get_time':True}
+                'get_time':True,
+                'xScan':True}
             
         self.action_dict = {'scan_image':['self.robot_simulation.robot.GeometricCamerav1', '.scan_image'],
 				'set_speed':['self.robot_simulation.robot','.set_speed'],
@@ -112,7 +113,7 @@ class morse_middleware():
         print("Sending...", self.action_dict[datastr][1], argslist)
         rStr = self.action_dict[datastr][0] + self.action_dict[datastr][1] + '(' + ','.join(argslist) + ').result()'
         result = eval(rStr)
-        print("Recieved")
+        print("Recieved", result)
         #if 'return' in dir(result):
         #    result = result.result()
         while result == None:

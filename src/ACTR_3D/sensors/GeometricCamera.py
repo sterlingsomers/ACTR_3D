@@ -137,10 +137,10 @@ class GeometricCamera(morse.sensors.camera.Camera):
         return maxD
 
     @service
-    def yScan(self,openingDepth,y):
+    def xScan(self,openingDepth,y):
         #import time
         #now = time.time()       
-        
+        #return self.blender_cam.lens
         xPartsBig = 250
         maxD = 35.0
         x2s = []
@@ -148,30 +148,31 @@ class GeometricCamera(morse.sensors.camera.Camera):
         Edge2 = None
         
         switch = 0
-        for x in range(0,100): #250,always test 1, then the neighbour
+        for x in range(0,50): #250,always test 1, then the neighbour
+            print ("for x", x)
             switch = not switch
             d3d4 = [None,None]
-            d1 = self.distance_to_xy(x/100.0,y,0.10,maxD,grainSize=0.15)
-            d2 = self.distance_to_xy((x+1)/100.0,y,0.10,maxD,grainSize=0.15)
-            #print ("at first if",x,y, x/100.0,(x+1)/100.0, d1, d2, abs(d1-d2))
+            d1 = self.distance_to_xy(x/50.0,y,0.10,maxD,grainSize=0.15)
+            d2 = self.distance_to_xy((x+1)/50.0,y,0.10,maxD,grainSize=0.15)
+            print ("at first if",x,y, x/100.0,(x+1)/100.0, d1, d2, abs(d1-d2))
             if abs(d1-d2) > 1.00: #Just chose a threshold that might work, (1m)... actually does the openingDepth make sense?
                 #then it's probably a different object, at a different distance
                 #print("at second if", self.blender_cam.getScreenRay(x/100.,y,maxD), self.blender_cam.getScreenRay((x+1)/100.,y,35))
-                if self.blender_cam.getScreenRay(x/100.,y,maxD) != self.blender_cam.getScreenRay((x+1)/100.,y,maxD):
+                if self.blender_cam.getScreenRay(x/50.,y,maxD) != self.blender_cam.getScreenRay((x+1)/500.,y,maxD):
                     #Are they different blender objects? Then:
                     #even more likely
                     #fine search starting at x
-                    #print("x2 loop")
+                    print("x2 loop")
 #WHY DID I * 10? x2*10 or (x2+1) * 10
-                    x2 = x# - 1
-                    for bit in range(1000):
-                        addend = [(x2/100.)+(bit/1000.),(x2/100.)+(bit/1000.)+(1/1000.)]
+                    x2 = x - 1
+                    for bit in range(500):
+                        addend = [(x2/50.)+(bit/500.),(x2/50.)+(bit/500.)+(1/500.)]
                         d3d4[0] = self.distance_to_xy(addend[0],y,0.1,maxD,0.01)
                         d3d4[1] = self.distance_to_xy(addend[1],y,0.1,maxD,0.01)
-                        #print("X2", (x2/100.)+(bit/1000.), (x2/100.)+(bit/1000.)+(1/1000.),d3d4[0],d3d4[1],abs(d3d4[0]-d3d4[1]))
+                        print("X2", (x2/100.)+(bit/1000.), (x2/100.)+(bit/1000.)+(1/1000.),d3d4[0],d3d4[1],abs(d3d4[0]-d3d4[1]))
                         if abs(d3d4[0]-d3d4[1]) > openingDepth:
                             x2s.append([addend[switch],y,d3d4[switch]])
-                            #print ("BREAK BREAK BREAK")
+                            print ("BREAK BREAK BREAK")
                             break
                         
                         #print("in x2 loop")
@@ -218,7 +219,7 @@ class GeometricCamera(morse.sensors.camera.Camera):
         spots = []
         for y in range(30):
             #print("y",y/20)
-            spots.append(self.yScan(openingDepth,y/30))
+            spots.append(self.xScan(openingDepth,y/30))
         print(time.time() - now)
         return spots
         #for x in spots:

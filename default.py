@@ -115,7 +115,7 @@ GeometricCamerav1 = GeometricCamera()
 GeometricCamerav1.translate(x=0.13,y=-0.0,z=0.52)
 GeometricCamerav1.properties(Object=False)
 GeometricCamerav1.properties(cam_width=2048,cam_height=2048)
-GeometricCamerav1.properties(cam_focal=8)
+GeometricCamerav1.properties(cam_focal=14)
 
 GeometricCamerav1.rotate(math.radians(180),math.radians(180),math.radians(00))
 robot.append(GeometricCamerav1)

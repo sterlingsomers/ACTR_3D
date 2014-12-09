@@ -44,6 +44,10 @@ class BlenderVision(ccm.Model):
     def cScan(self,openingDepth):
         x  = middleware.request('cScan', [openingDepth])
         print(x)
+
+    def xScan(self,openingDepth,y):
+        x = middleware.request('xScan', [openingDepth,y])
+        print(x)
     
     def scan(self,delay=0.00):
         #print(ccm.middle)
