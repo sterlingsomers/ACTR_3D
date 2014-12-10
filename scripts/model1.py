@@ -23,8 +23,8 @@ class VisionMethods(ccm.ProductionSystem):
     def repeat(fake_buffer='fake'):
         #self.parent.vision_module.scan()
         #self.parent.vision_module.getScreenVector('0.4999','0.5')    
-        #self.parent.vision_module.cScan('0.5')#50cm minimum depth for an opening.
-        self.parent.vision_module.xScan('0.3','0.5')
+        self.parent.vision_module.cScan('0.5')#50cm minimum depth for an opening.
+        #self.parent.vision_module.xScan('0.3','0.5')
 
 
 # define the model
