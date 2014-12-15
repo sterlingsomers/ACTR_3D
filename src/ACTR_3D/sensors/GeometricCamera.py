@@ -192,6 +192,10 @@ class GeometricCamera(morse.sensors.camera.Camera):
         return x2s
 
 
+    @service
+    def ScanBetweenY(self, openingDepth, yRange):
+        '''yRange is 2 item list'''
+        pass
 
 
     @service

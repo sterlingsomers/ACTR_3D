@@ -138,8 +138,8 @@ class GeometricCamera(morse.sensors.camera.Camera):
 
     @service
     def xScan(self,openingDepth,y):
-        import time
-        now = time.time()       
+        #import time
+        #now = time.time()       
         #return self.blender_cam.lens
         xPartsBig = 250
         maxD = 35.0
@@ -187,7 +187,7 @@ class GeometricCamera(morse.sensors.camera.Camera):
                         #if abs(d3d4[0]-d3d4[1]) > openingDepth:
                         #    x2s.append([(x2*5)/500.0,y,d3d4[switch]])
                         #    break
-        print(time.time() - now)
+        #print(time.time() - now)
         #print("x2s",x2s)        
         return x2s
 
