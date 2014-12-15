@@ -21,9 +21,11 @@ class VisionMethods(ccm.ProductionSystem):
         fake_buffer.set('fake')
 
     def repeat(fake_buffer='fake'):
+        #This could be used during movement, actively doing the task
+        pass
         #self.parent.vision_module.scan()
         #self.parent.vision_module.getScreenVector('0.4999','0.5')    
-        self.parent.vision_module.cScan('0.5')#50cm minimum depth for an opening.
+        #self.parent.vision_module.cScan('0.5')#50cm minimum depth for an opening.
         #self.parent.vision_module.xScan('0.3','0.5')
         
 
@@ -51,24 +53,28 @@ class MyModel(ACTR):
     DM=Memory(DMbuffer,latency=0.0,threshold=None)
 
     def init():
-        DM.add('planning_unit:estimate_passability unit_task:find_opening cue:none')
+        DM.add('planning_unit:estimate_passability unit_task:find_opening cue:no_task')
         
         #DM.add('planning_unit:prepare_for_Take_off unit_task:starter cue:break_on')
         
         b_plan_unit.set('planning_unit:estimate_passability')
         b_unit_task.set('unit_task:get_task')
         b_operator.set('operator:get_task')
-        goal.set('stop')    
+        b_cue.set('cue:no_task')
+        #goal.set('stop')    
 
 
-    def estimate_passability_one(b_plan_unit='planning_unit:estimate_passability', b_unit_task='unit_task:get_task'):
-        
-
+    def estimate_passability_one(b_plan_unit='planning_unit:estimate_passability', b_unit_task='unit_task:get_task', b_cue='cue:no_task'):
+        #DM.request('planning_unit:estimate_passability cue:no_task unit_task:?')
+        b_cue.set('cue:retrieving_task')
         goal.set('stop')
 
-    def meet(goal='action:meet'):
-
-        goal.set('action:three')
+    #def estimate_passability_two(b_plan_unit='planning_unit:estimate_passability',
+    #                             b_unit_task='unit_task:get_task',
+    #                             b_cue='cue:retrieving_task', DMbuffer='unit_task:?UT'):
+    #    
+    #    print(UT)
+    #    goal.set('stop')
 
     def three(goal='action:three'):
 
