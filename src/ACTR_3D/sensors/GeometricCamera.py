@@ -222,9 +222,9 @@ class GeometricCamera(morse.sensors.camera.Camera):
         import time
         now = time.time()
         spots = []
-        for y in range(30):
+        for y in range(10):
             #print("y",y/20)
-            spots.append(self.xScan(openingDepth,y/30))
+            spots.append(self.xScan(openingDepth,y/10))
         print(time.time() - now)
         return spots
         #for x in spots:
