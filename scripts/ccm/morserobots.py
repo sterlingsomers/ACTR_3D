@@ -1,4 +1,5 @@
-from .morseconnection import *
+#from .morseconnection import *
+#import morseconnection
 import time
 
 
@@ -6,23 +7,26 @@ class morse_middleware():
     '''The middleware to handle the connection between ACT-R and Morse.'''
     
     def __init__(self):
+        from .morseconnection import robot_simulation
+            #.robot_simulation
         if robot_simulation == None:
             raise Exception("pymorse was not detected, or connection was not successful.")
-        
+
         self.robot_simulation = robot_simulation
         self.mustTick = False
+        self.active=False
         self.modes = ['best_effort']
         self.send_dict = {'set_speed':True,
                         'move_forward':False,
                         'set_rotation':False} #{function_name:blocking?}
 
-        self.request_dict = {'scan_image':True,
+        self.request_dict = {'scan_imageD':True,
                 'getScreenVector':True,
                 'cScan':True,
                 'get_time':True,
                 'xScan':True}
             
-        self.action_dict = {'scan_image':['self.robot_simulation.robot.GeometricCamerav1', '.scan_image'],
+        self.action_dict = {'scan_imageD':['self.robot_simulation.robot.GeometricCamerav1', '.scan_imageD'],
 				'set_speed':['self.robot_simulation.robot','.set_speed'],
                 'move_forward':['self.robot_simulation.robot','.move_forward'],
                 'set_rotation':['self.robot_simulation.robot.armature','.set_rotation'],
@@ -201,7 +205,7 @@ class morse_middleware():
 
         
 
-middleware = morse_middleware()
+middleware = None#morse_middleware()
 #middleware.tick()               
 
 #connection = robot_simulation

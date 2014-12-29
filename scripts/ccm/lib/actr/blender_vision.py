@@ -3,7 +3,7 @@
 
 
 import ccm
-#from ccm.pattern import Pattern
+from ccm.pattern import Pattern
 
 import re
 #from ccm.pattern import *
@@ -18,8 +18,9 @@ import math
 
 from ccm.morserobots import middleware
 
-
-
+class InternalEnvironment(ccm.Model):
+    poop=ccm.Model(isa='dial',value=-1000)
+    camp=ccm.Model(isa='dial',value=2000)
 
 
 class BlenderVision(ccm.Model):
@@ -32,6 +33,8 @@ class BlenderVision(ccm.Model):
         self.delay_sd=delay_sd
         self.error=False
         self.busy=False
+        self._objects = {}
+        self._internalEnvironment = InternalEnvironment(self._b1)
         #self.blender_camera = Morse().robot.GeometricCamerav1
     
     def getScreenVector(self,x,y):
@@ -41,7 +44,7 @@ class BlenderVision(ccm.Model):
         #x = numpy.array(middleware.request('getScreenVector',[x,y]))
         #print(numpy.linalg.norm(x))
     
-    def cScan(self,openingDepth):
+    def cScan(self,openingDepth='0.3'):
         x  = middleware.request('cScan', [openingDepth])
         print(x)
 
@@ -53,10 +56,14 @@ class BlenderVision(ccm.Model):
         #print(ccm.middle)
         #import time
         #now = time.time()
-        self._objects = middleware.request('scan_image',[])
+        self._objects = middleware.request('scan_imageD',[])
+        ###!!!Note the keys here are strings, not floats
+        ###!!Converti them to float below
+        self._objects = dict((float(k), v) for k,v in self._objects.items())
+        print(self._objects.keys(), "HEYSSSSSS")
         #print("Time:")
         #print(time.time() - now)
-        print(self._objects, "objects")
+        #print(self._objects, "objects")
         #yield 1.3
 
     def refresh(self):
@@ -96,15 +103,32 @@ class BlenderVision(ccm.Model):
         print(vision_cam.get_visible_angles(label))
    
     def request(self,pattern=''):
+        print("REQUEST")
         if self.busy: return
 
+        matcher = Pattern(pattern)
+
         self.error=False
-        
-        pattern_list = pattern.split()
-        for p in pattern_list:
-            (slot,value) = self.parse(p)
-            if 'obj' in slot:
-                print('obj')
+
+        print(dir(self._internalEnvironment), "InternalEnvironment")
+        print(self._internalEnvironment.poop.isa,"poooooooop")
+        print(matcher.match(self._internalEnvironment), "matcher")
+
+        print(self.parent, "parent")
+        print(self.parent.parent, "parent.parent")
+        print(self.parent.parent.get_children(), "get_children()")
+
+        print("CHILDREN")
+
+        for obj in self.parent.parent.get_children():
+            print("CHILD",obj)
+        if matcher.match(self._internalEnvironment) is not  None:
+            print("not none")
+        #pattern_list = pattern.split()
+        #for p in pattern_list:
+        #    (slot,value) = self.parse(p)
+        #    if 'obj' in slot:
+        #        print('obj')
             
         
 #  def request(self,pattern=''):

@@ -7,14 +7,20 @@
 
 #import ACT-R Stuff
 import ccm
+from ccm.morserobots import middleware
+middleware = ccm.morserobots.morse_middleware()
 from ccm.lib.actr import *
 #log=ccm.log()
-from ccm.morserobots import middleware
+#from ccm.morserobots import middleware
 
+class MyEnvironment(ccm.Model):
+    pass
 
+class VisionModule(ccm.Model):
+    poop=ccm.Model(isa='dial',value=-1000)
 
 class VisionMethods(ccm.ProductionSystem):
-    production_time = 0.01
+    production_time = 0.025
     fake_buffer = Buffer()
     
     def init():
@@ -22,8 +28,8 @@ class VisionMethods(ccm.ProductionSystem):
 
     def repeat(fake_buffer='fake'):
         #This could be used during movement, actively doing the task
-        pass
-        #self.parent.vision_module.scan()
+
+        self.parent.vision_module.scan()
         #self.parent.vision_module.getScreenVector('0.4999','0.5')    
         #self.parent.vision_module.cScan('0.5')#50cm minimum depth for an opening.
         #self.parent.vision_module.xScan('0.3','0.5')
@@ -45,29 +51,50 @@ class MyModel(ACTR):
     b_vision2 = Buffer()
     #vm = SOSVision(b_vision)    
     vision_module = BlenderVision(b_vision1,b_vision2)
+    p_vision=VisionModule(b_vision1)
+
+
     motor_module = BlenderMotorModule(b_motor)
     
     vm = VisionMethods()
     
     DMbuffer=Buffer()
-    DM=Memory(DMbuffer,latency=0.0,threshold=None)
+    DM=Memory(DMbuffer,latency=0.0)
 
     def init():
-        DM.add('planning_unit:estimate_passability unit_task:find_opening cue:no_task')
-        
+        DM.add('planning_unit:estimate_passability unit_task:find_opening')
+              
         #DM.add('planning_unit:prepare_for_Take_off unit_task:starter cue:break_on')
         
         b_plan_unit.set('planning_unit:estimate_passability')
-        b_unit_task.set('unit_task:get_task')
-        b_operator.set('operator:get_task')
-        b_cue.set('cue:no_task')
+        b_unit_task.set('unit_task:none')
+        b_operator.set('operator:none')
+        b_cue.set('cue:none')
         #goal.set('stop')    
 
 
-    def estimate_passability_one(b_plan_unit='planning_unit:estimate_passability', b_unit_task='unit_task:get_task', b_cue='cue:no_task'):
-        #DM.request('planning_unit:estimate_passability cue:no_task unit_task:?')
-        b_cue.set('cue:retrieving_task')
+    def estimate_passability_retrieveUT(b_plan_unit='planning_unit:estimate_passability', b_unit_task='unit_task:none',
+                                        b_operator='operator:none'):
+        DM.request('planning_unit:estimate_passability unit_task:?')
+        b_operator.set('operator:retrieveUT')
+        #b_cue.set('cue:retrieving_task')
+        #goal.set('stop')
+        #b_plan_unit.set('planning_unit:none')
+
+    def estimate_passability_recalledUT(b_plan_unit='planning_unit:estimate_passability', b_unit_task='unit_task:none',
+                                        b_operator='operator:retrieveUT',
+                                        DMbuffer='unit_task:?UT'):
+        b_unit_task.set('unit_task:' + UT)
+        b_operator.set('operator:none')
+        DMbuffer.clear()
+
+    def estimate_passability_find_opening(b_plan_unit='planning_unit:estimate_passability', b_unit_task='unit_task:find_opening',
+                                            b_operator='operator:none'):
+        #vision_module.cScan()
+        vision_module.request('isa:dial value:?')
         goal.set('stop')
+        b_plan_unit.set('planning_unit:none')
+        
 
     #def estimate_passability_two(b_plan_unit='planning_unit:estimate_passability',
     #                             b_unit_task='unit_task:get_task',
@@ -101,7 +128,9 @@ class MyModel(ACTR):
         
 
 model=MyModel()
-ccm.log_everything(model)
+env = MyEnvironment()
+env.agent = model
+ccm.log_everything(env)
 model.goal.set('action:greet')
 
 #initialize ACT-R
