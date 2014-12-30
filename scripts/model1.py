@@ -8,7 +8,7 @@
 #import ACT-R Stuff
 import ccm
 from ccm.morserobots import middleware
-middleware = ccm.morserobots.morse_middleware()
+#middleware = ccm.morserobots.morse_middleware()
 from ccm.lib.actr import *
 #log=ccm.log()
 #from ccm.morserobots import middleware

@@ -1,4 +1,4 @@
-#from .morseconnection import *
+from .morseconnection import *
 #import morseconnection
 import time
 
@@ -7,7 +7,7 @@ class morse_middleware():
     '''The middleware to handle the connection between ACT-R and Morse.'''
     
     def __init__(self):
-        from .morseconnection import robot_simulation
+        #from .morseconnection import robot_simulation
             #.robot_simulation
         if robot_simulation == None:
             raise Exception("pymorse was not detected, or connection was not successful.")
@@ -105,6 +105,7 @@ class morse_middleware():
     def request(self, datastr, argslist):
        
         print("Trying to request", datastr)
+        print("mustTick", self.mustTick)
         result = None
         if not type(argslist) == list:
             raise Exception("argslist parameter must be a list")
@@ -115,6 +116,7 @@ class morse_middleware():
         if self.mustTick:
             raise Exception("Blocking request already made.")#make something more informative        
         self.mustTick = True
+        print("setting mustTrick", self.mustTick)
         print("Sending...", self.action_dict[datastr][1], argslist)
         rStr = self.action_dict[datastr][0] + self.action_dict[datastr][1] + '(' + ','.join(argslist) + ').result()'
         result = eval(rStr)
@@ -168,7 +170,9 @@ class morse_middleware():
     def tick(self,sync=False):
         #eimport time
         if self.mode == 'best_effort':
+            print("mustTick - in tick", self.mustTick)
             self.mustTick = False
+            print("mustTick - in tick 2", self.mustTick)
             self.modules_in_use = {}
             for rate in range(self.rate):
                 print("Middleware tick!")
@@ -205,7 +209,7 @@ class morse_middleware():
 
         
 
-middleware = None#morse_middleware()
+middleware = morse_middleware()
 #middleware.tick()               
 
 #connection = robot_simulation
