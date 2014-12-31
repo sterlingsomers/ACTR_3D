@@ -105,7 +105,7 @@ class morse_middleware():
     def request(self, datastr, argslist):
        
         print("Trying to request", datastr)
-        print("mustTick", self.mustTick)
+        #print("mustTick", self.mustTick)
         result = None
         if not type(argslist) == list:
             raise Exception("argslist parameter must be a list")
@@ -116,7 +116,7 @@ class morse_middleware():
         if self.mustTick:
             raise Exception("Blocking request already made.")#make something more informative        
         self.mustTick = True
-        print("setting mustTrick", self.mustTick)
+        #print("setting mustTrick", self.mustTick)
         print("Sending...", self.action_dict[datastr][1], argslist)
         rStr = self.action_dict[datastr][0] + self.action_dict[datastr][1] + '(' + ','.join(argslist) + ').result()'
         result = eval(rStr)
@@ -170,9 +170,9 @@ class morse_middleware():
     def tick(self,sync=False):
         #eimport time
         if self.mode == 'best_effort':
-            print("mustTick - in tick", self.mustTick)
+            #print("mustTick - in tick", self.mustTick)
             self.mustTick = False
-            print("mustTick - in tick 2", self.mustTick)
+            #print("mustTick - in tick 2", self.mustTick)
             self.modules_in_use = {}
             for rate in range(self.rate):
                 print("Middleware tick!")

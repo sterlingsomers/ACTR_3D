@@ -50,20 +50,25 @@ class Pattern:
         self.partial=partial
         
     def match(self,obj):
+        #print("-OBJ",dir(obj))#sterling
         b={}
         b['_partial']=self.partial
         if self.partial is not None:
           obj._partial=0.0
-        try:
+
+        #import traceback#sterling
+        try:#sterling, removed try
             for f in self.funcs:
-                print("f",dir(f), repr(f))#sterling
+
+        #       #print("f",dir(f), repr(f))#sterling
                 if f(obj,b)==False:
-                    #print("RETURNING NONE?????")#sterling
+        #            print("RETURNING NONE?????")#sterling
                     return None
-        except (AttributeError,TypeError,KeyError):
-            #print("EXCEPTION HAPPENEND")#sterling
+        except (AttributeError,TypeError,KeyError) as e:
+            #print("EXCEPTION HAPPENEND",dir(e)) #sterling
+            #traceback.print_exc()
             return None
-        del b['_partial']    
+        del b['_partial']
         return b    
             
 
@@ -76,13 +81,13 @@ def parse(patterns,bound=None):
     funcs=[]
     vars={}
     funcs2=[]
-    print("parse patterns", patterns)#sterling
+    #print("parse patterns", patterns)#sterling
     for name,pattern in list(patterns.items()):
-        print("name,patter",name,pattern)#sterling
+        #print("name,patter",name,pattern)#sterling
         if not isinstance(pattern,(list,tuple)): pattern=[pattern]
 
         for p in pattern:
-            print("p in pattern", p)#sterling
+            #print("p in pattern", p)#sterling
             if p is None:
                 if name is None: funcs.append(lambda x,b: x==None)
                 else:            funcs.append(lambda x,b,name=name: x[name]==None or len(x[name])==0)
@@ -95,12 +100,12 @@ def parse(patterns,bound=None):
                     return p(x[name],b)
                 funcs2.append(callfunc)        
             elif isinstance(p,str):
-                print("p is a string!")#sterling
+                #print("p is a string!")#sterling
                 namedSlots=False
                 for j,text in enumerate(p.split()):
                     key=j
                     m=re.match('([?]?[\w\.]+):',text)
-                    print("1m", m)#sterling
+                    #print("1m", m)#sterling
                     if m!=None:
                         key=m.group(1)
                         try:
@@ -108,7 +113,7 @@ def parse(patterns,bound=None):
                         except ValueError:
                             pass
                         text=text[m.end():]
-                        print("text", text)#sterling
+                        #print("text", text)#sterling
                         if len(text)==0:
                             raise PatternException("No value for slot '%s' in pattern '%s'"%(key,pattern))
                         namedSlots=True          
@@ -118,16 +123,16 @@ def parse(patterns,bound=None):
                     if text=='?': continue
                     while len(text)>0:
                         m=re.match('([\w\.-]+)',text)
-                        print("2m", m)#sterling
+                        #print("2m", m)#sterling
                         if m!=None:
                             text=text[m.end():]
                             t=m.group(1)
-                            print("name,key,t",name,key,t)#sterling
+                            #print("name,key,t",name,key,t)#sterling
                             funcs.append(lambda x,b,name=name,key=key,t=t: partialmatch(x,name,key,b,t))
                             continue
 
                         m=re.match('!([\w\.-]+)',text)
-                        print("3m", m)#sterling
+                        #print("3m", m)#sterling
                         if m!=None:
                             text=text[m.end():]
                             t=m.group(1)
@@ -135,7 +140,7 @@ def parse(patterns,bound=None):
                             continue
         
                         m=re.match('\?(\w+)',text)
-                        print("4m", m)#sterling
+                        #print("4m", m)#sterling
                         if m!=None:
                             text=text[m.end():]
                             v=m.group(1)
@@ -152,7 +157,7 @@ def parse(patterns,bound=None):
                             continue
         
                         m=re.match('!\?(\w+)',text)
-                        print("5m", m)#sterling
+                        #print("5m", m)#sterling
                         if m!=None:
                             text=text[m.end():]
                             v=m.group(1)

@@ -25,7 +25,7 @@ class InternalEnvironment(ccm.Model):
 
 class BlenderVision(ccm.Model):
     def __init__(self,buffer1,buffer2,delay=0.0,log=None,delay_sd=None):
-        
+        #from ccm.morserobots import middleware
         #self._vision_cam = Morse().robot.GeometricCamerav1
         self._b1=buffer1
         self._b2=buffer2

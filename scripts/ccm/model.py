@@ -48,13 +48,18 @@ class Model:
     _auto_run_start=True
     name='top'
     
+
+
     def __init__(self,log=None,**keys):
         #print("this happens")
-        print(self,"Model")
+        print(self,"Model A1")#sterling
         self.__init_log=log
         for k,v in list(keys.items()):
           setattr(self,k,v)
-    
+
+    #getitem added by sterling
+    def __getitem__(self,item):
+        return getattr(self,item)
     def __convert(self,parent=None,name=None):
         print("__convert() called", self)
         #Culprit
@@ -67,7 +72,7 @@ class Model:
         
         methods={}
         objects={}
-        print(inspect.getmro(self.__class__),"MRO")
+        print(inspect.getmro(self.__class__),"MRO") #sterling
         #This MRO includes class object, whereas in 2.7, it does not
         #add[:-1], because it seems that object is always at the end.
         '''            obj.__convert(self,name)
@@ -79,7 +84,7 @@ class Model:
             if klass is not Model:
                 #print(klass, "klass")
                 for k,v in inspect.getmembers(klass):
-                    print(k,v,"k,v")
+                    print(k,",",v,"k,v")
                     
                     if k[0]!='_':
                         #print(k,"just k")
