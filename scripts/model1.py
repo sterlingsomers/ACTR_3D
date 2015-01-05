@@ -16,10 +16,10 @@ from ccm.lib.actr.blender_motor_module import BlenderMotorModule
 from ccm.morserobots import middleware
 
 class MyEnvironment(ccm.Model):
-    pass
+    v1 = ccm.Model(isa='dial')
 
-class VisionModule(ccm.Model):
-    poop=ccm.Model(isa='dial',value=-1000)
+#class VisionModule(ccm.Model):
+#    poop=ccm.Model(isa='dial',value=-1000)
 
 class VisionMethods(ccm.ProductionSystem):
     production_time = 0.025
@@ -38,6 +38,8 @@ class VisionMethods(ccm.ProductionSystem):
         
 
 
+
+
 # define the model
 class MyModel(ACTR):
     goal=Buffer()
@@ -53,7 +55,7 @@ class MyModel(ACTR):
     b_vision2 = Buffer()
     #vm = SOSVision(b_vision)    
     vision_module = BlenderVision(b_vision1,b_vision2)
-    p_vision=VisionModule(b_vision1)
+    #p_vision=VisionModule(b_vision1)
 
 
     motor_module = BlenderMotorModule(b_motor)
@@ -62,6 +64,9 @@ class MyModel(ACTR):
     
     DMbuffer=Buffer()
     DM=Memory(DMbuffer,latency=0.0)
+
+
+
 
     def init():
         DM.add('planning_unit:estimate_passability unit_task:find_opening')
@@ -93,7 +98,7 @@ class MyModel(ACTR):
     def estimate_passability_find_opening(b_plan_unit='planning_unit:estimate_passability', b_unit_task='unit_task:find_opening',
                                             b_operator='operator:none'):
         #vision_module.cScan()
-        vision_module.request('isa:dial value:?')
+        vision_module.request('isa:dial')
         goal.set('stop')
         b_plan_unit.set('planning_unit:none')
         
@@ -130,6 +135,7 @@ class MyModel(ACTR):
         
 
 model=MyModel()
+#vInternal = VisualEnvironment()
 env = MyEnvironment()
 env.agent = model
 ccm.log_everything(env)

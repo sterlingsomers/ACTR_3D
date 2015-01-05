@@ -19,6 +19,7 @@ class SOSVision(ccm.Model):
     r=[]
     for obj in self.parent.parent.get_children():
       if matcher.match(obj)!=None:
+        print("Not None")
         if not hasattr(obj,'salience') and not hasattr(obj,'visible'):
           continue
         

@@ -60,6 +60,9 @@ class Model:
     #getitem added by sterling
     def __getitem__(self,item):
         return getattr(self,item)
+
+
+
     def __convert(self,parent=None,name=None):
         print("__convert() called", self)
         #Culprit

@@ -4,6 +4,9 @@ from morse.helpers.components import add_data, add_property
 
 from morse.core.services import service, async_service, interruptible
 from morse.core import status
+
+import bpy
+
 class Manny(morse.core.robot.Robot):
     """ 
     Class definition for the Manny robot.
@@ -29,6 +32,9 @@ class Manny(morse.core.robot.Robot):
         logger.info('Component initialized')
 
 
+    @service
+    def get_bounding_box(self):
+        return bpy.data.objects['robot'].dimensions
 
     @interruptible 
     @async_service

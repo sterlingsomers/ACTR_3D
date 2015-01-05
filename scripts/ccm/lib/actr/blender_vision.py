@@ -19,7 +19,7 @@ import math
 from ccm.morserobots import middleware
 
 class InternalEnvironment(ccm.Model):
-    poop=ccm.Model(isa='dial',value=-1000)
+    dial=ccm.Model(isa='dial',value=-1000)
     camp=ccm.Model(isa='dial',value=2000)
 
 
@@ -34,7 +34,13 @@ class BlenderVision(ccm.Model):
         self.error=False
         self.busy=False
         self._objects = {}
-        self._internalEnvironment = InternalEnvironment(self._b1)
+        self._edges = {}
+        self._internalChunks = []
+
+        self._internalChunks.append(ccm.Model(isa='dial'))
+
+        #self._internalEnvironment = InternalEnvironment(self._b1)
+        #self._internalEnvironment.doConvert(parent=self)
         #self.blender_camera = Morse().robot.GeometricCamerav1
     
     def getScreenVector(self,x,y):
@@ -52,6 +58,47 @@ class BlenderVision(ccm.Model):
         x = middleware.request('xScan', [openingDepth,y])
         print(x)
     
+    def almost_equal(self,x1,x2):
+        return abs(x1-x2) < 0.01
+
+    def shares_edge(self,list1,list2):
+        if self.almost_equal(list1[0],list2[0]):
+            return 1
+        if self.almost_equal(list1[0],list2[1]):
+            return 1
+        if self.almost_equal(list1[1],list2[0]):
+            return 1
+        if self.almost_equal(list1[1],list2[1]):
+            return 1
+        return 0
+
+
+    def find_edges(self):
+        for y in sorted(self._objects.keys()):
+            if len(list(self._objects[y].keys())) > 1:#there needs to be more than one object to be a depth gap
+                edges = []
+                edgeCount = 0
+                while True:
+                    #print(edgeCount,'EDGECOUNT')
+                    try:
+                        firstLabel,firstvalue = list(self._objects[y].items())[edgeCount]
+                    except IndexError:
+                        break #or return something
+
+                    for label,value in list(self._objects[y].items())[edgeCount+1:]:
+                        if self.shares_edge(firstvalue,value): #if they form an edge
+                            edges.append([firstLabel,label])
+                    edgeCount+=1
+                self._edges[y] = edges
+                #print(edges,"EDGES")
+                #break
+
+
+
+
+
+
+
     def scan(self,delay=0.00):
         #print(ccm.middle)
         #import time
@@ -60,7 +107,11 @@ class BlenderVision(ccm.Model):
         ###!!!Note the keys here are strings, not floats
         ###!!Converti them to float below
         self._objects = dict((float(k), v) for k,v in self._objects.items())
-        print(self._objects.keys(), "HEYSSSSSS")
+        self.find_edges()
+        print(self._edges)
+        #for y in sorted(self._objects.keys()):
+        #    print(y)
+        #print(self._objects.keys(), "HEYSSSSSS")
         #print("Time:")
         #print(time.time() - now)
         #print(self._objects, "objects")
@@ -109,21 +160,26 @@ class BlenderVision(ccm.Model):
         matcher = Pattern(pattern)
 
         self.error=False
+        r=[]
+        for obj in self._internalChunks:
+            print("one")
+            if matcher.match(obj)!=None:
+                print("Not None")
+        #self._internalEnvironment.__convert()
+        #print(dir(self._internalEnvironment), "InternalEnvironment")
+        #print(self._internalEnvironment.poop.isa,"poooooooop")
+       ## print(matcher.match(self._internalEnvironment), "matcher")
 
-        print(dir(self._internalEnvironment), "InternalEnvironment")
-        print(self._internalEnvironment.poop.isa,"poooooooop")
-        print(matcher.match(self._internalEnvironment), "matcher")
+        #print(self.parent, "parent")
+        #print(self.parent.parent, "parent.parent")
+       # print(self.parent.parent.get_children(), "get_children()")
 
-        print(self.parent, "parent")
-        print(self.parent.parent, "parent.parent")
-        print(self.parent.parent.get_children(), "get_children()")
+       # print("CHILDREN")
 
-        print("CHILDREN")
-
-        for obj in self.parent.parent.get_children():
-            print("CHILD",obj)
-        if matcher.match(self._internalEnvironment) is not  None:
-            print("not none")
+        #for obj in self.parent.parent.get_children():
+        #    print("CHILD",obj)
+      ##  if matcher.match(self._internalEnvironment) is not  None:
+      ##      print("not none")
         #pattern_list = pattern.split()
         #for p in pattern_list:
         #    (slot,value) = self.parse(p)
