@@ -26,7 +26,7 @@ class VisionMethods(ccm.ProductionSystem):
     fake_buffer = Buffer()
     
     def init():
-        fake_buffer.set('fake')
+        fake_buffer.set('asdfasdfasdfasdf')
 
     def repeat(fake_buffer='fake'):
         #This could be used during movement, actively doing the task
@@ -73,11 +73,14 @@ class MyModel(ACTR):
               
         #DM.add('planning_unit:prepare_for_Take_off unit_task:starter cue:break_on')
         
-        b_plan_unit.set('planning_unit:estimate_passability')
+        b_plan_unit.set('planning_unit:estimate_passability_X')
         b_unit_task.set('unit_task:none')
         b_operator.set('operator:none')
         b_cue.set('cue:none')
-        #goal.set('stop')    
+        goal.set('stop')
+
+        #get bounding box here.
+        self.middleware.request('getBoundingBox', [])
 
 
     def estimate_passability_retrieveUT(b_plan_unit='planning_unit:estimate_passability', b_unit_task='unit_task:none',
@@ -135,6 +138,7 @@ class MyModel(ACTR):
         
 
 model=MyModel()
+model.middleware = middleware
 #vInternal = VisualEnvironment()
 env = MyEnvironment()
 env.agent = model

@@ -5,7 +5,9 @@ from morse.helpers.components import add_data, add_property
 from morse.core.services import service, async_service, interruptible
 from morse.core import status
 
+from morse.core import blenderapi
 import bpy
+import bge
 
 class Manny(morse.core.robot.Robot):
     """ 
@@ -33,8 +35,31 @@ class Manny(morse.core.robot.Robot):
 
 
     @service
-    def get_bounding_box(self):
-        return bpy.data.objects['robot'].dimensions
+    def getBoundingBox(self):
+        #print(blenderapi.scene().objects, "objects")#bpy.data.objects['Male_Base'].show_bounds()
+        #print(dir(blenderapi.objectdata('robot')))
+        #blenderapi.objectdata('Male_Base').show_wire=False
+        #bpy.data.objects['Male_Base'].show_bounds=True
+        #print(self.bge_object.parent)
+        #print(dir(self.bge_object.parent))
+        vertices = []
+        vxlist = []
+        vylist = []
+        vzlist = []
+        for child in self.bge_object.childrenRecursive:
+            if '_Base' in child.name:
+                VSLength = child.meshes[0].getVertexArrayLength(0)
+
+                for vArray in range(0,VSLength):
+                    vx,vy,vz = child.meshes[0].getVertex(0,vArray).getXYZ()
+                    vxlist.append(vx)
+                    vylist.append(vy)
+                    vzlist.append(vz)
+                #print(min(vxlist),max(vxlist),min(vylist),max(vylist),min(vzlist),max(vzlist))
+        return [min(vxlist),max(vxlist),min(vylist),max(vylist),min(vzlist),max(vzlist)]
+
+        #    child.visible=not(child.visible)
+        return 1#bpy.data.objects['robot'].bound_box
 
     @interruptible 
     @async_service

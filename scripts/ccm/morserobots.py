@@ -24,7 +24,8 @@ class morse_middleware():
                 'getScreenVector':True,
                 'cScan':True,
                 'get_time':True,
-                'xScan':True}
+                'xScan':True,
+                'getBoundingBox':True}
             
         self.action_dict = {'scan_imageD':['self.robot_simulation.robot.GeometricCamerav1', '.scan_imageD'],
 				'set_speed':['self.robot_simulation.robot','.set_speed'],
@@ -32,7 +33,8 @@ class morse_middleware():
                 'set_rotation':['self.robot_simulation.robot.armature','.set_rotation'],
                 'getScreenVector':['self.robot_simulation.robot.GeometricCamerav1', '.getScreenVector'],
                 'cScan':['self.robot_simulation.robot.GeometricCamerav1', '.cScan'],
-                'xScan':['self.robot_simulation.robot.GeometricCamerav1', '.xScan']}
+                'xScan':['self.robot_simulation.robot.GeometricCamerav1', '.xScan'],
+                'getBoundingBox':['self.robot_simulation.robot','.getBoundingBox']}
 
         self.danger_list = ['get_time']
         self.modules_in_use = {}
