@@ -57,7 +57,7 @@ class morse_middleware():
             self.send_queue.append([datastr,argslist])
         else:
             if self.send_dict[datastr]: #it is blocking
-                pass
+                pass#put it on the next tick
             else: #if it's not blocking, we need to add it's location to a list, and check if it is already in the list
                 if self.action_dict[datastr][0] in self.modules_in_use:
                     raise Exception("Module " + self.action_dict[datastr][0] + " is already in use this cycle by " 

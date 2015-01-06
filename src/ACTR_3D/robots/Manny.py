@@ -42,24 +42,31 @@ class Manny(morse.core.robot.Robot):
         #bpy.data.objects['Male_Base'].show_bounds=True
         #print(self.bge_object.parent)
         #print(dir(self.bge_object.parent))
-        vertices = []
-        vxlist = []
-        vylist = []
-        vzlist = []
-        for child in self.bge_object.childrenRecursive:
-            if '_Base' in child.name:
-                VSLength = child.meshes[0].getVertexArrayLength(0)
+        print(bpy.data.objects.keys(),"KEYS")
+        print(bpy.data.objects['Male_Base'].dimensions.y)
+        print(bpy.data.meshes['Male'].materials['skin'].node_tree.nodes.values()[0],"DIR")
 
-                for vArray in range(0,VSLength):
-                    vx,vy,vz = child.meshes[0].getVertex(0,vArray).getXYZ()
-                    vxlist.append(vx)
-                    vylist.append(vy)
-                    vzlist.append(vz)
-                #print(min(vxlist),max(vxlist),min(vylist),max(vylist),min(vzlist),max(vzlist))
-        return [min(vxlist),max(vxlist),min(vylist),max(vylist),min(vzlist),max(vzlist)]
+        return 1
+        #help(bpy.data.meshes['Male'])
+        ##BGE version
+        ##vertices = []
+        ##vxlist = []
+        ##vylist = []
+        ##vzlist = []
+        ##for child in self.bge_object.childrenRecursive:
+        ##    if '_Base' in child.name:
+        ##        VSLength = child.meshes[0].getVertexArrayLength(0)
+        ##
+        ##        for vArray in range(0,VSLength):
+        ##            vx,vy,vz = child.meshes[0].getVertex(0,vArray).getXYZ()
+        ##            vxlist.append(vx)
+        ##            vylist.append(vy)
+        ##            vzlist.append(vz)
+        ##        #print(min(vxlist),max(vxlist),min(vylist),max(vylist),min(vzlist),max(vzlist))
+        ##return [min(vxlist),max(vxlist),min(vylist),max(vylist),min(vzlist),max(vzlist)]
 
         #    child.visible=not(child.visible)
-        return 1#bpy.data.objects['robot'].bound_box
+        #return 1#bpy.data.objects['robot'].bound_box
 
     @interruptible 
     @async_service
