@@ -44,7 +44,7 @@ robot.translate(5.131, 0.0, 0.0)
 armature = Armature(model_name='ACTR_3D/actuators/Torso.blend', armature_name='Armature')
 
 armature.properties(classpath = "ACTR_3D.actuators.Torso.Torso")
-armature.translate(0,0,-1.2)
+armature.translate(0,0,-0.42)
 armature.rotate(z=math.radians(90))
 
 
@@ -112,7 +112,7 @@ armature.add_service('socket')
 #Geometric camera
 GeometricCamerav1 = GeometricCamera()
 
-GeometricCamerav1.translate(x=0.13,y=-0.0,z=0.52)
+GeometricCamerav1.translate(x=0.13,y=-0.0,z=1.22)
 GeometricCamerav1.properties(Object=False)
 GeometricCamerav1.properties(cam_width=2048,cam_height=2048)
 GeometricCamerav1.properties(cam_focal=14)
@@ -140,8 +140,8 @@ keyboard.properties(ControlType = 'Position')
 #
 # 'morse add sensor <name> ACT_v1' can help you with the creation of a custom
 # sensor.
-pose = Pose()
-robot.append(pose)
+#pose = Pose()
+#robot.append(pose)
 #pose.translate(z=50)
 
 robot.add_service('socket')
@@ -156,6 +156,7 @@ robot.add_default_interface('socket')
 
 # set 'fastmode' to True to switch to wireframe mode
 env = Environment('../projects/ACTR_3D/room2.blend')
+# = Environment('indoors-1/indoor-1')
 import math
 env.set_camera_location([15.0, 0, 10.0])
 env.set_camera_rotation([math.radians(50), 0, math.radians(90)])
