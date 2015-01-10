@@ -36,17 +36,85 @@ class Manny(morse.core.robot.Robot):
 
     @service
     def getBoundingBox(self):
+
+        children = self.bge_object.childrenRecursive
+        children.append(self.bge_object)
+        vxlist = []
+        vylist = []
+        vzlist = []
+        for child in children:#self.bge_object.childrenRecursive:
+            #print(child)
+            if "part" in child.name:
+                for mesh in child.meshes:
+
+                    for m_index in range(len(mesh.materials)):
+                        for v_index in range(mesh.getVertexArrayLength(m_index)):
+                            vertex = mesh.getVertex(m_index,v_index)
+                            vertex = child.worldTransform * vertex.getXYZ()
+
+                            vx,vy,vz = vertex[0],vertex[1],vertex[2]
+                            vxlist.append(vx)
+                            vylist.append(vy)
+                            vzlist.append(vz)
+
+        print(max(vxlist),min(vxlist),max(vylist),min(vylist),max(vzlist),min(vzlist))
+
+        return [max(vxlist)-min(vxlist),max(vylist)-min(vylist),max(vzlist)-min(vzlist)]
+
+
+        ####vxlist = []
+        ####vylist = []
+        ####vzlist = []
+        ####for child in self.bge_object.childrenRecursive:
+
+        ####   for mesh in self.bge_object.meshes:
+        ####        for m_index in range(len(mesh.materials)):
+        ####        for v_index in range(mesh.getVertexArrayLength(m_index)):
+        ####            vertex = mesh.getVertex(m_index,v_index)
+
+        ####            print(self.bge_object.worldTransform * vertex.getXYZ()) #worldcoordinates??
+
+        return 1
+        ###vxlist = []
+        ###vylist = []
+        ###vzlist = []
+        ###VSLength = self.bge_object.meshes[0].getVertexArrayLength(0)
+        ###for vArray in range(0,VSLength):
+        ###    vx,vy,vz = self.bge_object.meshes[0].getVertex(0,vArray).getXYZ()
+        ###    vxlist.append(vx)
+        ###    vylist.append(vy)
+        ###    vzlist.append(vz)
+
+        ###print(max(vxlist),min(vxlist),max(vylist),min(vylist),max(vzlist),min(vzlist))
+
+        ###print (dir(self.bge_object.meshes[0]))
+        ###print (self.bge_object.childrenRecursive)
+        ###for child in self.bge_object.childrenRecursive:
+        ###    if 'part' in child.name:
+        ###        print (child)
+        ###
+        ###        VSLength = self.bge_object.meshes[0].getVertexArrayLength(0)
+        ###        for vArray in range(0,VSLength):
+        ###            vx,vy,vz = child.meshes[0].getVertex(0,vArray).getXYZ()
+        ###            vxlist.append(vx)
+        ###            vylist.append(vy)
+        ###            vzlist.append(vz)
+        ###       print(max(vxlist),min(vxlist),max(vylist),min(vylist),max(vzlist),min(vzlist))
+        ###
+        ###return [max(vxlist)-min(vxlist),max(vylist)-min(vylist),max(vzlist)-min(vzlist)]
+
+
         #print(blenderapi.scene().objects, "objects")#bpy.data.objects['Male_Base'].show_bounds()
         #print(dir(blenderapi.objectdata('robot')))
         #blenderapi.objectdata('Male_Base').show_wire=False
         #bpy.data.objects['Male_Base'].show_bounds=True
         #print(self.bge_object.parent)
         #print(dir(self.bge_object.parent))
-        print(bpy.data.objects.keys(),"KEYS")
-        print(bpy.data.objects['Male_Base'].dimensions.y)
-        print(bpy.data.meshes['Male'].materials['skin'].node_tree.nodes.values()[0],"DIR")
+        #print(bpy.data.objects.keys(),"KEYS")
+        #print(bpy.data.objects['Male_Base'].dimensions.y)
+        #print(bpy.data.meshes['Male'].materials['skin'].node_tree.nodes.values()[0],"DIR")
 
-        return 1
+        #return 1
         #help(bpy.data.meshes['Male'])
         ##BGE version
         ##vertices = []

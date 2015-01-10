@@ -80,11 +80,11 @@ class MyModel(ACTR):
         goal.set('stop')
         import math
 
-        self.motor_module.set_rotation('arm_upper.R','2',repr(math.radians(-30)))
+        self.motor_module.set_rotation('ribs','0',repr(math.radians(0)))
         #self.motor_module.set_rotation('arm_upper.R','0',repr(math.radians(35)))
 
         #get bounding box here.
-        #self.middleware.request('getBoundingBox', [])
+        self.middleware.request('getBoundingBox', [])
 
     def estimate_passability_retrieveUT(b_plan_unit='planning_unit:estimate_passability', b_unit_task='unit_task:none',
                                         b_operator='operator:none'):

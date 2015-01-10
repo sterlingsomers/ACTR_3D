@@ -118,7 +118,8 @@ GeometricCamerav1.properties(cam_width=2048,cam_height=2048)
 GeometricCamerav1.properties(cam_focal=14)
 
 GeometricCamerav1.rotate(math.radians(180),math.radians(180),math.radians(00))
-robot.append(GeometricCamerav1)
+armature.append(GeometricCamerav1)
+#robot.append(GeometricCamerav1)
 #geometric1.add_stream('socket')
 GeometricCamerav1.add_service('socket')
 #Face the wall
@@ -164,6 +165,6 @@ env.select_display_camera(GeometricCamerav1)
 #pdb.set_trace()
 env.set_time_strategy(TimeStrategies.FixedSimulationStepExternalTrigger)
 env.show_framerate(True)
-#env.show_physics(True)
+env.show_physics(True)
 
 
