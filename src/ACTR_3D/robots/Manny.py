@@ -39,12 +39,14 @@ class Manny(morse.core.robot.Robot):
 
         children = self.bge_object.childrenRecursive
         children.append(self.bge_object)
+        #print("self", self.bge_object)
         vxlist = []
         vylist = []
         vzlist = []
         for child in children:#self.bge_object.childrenRecursive:
             #print(child)
-            if "part" in child.name:
+            if "part" in child.name or child.name == 'robot':
+                #print(child)
                 for mesh in child.meshes:
 
                     for m_index in range(len(mesh.materials)):
@@ -57,7 +59,7 @@ class Manny(morse.core.robot.Robot):
                             vylist.append(vy)
                             vzlist.append(vz)
 
-        print(max(vxlist),min(vxlist),max(vylist),min(vylist),max(vzlist),min(vzlist))
+        #print(max(vxlist),min(vxlist),max(vylist),min(vylist),max(vzlist),min(vzlist))
 
         return [max(vxlist)-min(vxlist),max(vylist)-min(vylist),max(vzlist)-min(vzlist)]
 

@@ -80,7 +80,7 @@ class MyModel(ACTR):
         goal.set('stop')
         import math
 
-        self.motor_module.set_rotation('ribs','0',repr(math.radians(0)))
+        self.motor_module.set_rotation('ribs','0',repr(math.radians(90)))
         #self.motor_module.set_rotation('arm_upper.R','0',repr(math.radians(35)))
 
         #get bounding box here.
