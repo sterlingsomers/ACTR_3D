@@ -26,7 +26,7 @@ class VisionMethods(ccm.ProductionSystem):
     fake_buffer = Buffer()
     
     def init():
-        fake_buffer.set('asdfasdfasdfasdf')
+        fake_buffer.set('fake')
 
     def repeat(fake_buffer='fake'):
         #This could be used during movement, actively doing the task
@@ -69,22 +69,26 @@ class MyModel(ACTR):
 
 
     def init():
-        DM.add('planning_unit:estimate_passability unit_task:find_opening')
+        DM.add('planning_unit:find_target unit_task:find_target')
               
         #DM.add('planning_unit:prepare_for_Take_off unit_task:starter cue:break_on')
         
-        b_plan_unit.set('planning_unit:estimate_passability_X')
+        b_plan_unit.set('planning_unit:find_target')
         b_unit_task.set('unit_task:none')
         b_operator.set('operator:none')
         b_cue.set('cue:none')
-        goal.set('stop')
-        import math
+        #goal.set('stop')
 
-        self.motor_module.set_rotation('ribs','0',repr(math.radians(90)))
+        self.motor_module.lower_arms()
+        self.motor_module.set_speed('0.05')
+
+        #import math
+
+        #self.motor_module.set_rotation('ribs','0',repr(math.radians(90)))
         #self.motor_module.set_rotation('arm_upper.R','0',repr(math.radians(35)))
 
         #get bounding box here.
-        self.middleware.request('getBoundingBox', [])
+        #self.middleware.request('getBoundingBox', [])
 
     def estimate_passability_retrieveUT(b_plan_unit='planning_unit:estimate_passability', b_unit_task='unit_task:none',
                                         b_operator='operator:none'):

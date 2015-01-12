@@ -18,14 +18,16 @@ class morse_middleware():
         self.modes = ['best_effort']
         self.send_dict = {'set_speed':True,
                         'move_forward':False,
-                        'set_rotation':False} #{function_name:blocking?}
+                        'set_rotation':False,
+                        'lower_arms':True} #{function_name:blocking?}
 
         self.request_dict = {'scan_imageD':True,
                 'getScreenVector':True,
                 'cScan':True,
                 'get_time':True,
                 'xScan':True,
-                'getBoundingBox':True}
+                'getBoundingBox':True,
+                }
             
         self.action_dict = {'scan_imageD':['self.robot_simulation.robot.GeometricCamerav1', '.scan_imageD'],
 				'set_speed':['self.robot_simulation.robot','.set_speed'],
@@ -34,7 +36,8 @@ class morse_middleware():
                 'getScreenVector':['self.robot_simulation.robot.GeometricCamerav1', '.getScreenVector'],
                 'cScan':['self.robot_simulation.robot.GeometricCamerav1', '.cScan'],
                 'xScan':['self.robot_simulation.robot.GeometricCamerav1', '.xScan'],
-                'getBoundingBox':['self.robot_simulation.robot','.getBoundingBox']}
+                'getBoundingBox':['self.robot_simulation.robot','.getBoundingBox'],
+                'lower_arms':['self.robot_simulation.robot.armature','.lower_arms']}
 
         self.danger_list = ['get_time']
         self.modules_in_use = {}
@@ -57,10 +60,19 @@ class morse_middleware():
             self.send_queue.append([datastr,argslist])
         else:
             if self.send_dict[datastr]: #it is blocking
-                pass#put it on the next tick
+                if self.action_dict[datastr][0] in self.modules_in_use:
+                    raise Exception("Module " + self.action_dict[datastr][0] + " is already in use this cycle by "
+                    + self.modules_in_use[self.action_dict[datastr][0]])
+                else:
+                    self.modules_in_use[self.action_dict[datastr][0]] = datastr #set it as in use
+                    #print(self.modules_in_use)
+                    rStr = self.action_dict[datastr][0] + self.action_dict[datastr][1] + '(' + ','.join(argslist) + ')'
+                    #print(rStr)
+                    eval(rStr)
+                    self.mustTick=True
             else: #if it's not blocking, we need to add it's location to a list, and check if it is already in the list
                 if self.action_dict[datastr][0] in self.modules_in_use:
-                    raise Exception("Module " + self.action_dict[datastr][0] + " is already in use this cycle by " 
+                    raise Exception("Module " + self.action_dict[datastr][0] + " is already in use this cycle by "
                     + self.modules_in_use[self.action_dict[datastr][0]])
                 else:
                     self.modules_in_use[self.action_dict[datastr][0]] = datastr #set it as in use

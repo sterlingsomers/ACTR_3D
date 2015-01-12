@@ -104,9 +104,10 @@ class Torso(morse.core.actuator.Actuator):
 
     @service
     def lower_arms(self):
+        print("lower arms...")
         self.set_rotation('arm_upper.L',0,math.radians(-40))
         self.set_rotation('arm_upper.R',0,math.radians(40))
-        return
+        return 1
     
     @service
     def shoulder_rotate(self):

@@ -38,7 +38,7 @@ robot = Manny()
 
 # The list of the main methods to manipulate your components
 # is here: http://www.openrobots.org/morse/doc/stable/user/builder_overview.html
-robot.translate(5.131, 0.0, 0.0)
+robot.translate(0.0, 0.0, 0.0)
 
 
 armature = Armature(model_name='ACTR_3D/actuators/Torso.blend', armature_name='Armature')
@@ -123,7 +123,7 @@ robot.append(GeometricCamerav1)
 #geometric1.add_stream('socket')
 GeometricCamerav1.add_service('socket')
 #Face the wall
-robot.rotate(z=math.radians(180))
+robot.rotate(z=math.radians(90))
 
 motion = MotionVW()
 robot.append(motion)
@@ -156,11 +156,11 @@ robot.add_default_interface('socket')
 
 
 # set 'fastmode' to True to switch to wireframe mode
-env = Environment('../projects/ACTR_3D/room2_target.blend')
+env = Environment('../projects/ACTR_3D/target.blend')
 #env = Environment('indoors-1/indoor-1')
 import math
-env.set_camera_location([15.0, 0, 10.0])
-env.set_camera_rotation([math.radians(50), 0, math.radians(90)])
+env.set_camera_location([0, -10, 7])
+env.set_camera_rotation([math.radians(80), 0, math.radians(00)])
 env.select_display_camera(GeometricCamerav1)
 #pdb.set_trace()
 env.set_time_strategy(TimeStrategies.FixedSimulationStepExternalTrigger)

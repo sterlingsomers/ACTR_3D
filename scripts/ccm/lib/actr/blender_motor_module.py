@@ -29,6 +29,11 @@ class BlenderMotorModule(ccm.Model):
     def move(self):
         pass
 
+    def lower_arms(self):
+        '''Lower the arms'''
+        print("Motormodule_sending lower arms")
+        middleware.send('lower_arms',[])
+
     def set_speed(self,speed=0.01):
         '''Move forward @speed in m/s'''
         middleware.send('set_speed',[speed])
