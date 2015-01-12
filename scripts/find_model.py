@@ -26,7 +26,7 @@ class VisionMethods(ccm.ProductionSystem):
     fake_buffer = Buffer()
     
     def init():
-        fake_buffer.set('fake')
+        fake_buffer.set('asdf')#should be 'fake'
 
     def repeat(fake_buffer='fake'):
         #This could be used during movement, actively doing the task
@@ -80,7 +80,7 @@ class MyModel(ACTR):
         #goal.set('stop')
 
         self.motor_module.lower_arms()
-        self.motor_module.set_speed('0.05')
+        #self.motor_module.set_speed('0.05')
 
         #import math
 
@@ -90,24 +90,26 @@ class MyModel(ACTR):
         #get bounding box here.
         #self.middleware.request('getBoundingBox', [])
 
-    def estimate_passability_retrieveUT(b_plan_unit='planning_unit:estimate_passability', b_unit_task='unit_task:none',
+    def estimate_passability_retrieveUT(b_plan_unit='planning_unit:find_target', b_unit_task='unit_task:none',
                                         b_operator='operator:none'):
-        DM.request('planning_unit:estimate_passability unit_task:?')
+        print("fire estimate_passsability_retrieveUT")
+        DM.request('planning_unit:find_target unit_task:?')
         b_operator.set('operator:retrieveUT')
         #b_cue.set('cue:retrieving_task')
         #goal.set('stop')
         #b_plan_unit.set('planning_unit:none')
 
-    def estimate_passability_recalledUT(b_plan_unit='planning_unit:estimate_passability', b_unit_task='unit_task:none',
+    def estimate_passability_recalledUT(b_plan_unit='planning_unit:find_target', b_unit_task='unit_task:none',
                                         b_operator='operator:retrieveUT',
                                         DMbuffer='unit_task:?UT'):
         b_unit_task.set('unit_task:' + UT)
         b_operator.set('operator:none')
         DMbuffer.clear()
 
-    def estimate_passability_find_opening(b_plan_unit='planning_unit:estimate_passability', b_unit_task='unit_task:find_opening',
+    def estimate_passability_find_opening(b_plan_unit='planning_unit:find_target', b_unit_task='unit_task:find_target',
                                             b_operator='operator:none'):
         #vision_module.cScan()
+        print("estimate_passability_find_opening")
         vision_module.request('isa:dial')
         goal.set('stop')
         b_plan_unit.set('planning_unit:none')
