@@ -156,8 +156,8 @@ robot.add_default_interface('socket')
 
 
 # set 'fastmode' to True to switch to wireframe mode
-env = Environment('../projects/ACTR_3D/room2.blend')
-# = Environment('indoors-1/indoor-1')
+env = Environment('../projects/ACTR_3D/room2_target.blend')
+#env = Environment('indoors-1/indoor-1')
 import math
 env.set_camera_location([15.0, 0, 10.0])
 env.set_camera_rotation([math.radians(50), 0, math.radians(90)])
