@@ -63,9 +63,10 @@ class GeometricCamera(morse.sensors.camera.Camera):
         The second parameter should be the name of the object's parent.
         """
         logger.info('%s initialization' % obj.name)
+        self.timeService = morse.
         # Call the constructor of the parent class
         morse.sensors.camera.Camera.__init__(self, obj, parent)
-
+        self.visual_objects = {}
         # Locate the Blender camera object associated with this sensor
         main_obj = self.bge_object
         for obj in main_obj.children:
@@ -258,7 +259,12 @@ class GeometricCamera(morse.sensors.camera.Camera):
         #sinang = numpy.linalg.norm(numpy.cross(normal,dif))
         #return numpy.arctan2(sinang,cosang)
         #return math.degrees(math.acos(numpy.dot(normal,dif)))
-            
+
+    @service
+    def scan_imageD(self):
+
+        return self.visual_objects
+
     @service
     def scan_image(self):
         '''Scans carefully from the Screen. Any object tagged to be skipped, is skipped.
@@ -384,11 +390,11 @@ class GeometricCamera(morse.sensors.camera.Camera):
 
             y+=grain
             rowY+=1#a counter for the objects[hit][rowY]
-        print(repr(time.time() - beginning) +  " TIME ASDFADFAD")    
+        print(repr(time.time() - beginning) +  " TIME ASDFADFAD")
         return objects
                                
-    @service
-    def scan_imageD(self,xyGrain=0.01,xyPrecision=0.0001,depthGrain=0.05,minDepth=0.05,maxDepth=50):
+
+    def default_scan_image(self,xyGrain=0.01,xyPrecision=0.0001,depthGrain=0.05,minDepth=0.05,maxDepth=50):
         '''Scans carefully from the Screen. Any object tagged to be skipped, is skipped.
             args:
                     ignoreTage: list of tags to ignore'''
@@ -526,6 +532,7 @@ class GeometricCamera(morse.sensors.camera.Camera):
             rowY+=1#a counter for the objects[hit][rowY]
         print(repr(time.time() - beginning) +  " TIME ASDFADFAD")
         #print(type(list(YS.keys())[0]))
+        #self.completed(status.SUCCESS,"data sent")
         return YS
 
     @service
@@ -906,11 +913,14 @@ class GeometricCamera(morse.sensors.camera.Camera):
 
         return self.local_data['distance']
 
-#    def default_action(self):
-#        """ Main loop of the sensor.
-#
-#        Implements the component behaviour
-#        """#
+    def default_action(self):
+        """ Main loop of the sensor.
+
+        Implements the component behaviour
+        """
+        morse.sensors.camera.Camera.default_action(self)
+        logger.info("Geometric_default: " + repr(morse.services.time_services.TimeServices.now()))
+        #self.visual_objects = self.default_scan_image()
 #
 #        import random
 #

@@ -107,8 +107,12 @@ class BlenderVision(ccm.Model):
         ###!!!Note the keys here are strings, not floats
         ###!!Converti them to float below
         self._objects = dict((float(k), v) for k,v in self._objects.items())
-        self.find_edges()
-        print(self._edges)
+        ##self.find_edges()
+        ##print(self._edges)
+
+        print("Obejects:",self._objects)
+
+
         #for y in sorted(self._objects.keys()):
         #    print(y)
         #print(self._objects.keys(), "HEYSSSSSS")

@@ -22,7 +22,7 @@ class MyEnvironment(ccm.Model):
 #    poop=ccm.Model(isa='dial',value=-1000)
 
 class VisionMethods(ccm.ProductionSystem):
-    production_time = 0.025
+    production_time = 0.030
     fake_buffer = Buffer()
     
     def init():
@@ -80,7 +80,7 @@ class MyModel(ACTR):
         #goal.set('stop')
 
         self.motor_module.lower_arms()
-        #self.motor_module.set_speed('0.05')
+        self.motor_module.set_speed('0.01')
 
         #import math
 
@@ -110,7 +110,7 @@ class MyModel(ACTR):
                                             b_operator='operator:none'):
         #vision_module.cScan()
         print("estimate_passability_find_opening")
-        vision_module.request('isa:dial')
+        #vision_module.request('isa:dial')
         goal.set('stop')
         b_plan_unit.set('planning_unit:none')
         
