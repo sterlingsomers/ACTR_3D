@@ -163,7 +163,7 @@ env.set_camera_location([0, -10, 7])
 env.set_camera_rotation([math.radians(80), 0, math.radians(00)])
 env.select_display_camera(GeometricCamerav1)
 #pdb.set_trace()
-env.set_time_strategy(TimeStrategies.FixedSimulationStepExternalTrigger)
+#env.set_time_strategy(TimeStrategies.FixedSimulationStepExternalTrigger)
 env.show_framerate(True)
 #env.show_physics(True)
 

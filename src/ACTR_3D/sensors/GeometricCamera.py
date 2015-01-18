@@ -1,4 +1,4 @@
-import logging; logger = logging.getLogger("morse." + __name__)
+the chanimport logging; logger = logging.getLogger("morse." + __name__)
 from morse.core import blenderapi
 
 import morse.sensors.camera
@@ -63,7 +63,7 @@ class GeometricCamera(morse.sensors.camera.Camera):
         The second parameter should be the name of the object's parent.
         """
         logger.info('%s initialization' % obj.name)
-        self.timeService = morse.
+        #self.timeService = morse.
         # Call the constructor of the parent class
         morse.sensors.camera.Camera.__init__(self, obj, parent)
         self.visual_objects = {}
@@ -919,7 +919,7 @@ class GeometricCamera(morse.sensors.camera.Camera):
         Implements the component behaviour
         """
         morse.sensors.camera.Camera.default_action(self)
-        logger.info("Geometric_default: " + repr(morse.services.time_services.TimeServices.now()))
+        logger.info("Geometric_default")# + repr(morse.services.time_services.TimeServices.now()))
         #self.visual_objects = self.default_scan_image()
 #
 #        import random

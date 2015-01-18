@@ -14,7 +14,7 @@ class GeometricCamera(VideoCamera):
 
         self.properties(Vertical_Flip=False)#cam_width=512,cam_height=512, Vertical_Flip=False)
         self.properties(classpath="ACTR_3D.sensors.GeometricCamera.GeometricCamera")
-        self.frequency(delay=0)
+        self.frequency(frequency=200,delay=0)
   
 
 #class GeometricCamera(SemanticCamera):
