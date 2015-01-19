@@ -1,4 +1,4 @@
-the chanimport logging; logger = logging.getLogger("morse." + __name__)
+import logging; logger = logging.getLogger("morse." + __name__)
 from morse.core import blenderapi
 
 import morse.sensors.camera
@@ -919,7 +919,8 @@ class GeometricCamera(morse.sensors.camera.Camera):
         Implements the component behaviour
         """
         morse.sensors.camera.Camera.default_action(self)
-        logger.info("Geometric_default")# + repr(morse.services.time_services.TimeServices.now()))
+        #time.sleep(1)
+        logger.info("Geometric_default:" + repr(morse.core.blenderapi.persistantstorage().time.time))# + repr(morse.services.time_services.TimeServices.now()))
         #self.visual_objects = self.default_scan_image()
 #
 #        import random

@@ -9,6 +9,8 @@ import pdb
 import bpy
 import math
 from ACTR_3D.builder.robots import Manny
+from ACTR_3D.builder.robots import Car
+
 from ACTR_3D.builder.sensors import GeometricCamera
 #from ACT_v1.builder.actuators import Mannyactuator
 #from ACT_v1.builder.sensors.Collision import Collision as LocalCollision
@@ -19,7 +21,7 @@ from morse.builder import *
 #from ACT_v1.builder.sensors import SemanticCamera#Geometriccamerav1
 from morse.core.morse_time import TimeStrategies
 
-bpymorse.set_speed(fps=200)#,logic_step_max=1,physics_step_max=1)
+bpymorse.set_speed(fps=20)#,logic_step_max=1,physics_step_max=1)
 
 # Add the MORSE mascott, MORSY.
 # Out-the-box available robots are listed here:
@@ -32,8 +34,15 @@ bpymorse.set_speed(fps=200)#,logic_step_max=1,physics_step_max=1)
 ##robot.disable_keyboard_control()
 
 
+#car = Car()
+#car.rotate(z=math.radians(0))
+#keyboard = Keyboard()
+#car.append(keyboard)
+#keyboard.properties(ControlType = 'Position')
 #going to try manny
 robot = Manny()
+
+#car.append(robot)
 
 
 # The list of the main methods to manipulate your components
@@ -156,7 +165,7 @@ robot.add_default_interface('socket')
 
 
 # set 'fastmode' to True to switch to wireframe mode
-env = Environment('../projects/ACTR_3D/target.blend')
+env = Environment('../projects/ACTR_3D/Left_Hand_Traffic.blend')
 #env = Environment('indoors-1/indoor-1')
 import math
 env.set_camera_location([0, -10, 7])
@@ -164,7 +173,8 @@ env.set_camera_rotation([math.radians(80), 0, math.radians(00)])
 env.select_display_camera(GeometricCamerav1)
 #pdb.set_trace()
 #env.set_time_strategy(TimeStrategies.FixedSimulationStepExternalTrigger)
+env.configure_stream_manager('socket',time_sync=True,sync_port=5000)
 env.show_framerate(True)
-#env.show_physics(True)
+env.show_physics(True)
 
 
