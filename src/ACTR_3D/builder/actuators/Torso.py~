@@ -3,8 +3,8 @@ from morse.builder.creator import ActuatorCreator
 class Torso(ActuatorCreator):
     def __init__(self, name=None):
         ActuatorCreator.__init__(self, name, \
-                                 "ACT_v1.actuators.Torso.Torso",\
+                                 "ACTR_3D.actuators.Torso.Torso",\
                                  "Torso")
         
-        self.properties(classpath="ACT_v1.actuators.Torso.Torso")
+        self.properties(classpath="ACTR_3D.actuators.Torso.MannequinTorso")
         #self.add_meshes(['Armature'])
