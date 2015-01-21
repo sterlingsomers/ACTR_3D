@@ -11,6 +11,10 @@ import math
 
 from ACTR_3D.builder.robots import Mannequin
 from ACTR_3D.builder.actuators import MannequinTorso
+from ACTR_3D.builder.actuators import Leftleg
+from ACTR_3D.builder.actuators import Rightleg
+
+
 #from ACTR_3D.builder.robots import Manny
 #from ACTR_3D.builder.robots import Car
 
@@ -39,12 +43,26 @@ bpymorse.set_speed(fps=20)#,logic_step_max=1,physics_step_max=1)
 
 robot = Mannequin()
 robot.translate(0.0, 0.0, 0.90)
-robot.rotate(z=math.radians(00))
+robot.rotate(z=math.radians(0))
 
-torso = Armature(model_name='ACTR_3D/actuators/MannequinTorso.blend')#, armature_name='ribs')
+
+
+leftleg = Armature(model_name='ACTR_3D/actuators/leftleg.blend')#, armature_name='Armature')
+leftleg.properties(classpath = "ACTR_3D.actuators.Leftleg.Leftleg")
+leftleg.translate(0,0,-0.0)
+robot.append(leftleg)
+
+
+rightleg = Armature(model_name='ACTR_3D/actuators/rightleg.blend', armature_name='RightLegArmature')
+rightleg.properties(classpath = "ACTR_3D.actuators.Rightleg.Rightleg")
+rightleg.translate(0.0,0.0,-0.90)
+robot.append(rightleg)
+
+
+#torso = Armature(model_name='ACTR_3D/actuators/MannequinTorso.blend')#, armature_name='ribs')
 #torso.properties(classpath = "ACTR_3D.actuators.Torso.MannequinTorso")
-
-robot.append(torso)
+#torso.translate(0,0,0.8)
+#robot.append(torso)
 
 #car = Car()
 #car.rotate(z=math.radians(0))
@@ -185,7 +203,7 @@ env.set_camera_rotation([math.radians(80), 0, math.radians(00)])
 ##env.select_display_camera(GeometricCamerav1)
 #pdb.set_trace()
 #env.set_time_strategy(TimeStrategies.FixedSimulationStepExternalTrigger)
-env.configure_stream_manager('socket',time_sync=True,sync_port=5000)
+#env.configure_stream_manager('socket',time_sync=True,sync_port=5000)
 env.show_framerate(True)
 env.show_physics(True)
 
