@@ -9,14 +9,14 @@ import pdb
 import bpy
 import math
 
-from ACTR_3D.builder.robots import Mannequin
-from ACTR_3D.builder.actuators import MannequinTorso
-from ACTR_3D.builder.actuators import Leftleg
-from ACTR_3D.builder.actuators import Rightleg
+#from ACTR_3D.builder.robots import Mannequin
+##from ACTR_3D.builder.actuators import MannequinTorso
+##from ACTR_3D.builder.actuators import Leftleg
+##from ACTR_3D.builder.actuators import Rightleg
 
 
-#from ACTR_3D.builder.robots import Manny
-#from ACTR_3D.builder.robots import Car
+from ACTR_3D.builder.robots import Manny
+from ACTR_3D.builder.robots import Car
 
 from ACTR_3D.builder.sensors import GeometricCamera
 #from ACT_v1.builder.actuators import Mannyactuator
@@ -41,22 +41,23 @@ bpymorse.set_speed(fps=20)#,logic_step_max=1,physics_step_max=1)
 ##robot.disable_keyboard_control()
 
 
-robot = Mannequin()
-robot.translate(0.0, 0.0, 0.90)
-robot.rotate(z=math.radians(0))
+robot = Car()
+robot.translate(0.0, 0.0, 0.0)
+robot.rotate(z=math.radians(-90))
+
+##driver = Manny()
 
 
+##leftleg = Armature(model_name='ACTR_3D/actuators/leftleg.blend')#, armature_name='Armature')
+##leftleg.properties(classpath = "ACTR_3D.actuators.Leftleg.Leftleg")
+##leftleg.translate(0,0,-0.0)
+##robot.append(leftleg)
 
-leftleg = Armature(model_name='ACTR_3D/actuators/leftleg.blend')#, armature_name='Armature')
-leftleg.properties(classpath = "ACTR_3D.actuators.Leftleg.Leftleg")
-leftleg.translate(0,0,-0.0)
-robot.append(leftleg)
 
-
-rightleg = Armature(model_name='ACTR_3D/actuators/rightleg.blend', armature_name='RightLegArmature')
-rightleg.properties(classpath = "ACTR_3D.actuators.Rightleg.Rightleg")
-rightleg.translate(0.0,0.0,-0.90)
-robot.append(rightleg)
+##rightleg = Armature(model_name='ACTR_3D/actuators/rightleg.blend', armature_name='RightLegArmature')
+##rightleg.properties(classpath = "ACTR_3D.actuators.Rightleg.Rightleg")
+##rightleg.translate(0.0,0.0,-0.90)
+##robot.append(rightleg)
 
 
 #torso = Armature(model_name='ACTR_3D/actuators/MannequinTorso.blend')#, armature_name='ribs')
@@ -112,7 +113,7 @@ robot.append(rightleg)
 #armature.append(armcollision)
 
 
-##robot.append(armature)
+##driver.append(armature)
 ##armature.add_service('socket')
 
 
@@ -149,20 +150,20 @@ robot.append(rightleg)
 
 
 #Geometric camera
-##GeometricCamerav1 = GeometricCamera()
+GeometricCamerav1 = GeometricCamera()
 
-##GeometricCamerav1.translate(x=0.13,y=-0.0,z=1.22)
-##GeometricCamerav1.properties(Object=False)
-##GeometricCamerav1.properties(cam_width=2048,cam_height=2048)
-##GeometricCamerav1.properties(cam_focal=14)
+GeometricCamerav1.translate(x=0.13,y=-0.0,z=1.0)
+GeometricCamerav1.properties(Object=False)
+GeometricCamerav1.properties(cam_width=2048,cam_height=2048)
+GeometricCamerav1.properties(cam_focal=14)
 
-##GeometricCamerav1.rotate(math.radians(180),math.radians(180),math.radians(00))
-##robot.append(GeometricCamerav1)
+GeometricCamerav1.rotate(math.radians(180),math.radians(0),math.radians(180))
+robot.append(GeometricCamerav1)
 #robot.append(GeometricCamerav1)
 #geometric1.add_stream('socket')
-##GeometricCamerav1.add_service('socket')
+GeometricCamerav1.add_service('socket')
 #Face the wall
-##robot.rotate(z=math.radians(90))
+#robot.rotate(z=math.radians(90))
 
 motion = MotionVW()
 robot.append(motion)
@@ -195,12 +196,12 @@ robot.add_default_interface('socket')
 
 
 # set 'fastmode' to True to switch to wireframe mode
-##env = Environment('../projects/ACTR_3D/Left_Hand_Traffic.blend')
-env = Environment('indoors-1/indoor-1')
+env = Environment('../projects/ACTR_3D/Oval_Track2.blend')
+#env = Environment('indoors-1/indoor-1')
 
 env.set_camera_location([0, -10, 7])
 env.set_camera_rotation([math.radians(80), 0, math.radians(00)])
-##env.select_display_camera(GeometricCamerav1)
+env.select_display_camera(GeometricCamerav1)
 #pdb.set_trace()
 #env.set_time_strategy(TimeStrategies.FixedSimulationStepExternalTrigger)
 #env.configure_stream_manager('socket',time_sync=True,sync_port=5000)
