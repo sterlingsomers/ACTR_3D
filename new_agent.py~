@@ -9,10 +9,7 @@ import pdb
 import bpy
 import math
 
-from ACTR_3D.builder.robots import Mannequin
-#from ACTR_3D.builder.actuators import Rightleg
-#from ACTR_3D.builder.actuators import Leftleg
-
+from ACTR_3D.builer.robots import Mannequin
 #from ACTR_3D.builder.robots import Manny
 #from ACTR_3D.builder.robots import Car
 
@@ -46,22 +43,10 @@ bpymorse.set_speed(fps=30)#,logic_step_max=1,physics_step_max=1)
 #car.append(keyboard)
 #keyboard.properties(ControlType = 'Position')
 #going to try manny
-
 robot = Mannequin()
-robot.translate(0.0,0.0,0.30)
-robot.rotate(0,0,math.radians(90))
+
 #car.append(robot)
 
-leftleg = Armature(model_name='ACTR_3D/actuators/LeftLeg.blend')
-leftleg.translate(0.0,0.0,-0.90)
-robot.append(leftleg)
-
-rightLeg = Armature(model_name='ACTR_3D/actuators/RightLeg.blend')
-rightLeg.translate(0.0,0.0,-0.90)
-robot.append(rightLeg)
-
-#rightleg = Armature('ACTR_3D/actuators/RightLeg.blend', armature_name='leg_upper.R')
-#robot.append(rightleg)
 
 # The list of the main methods to manipulate your components
 # is here: http://www.openrobots.org/morse/doc/stable/user/builder_overview.html
@@ -183,7 +168,7 @@ robot.add_default_interface('socket')
 
 
 # set 'fastmode' to True to switch to wireframe mode
-env = Environment('../projects/ACTR_3D/target.blend')
+env = Environment('Left_Hand_Traffic.blend')
 #env = Environment('indoors-1/indoor-1')
 
 env.set_camera_location([0, -10, 7])
