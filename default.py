@@ -60,6 +60,10 @@ rightLeg = Armature(model_name='ACTR_3D/actuators/RightLeg.blend')
 rightLeg.translate(0.0,0.0,-0.90)
 robot.append(rightLeg)
 
+torso = Armature(model_name='ACTR_3D/actuators/MannequinTorso.blend')
+torso.translate(0.0,0.0,-0.90)
+robot.append(torso)
+
 #rightleg = Armature('ACTR_3D/actuators/RightLeg.blend', armature_name='leg_upper.R')
 #robot.append(rightleg)
 

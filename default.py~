@@ -48,7 +48,7 @@ bpymorse.set_speed(fps=30)#,logic_step_max=1,physics_step_max=1)
 #going to try manny
 
 robot = Mannequin()
-robot.translate(0.0,0.0,0.0)
+robot.translate(0.0,0.0,0.30)
 robot.rotate(0,0,math.radians(90))
 #car.append(robot)
 
@@ -59,6 +59,10 @@ robot.append(leftleg)
 rightLeg = Armature(model_name='ACTR_3D/actuators/RightLeg.blend')
 rightLeg.translate(0.0,0.0,-0.90)
 robot.append(rightLeg)
+
+torso = Armature(model_name='ACTR_3D/actuators/MannequinTorso.blend')
+
+robot.append(torso)
 
 #rightleg = Armature('ACTR_3D/actuators/RightLeg.blend', armature_name='leg_upper.R')
 #robot.append(rightleg)
