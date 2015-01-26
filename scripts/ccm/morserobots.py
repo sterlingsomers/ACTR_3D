@@ -19,7 +19,8 @@ class morse_middleware():
         self.send_dict = {'set_speed':True,
                         'move_forward':False,
                         'set_rotation':False,
-                        'lower_arms':True} #{function_name:blocking?}
+                        'lower_arms':True,
+                        'rotate_torso':False} #{function_name:blocking?}
 
         self.request_dict = {'scan_imageD':True,
                 'getScreenVector':True,
@@ -29,15 +30,16 @@ class morse_middleware():
                 'getBoundingBox':True,
                 }
             
-        self.action_dict = {'scan_imageD':['self.robot_simulation.robot.GeometricCamerav1', '.scan_imageD'],
-				'set_speed':['self.robot_simulation.robot','.set_speed'],
-                'move_forward':['self.robot_simulation.robot','.move_forward'],
-                'set_rotation':['self.robot_simulation.robot.armature','.set_rotation'],
-                'getScreenVector':['self.robot_simulation.robot.GeometricCamerav1', '.getScreenVector'],
-                'cScan':['self.robot_simulation.robot.GeometricCamerav1', '.cScan'],
-                'xScan':['self.robot_simulation.robot.GeometricCamerav1', '.xScan'],
-                'getBoundingBox':['self.robot_simulation.robot','.getBoundingBox'],
-                'lower_arms':['self.robot_simulation.robot.armature','.lower_arms']}
+        self.action_dict = {'rotate_torso':['self.robot_simulation.robot.torso','.rotate']}
+        #self.action_dict = {'scan_imageD':['self.robot_simulation.robot.GeometricCamerav1', '.scan_imageD'],
+		#		'set_speed':['self.robot_simulation.robot','.set_speed'],
+        #        'move_forward':['self.robot_simulation.robot','.move_forward'],
+        #        'set_rotation':['self.robot_simulation.robot.armature','.set_rotation'],
+        #        'getScreenVector':['self.robot_simulation.robot.GeometricCamerav1', '.getScreenVector'],
+        #        'cScan':['self.robot_simulation.robot.GeometricCamerav1', '.cScan'],
+        #        'xScan':['self.robot_simulation.robot.GeometricCamerav1', '.xScan'],
+        #        'getBoundingBox':['self.robot_simulation.robot','.getBoundingBox'],
+        #        'lower_arms':['self.robot_simulation.robot.armature','.lower_arms']}
 
         self.danger_list = ['get_time']
         self.modules_in_use = {}
@@ -190,7 +192,7 @@ class morse_middleware():
             self.modules_in_use = {}
             for rate in range(self.rate):
                 print("Middleware tick!")
-                self.robot_simulation.tick()
+                #self.robot_simulation.tick()
                 if self.send_queue:
                     print("Popping send queue")
                     snd = self.send_queue.pop(0)

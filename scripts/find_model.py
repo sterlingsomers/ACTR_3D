@@ -77,10 +77,14 @@ class MyModel(ACTR):
         b_unit_task.set('unit_task:none')
         b_operator.set('operator:none')
         b_cue.set('cue:none')
-        #goal.set('stop')
+        goal.set('stop')
 
-        self.motor_module.lower_arms()
-        self.motor_module.set_speed('0.01')
+        import math
+        #input new model stuffs here:
+        self.motor_module.rotate_torso(repr(math.radians(20)),'0')
+
+        #self.motor_module.lower_arms()
+        #self.motor_module.set_speed('0.01')
 
         #import math
 

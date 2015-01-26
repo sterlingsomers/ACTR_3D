@@ -20,6 +20,10 @@ class BlenderMotorModule(ccm.Model):
         self.busy=False
         #self.blender_camera = Morse().robot.GeometricCamerav1
 
+    def rotate_torso(self,axis,radians):
+        middleware.send('rotate_torso',[radians,'ribs'])
+
+
     def rotate_shoulders_to(self,radians):
         '''Rotates the shoulders by some percentage of maximum rotation.
             Negative rotations are possible.'''
