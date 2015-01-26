@@ -21,7 +21,8 @@ class BlenderMotorModule(ccm.Model):
         #self.blender_camera = Morse().robot.GeometricCamerav1
 
     def rotate_torso(self,axis,radians):
-        middleware.send('rotate_torso',[radians,'ribs'])
+        '''Rotate ribs on axis by radians'''
+        middleware.send('set_rotation_ribs',[repr('ribs'),axis,radians])
 
 
     def rotate_shoulders_to(self,radians):

@@ -81,7 +81,7 @@ class MyModel(ACTR):
 
         import math
         #input new model stuffs here:
-        self.motor_module.rotate_torso(repr(math.radians(20)),'0')
+        self.motor_module.rotate_torso('0',repr(math.radians(90)))
 
         #self.motor_module.lower_arms()
         #self.motor_module.set_speed('0.01')

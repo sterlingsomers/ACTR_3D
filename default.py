@@ -61,6 +61,7 @@ rightLeg.translate(0.0,0.0,-0.90)
 robot.append(rightLeg)
 
 torso = Armature(model_name='ACTR_3D/actuators/MannequinTorso.blend')
+torso.properties(classpath = "ACTR_3D.actuators.MannequinTorso.MannequinTorso")
 torso.translate(0.0,0.0,-0.90)
 robot.append(torso)
 

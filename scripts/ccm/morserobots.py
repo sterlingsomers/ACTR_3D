@@ -20,7 +20,7 @@ class morse_middleware():
                         'move_forward':False,
                         'set_rotation':False,
                         'lower_arms':True,
-                        'rotate_torso':False} #{function_name:blocking?}
+                        'set_rotation_ribs':False} #{function_name:blocking?}
 
         self.request_dict = {'scan_imageD':True,
                 'getScreenVector':True,
@@ -30,7 +30,7 @@ class morse_middleware():
                 'getBoundingBox':True,
                 }
             
-        self.action_dict = {'rotate_torso':['self.robot_simulation.robot.torso','.rotate']}
+        self.action_dict = {'set_rotation_ribs':['self.robot_simulation.robot.torso','.set_rotation']}
         #self.action_dict = {'scan_imageD':['self.robot_simulation.robot.GeometricCamerav1', '.scan_imageD'],
 		#		'set_speed':['self.robot_simulation.robot','.set_speed'],
         #        'move_forward':['self.robot_simulation.robot','.move_forward'],
