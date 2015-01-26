@@ -15,7 +15,7 @@ import math
 ##from ACTR_3D.builder.actuators import Rightleg
 
 
-from ACTR_3D.builder.robots import Manny
+#from ACTR_3D.builder.robots import Manny
 from ACTR_3D.builder.robots import Car
 
 from ACTR_3D.builder.sensors import GeometricCamera
@@ -154,8 +154,8 @@ GeometricCamerav1 = GeometricCamera()
 
 GeometricCamerav1.translate(x=0.13,y=-0.0,z=1.0)
 GeometricCamerav1.properties(Object=False)
-GeometricCamerav1.properties(cam_width=2048,cam_height=2048)
-GeometricCamerav1.properties(cam_focal=14)
+GeometricCamerav1.properties(cam_width=100,cam_height=100)
+GeometricCamerav1.properties(cam_focal=12)
 
 GeometricCamerav1.rotate(math.radians(180),math.radians(0),math.radians(180))
 robot.append(GeometricCamerav1)
@@ -196,10 +196,10 @@ robot.add_default_interface('socket')
 
 
 # set 'fastmode' to True to switch to wireframe mode
-env = Environment('../projects/ACTR_3D/target.blend')
+env = Environment('../projects/ACTR_3D/Oval_Track2.blend')
 #env = Environment('indoors-1/indoor-1')
 
-env.set_camera_location([0, -10, 7])
+env.set_camera_location([-10, -50, 15])
 env.set_camera_rotation([math.radians(80), 0, math.radians(00)])
 env.select_display_camera(GeometricCamerav1)
 #pdb.set_trace()

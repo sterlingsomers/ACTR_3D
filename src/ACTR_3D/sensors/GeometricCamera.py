@@ -13,6 +13,9 @@ from morse.helpers.transformation import Transformation3d
 import numpy
 import numpy.linalg
 
+from matplotlib import pyplot
+
+
 import bpy
 import bge
 import math
@@ -109,7 +112,17 @@ class GeometricCamera(morse.sensors.camera.Camera):
         #logger.debug("Visible objects: %s" % self.local_data['visible_objects'])
         return visible_object_keys
             
-    
+    @service
+    def get_image(self):
+        #print("XXXX", morse.core.blenderapi.cameras()[self.name()].source.image)
+        image = morse.core.blenderapi.cameras()[self.name()].source.image
+        x = [ int(0.2126 * image[index] +
+                 0.7152 * image[index + 1] +
+                 0.0722 * image[index + 2] )
+             for index in range(0, len(image), 4) ]
+        print(x)
+        return 1
+
     @service
     def check_visibility(self,label):
         '''Returns True if an object with that label is currently visible'''
@@ -919,8 +932,11 @@ class GeometricCamera(morse.sensors.camera.Camera):
         Implements the component behaviour
         """
         morse.sensors.camera.Camera.default_action(self)
+               
+        #x = numpy.array(morse.core.blenderapi.cameras()[self.name()].source.image)
+        #pyplot.imsave('abc.png',x)
         #time.sleep(1)
-        logger.info("Geometric_default:" + repr(morse.core.blenderapi.persistantstorage().time.time))# + repr(morse.services.time_services.TimeServices.now()))
+        #logger.info("Geometric_default:" + repr(morse.core.blenderapi.persistantstorage().time.time))# + repr(morse.services.time_services.TimeServices.now()))
         #self.visual_objects = self.default_scan_image()
 #
 #        import random

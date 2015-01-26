@@ -96,6 +96,8 @@ class BlenderVision(ccm.Model):
 
 
 
+    def process_image(self):
+        img = middleware.request('get_image',[])
 
 
 
