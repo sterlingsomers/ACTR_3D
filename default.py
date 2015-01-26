@@ -154,7 +154,7 @@ GeometricCamerav1 = GeometricCamera()
 
 GeometricCamerav1.translate(x=0.13,y=-0.0,z=1.0)
 GeometricCamerav1.properties(Object=False)
-GeometricCamerav1.properties(cam_width=100,cam_height=100)
+GeometricCamerav1.properties(cam_width=700,cam_height=700)
 GeometricCamerav1.properties(cam_focal=12)
 
 GeometricCamerav1.rotate(math.radians(180),math.radians(0),math.radians(180))
@@ -196,7 +196,7 @@ robot.add_default_interface('socket')
 
 
 # set 'fastmode' to True to switch to wireframe mode
-env = Environment('../projects/ACTR_3D/Oval_Track2.blend')
+env = Environment('../projects/ACTR_3D/Oval_Track_new.blend')
 #env = Environment('indoors-1/indoor-1')
 
 env.set_camera_location([-10, -50, 15])

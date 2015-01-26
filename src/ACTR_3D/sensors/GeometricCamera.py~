@@ -14,7 +14,8 @@ import numpy
 import numpy.linalg
 
 from matplotlib import pyplot
-
+import cv2
+import scipy
 
 import bpy
 import bge
@@ -116,10 +117,7 @@ class GeometricCamera(morse.sensors.camera.Camera):
     def get_image(self):
         #print("XXXX", morse.core.blenderapi.cameras()[self.name()].source.image)
         image = morse.core.blenderapi.cameras()[self.name()].source.image
-        x = [ int(0.2126 * image[index] +
-                 0.7152 * image[index + 1] +
-                 0.0722 * image[index + 2] )
-             for index in range(0, len(image), 4) ]
+        
         return 1
 
     @service
