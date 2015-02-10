@@ -6,29 +6,28 @@ Feel free to edit this template as you like!
 """
 import pdb
 
-import bpy
+#import bpy
 import math
 
-#from ACTR_3D.builder.robots import Mannequin
-##from ACTR_3D.builder.actuators import MannequinTorso
-##from ACTR_3D.builder.actuators import Leftleg
-##from ACTR_3D.builder.actuators import Rightleg
-
+from ACTR_3D.builder.robots import Mannequin
+#from ACTR_3D.builder.actuators import Rightleg
+#from ACTR_3D.builder.actuators import Leftleg
 
 #from ACTR_3D.builder.robots import Manny
-from ACTR_3D.builder.robots import Car
+#from ACTR_3D.builder.robots import Car
 
 from ACTR_3D.builder.sensors import GeometricCamera
 #from ACT_v1.builder.actuators import Mannyactuator
 #from ACT_v1.builder.sensors.Collision import Collision as LocalCollision
-##from ACT_v1.builder.actuators import Torso
+#from ACT_v1.builder.actuators import Torso
 
 from morse.builder import *
+
 #from ACT_v1.builder.actuators import Draw1
 #from ACT_v1.builder.sensors import SemanticCamera#Geometriccamerav1
 from morse.core.morse_time import TimeStrategies
 
-bpymorse.set_speed(fps=20)#,logic_step_max=1,physics_step_max=1)
+bpymorse.set_speed(fps=30)#,logic_step_max=1,physics_step_max=1)
 
 # Add the MORSE mascott, MORSY.
 # Out-the-box available robots are listed here:
@@ -41,51 +40,50 @@ bpymorse.set_speed(fps=20)#,logic_step_max=1,physics_step_max=1)
 ##robot.disable_keyboard_control()
 
 
-robot = Car()
-robot.translate(0.0, 0.0, 0.0)
-robot.rotate(z=math.radians(-90))
-
-##driver = Manny()
-
-
-##leftleg = Armature(model_name='ACTR_3D/actuators/leftleg.blend')#, armature_name='Armature')
-##leftleg.properties(classpath = "ACTR_3D.actuators.Leftleg.Leftleg")
-##leftleg.translate(0,0,-0.0)
-##robot.append(leftleg)
-
-
-##rightleg = Armature(model_name='ACTR_3D/actuators/rightleg.blend', armature_name='RightLegArmature')
-##rightleg.properties(classpath = "ACTR_3D.actuators.Rightleg.Rightleg")
-##rightleg.translate(0.0,0.0,-0.90)
-##robot.append(rightleg)
-
-
-#torso = Armature(model_name='ACTR_3D/actuators/MannequinTorso.blend')#, armature_name='ribs')
-#torso.properties(classpath = "ACTR_3D.actuators.Torso.MannequinTorso")
-#torso.translate(0,0,0.8)
-#robot.append(torso)
-
 #car = Car()
 #car.rotate(z=math.radians(0))
 #keyboard = Keyboard()
 #car.append(keyboard)
 #keyboard.properties(ControlType = 'Position')
 #going to try manny
-##robot = Manny()
 
+robot = Mannequin()
+robot.translate(0.0,0.0,0.30)
+robot.rotate(0,0,math.radians(90))
 #car.append(robot)
 
+leftleg = Armature(model_name='ACTR_3D/actuators/LeftLeg.blend')
+leftleg.translate(0.0,0.0,-0.90)
+robot.append(leftleg)
+
+rightLeg = Armature(model_name='ACTR_3D/actuators/RightLeg.blend')
+rightLeg.translate(0.0,0.0,-0.90)
+robot.append(rightLeg)
+
+torso = Armature(model_name='ACTR_3D/actuators/MannequinTorso.blend')
+torso.properties(classpath = "ACTR_3D.actuators.MannequinTorso.MannequinTorso")
+torso.translate(0.0,0.0,-0.90)
+robot.append(torso)
+
+leftClavical = Armature(model_name='ACTR_3D/actuators/LeftClavical.blend')
+leftClavical.translate(0.0,0.0,-0.94)
+torso.append(leftClavical)
+
+
+
+#rightleg = Armature('ACTR_3D/actuators/RightLeg.blend', armature_name='leg_upper.R')
+#robot.append(rightleg)
 
 # The list of the main methods to manipulate your components
 # is here: http://www.openrobots.org/morse/doc/stable/user/builder_overview.html
+###robot.translate(0.0, 0.0, 0.0)
 
 
+###armature = Armature(model_name='ACTR_3D/actuators/Torso.blend', armature_name='Armature')
 
-##armature = Armature(model_name='ACTR_3D/actuators/Torso.blend', armature_name='Armature')
-
-##armature.properties(classpath = "ACTR_3D.actuators.Torso.Torso")
-##armature.translate(0,0,-0.42)
-##armature.rotate(z=math.radians(90))
+###armature.properties(classpath = "ACTR_3D.actuators.Torso.Torso")
+###armature.translate(0,0,-0.42)
+###armature.rotate(z=math.radians(90))
 
 
 #armature.rotate(0.0,0.0,0.0)
@@ -113,8 +111,8 @@ robot.rotate(z=math.radians(-90))
 #armature.append(armcollision)
 
 
-##driver.append(armature)
-##armature.add_service('socket')
+###robot.append(armature)
+###armature.add_service('socket')
 
 
 
@@ -152,18 +150,18 @@ robot.rotate(z=math.radians(-90))
 #Geometric camera
 GeometricCamerav1 = GeometricCamera()
 
-GeometricCamerav1.translate(x=0.13,y=-0.0,z=1.0)
+GeometricCamerav1.translate(x=0.13,y=-0.0,z=0.8)
 GeometricCamerav1.properties(Object=False)
-GeometricCamerav1.properties(cam_width=700,cam_height=700)
-GeometricCamerav1.properties(cam_focal=12)
+GeometricCamerav1.properties(cam_width=2048,cam_height=2048)
+GeometricCamerav1.properties(cam_focal=14)
 
-GeometricCamerav1.rotate(math.radians(180),math.radians(0),math.radians(180))
+GeometricCamerav1.rotate(math.radians(180),math.radians(180),math.radians(00))
 robot.append(GeometricCamerav1)
 #robot.append(GeometricCamerav1)
 #geometric1.add_stream('socket')
 GeometricCamerav1.add_service('socket')
 #Face the wall
-#robot.rotate(z=math.radians(90))
+robot.rotate(z=math.radians(90))
 
 motion = MotionVW()
 robot.append(motion)
@@ -196,15 +194,15 @@ robot.add_default_interface('socket')
 
 
 # set 'fastmode' to True to switch to wireframe mode
-env = Environment('../projects/ACTR_3D/Oval_Track_new.blend')
+env = Environment('../projects/ACTR_3D/target.blend')
 #env = Environment('indoors-1/indoor-1')
 
-env.set_camera_location([-10, -50, 15])
+env.set_camera_location([0, -10, 7])
 env.set_camera_rotation([math.radians(80), 0, math.radians(00)])
 env.select_display_camera(GeometricCamerav1)
 #pdb.set_trace()
 #env.set_time_strategy(TimeStrategies.FixedSimulationStepExternalTrigger)
-#env.configure_stream_manager('socket',time_sync=True,sync_port=5000)
+env.configure_stream_manager('socket',time_sync=True,sync_port=5000)
 env.show_framerate(True)
 env.show_physics(True)
 
