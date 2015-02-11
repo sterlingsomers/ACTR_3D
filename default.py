@@ -6,15 +6,12 @@ Feel free to edit this template as you like!
 """
 import pdb
 
-#import bpy
+import bpy
 import math
 
-from ACTR_3D.builder.robots import Mannequin
-#from ACTR_3D.builder.actuators import Rightleg
-#from ACTR_3D.builder.actuators import Leftleg
-
-#from ACTR_3D.builder.robots import Manny
-#from ACTR_3D.builder.robots import Car
+#from ACTR_3D.builer.robots import Mannequin
+from ACTR_3D.builder.robots import Manny
+from ACTR_3D.builder.robots import Car
 
 from ACTR_3D.builder.sensors import GeometricCamera
 #from ACT_v1.builder.actuators import Mannyactuator
@@ -22,12 +19,11 @@ from ACTR_3D.builder.sensors import GeometricCamera
 #from ACT_v1.builder.actuators import Torso
 
 from morse.builder import *
-
 #from ACT_v1.builder.actuators import Draw1
 #from ACT_v1.builder.sensors import SemanticCamera#Geometriccamerav1
 from morse.core.morse_time import TimeStrategies
 
-bpymorse.set_speed(fps=30)#,logic_step_max=1,physics_step_max=1)
+bpymorse.set_speed(fps=20)#,logic_step_max=1,physics_step_max=1)
 
 # Add the MORSE mascott, MORSY.
 # Out-the-box available robots are listed here:
@@ -46,44 +42,21 @@ bpymorse.set_speed(fps=30)#,logic_step_max=1,physics_step_max=1)
 #car.append(keyboard)
 #keyboard.properties(ControlType = 'Position')
 #going to try manny
+robot = Manny()
 
-robot = Mannequin()
-robot.translate(0.0,0.0,0.30)
-robot.rotate(0,0,math.radians(90))
 #car.append(robot)
 
-leftleg = Armature(model_name='ACTR_3D/actuators/LeftLeg.blend')
-leftleg.translate(0.0,0.0,-0.90)
-robot.append(leftleg)
-
-rightLeg = Armature(model_name='ACTR_3D/actuators/RightLeg.blend')
-rightLeg.translate(0.0,0.0,-0.90)
-robot.append(rightLeg)
-
-torso = Armature(model_name='ACTR_3D/actuators/MannequinTorso.blend')
-torso.properties(classpath = "ACTR_3D.actuators.MannequinTorso.MannequinTorso")
-torso.translate(0.0,0.0,-0.90)
-robot.append(torso)
-
-leftClavical = Armature(model_name='ACTR_3D/actuators/LeftClavical.blend')
-leftClavical.translate(0.0,0.0,-0.94)
-torso.append(leftClavical)
-
-
-
-#rightleg = Armature('ACTR_3D/actuators/RightLeg.blend', armature_name='leg_upper.R')
-#robot.append(rightleg)
 
 # The list of the main methods to manipulate your components
 # is here: http://www.openrobots.org/morse/doc/stable/user/builder_overview.html
-###robot.translate(0.0, 0.0, 0.0)
+robot.translate(0.0, 0.0, 0.0)
 
 
-###armature = Armature(model_name='ACTR_3D/actuators/Torso.blend', armature_name='Armature')
+torso = Armature(model_name='ACTR_3D/actuators/Torso.blend', armature_name='Armature')
 
-###armature.properties(classpath = "ACTR_3D.actuators.Torso.Torso")
-###armature.translate(0,0,-0.42)
-###armature.rotate(z=math.radians(90))
+torso.properties(classpath = "ACTR_3D.actuators.Torso.Torso")
+torso.translate(0,0,-0.42)
+torso.rotate(z=math.radians(90))
 
 
 #armature.rotate(0.0,0.0,0.0)
@@ -111,8 +84,8 @@ torso.append(leftClavical)
 #armature.append(armcollision)
 
 
-###robot.append(armature)
-###armature.add_service('socket')
+robot.append(torso)
+torso.add_service('socket')
 
 
 
@@ -150,7 +123,7 @@ torso.append(leftClavical)
 #Geometric camera
 GeometricCamerav1 = GeometricCamera()
 
-GeometricCamerav1.translate(x=0.13,y=-0.0,z=0.8)
+GeometricCamerav1.translate(x=0.13,y=-0.0,z=1.22)
 GeometricCamerav1.properties(Object=False)
 GeometricCamerav1.properties(cam_width=2048,cam_height=2048)
 GeometricCamerav1.properties(cam_focal=14)
@@ -194,9 +167,10 @@ robot.add_default_interface('socket')
 
 
 # set 'fastmode' to True to switch to wireframe mode
+#env = Environment('../projects/ACTR_3D/Left_Hand_Traffic.blend')
 env = Environment('../projects/ACTR_3D/target.blend')
 #env = Environment('indoors-1/indoor-1')
-
+import math
 env.set_camera_location([0, -10, 7])
 env.set_camera_rotation([math.radians(80), 0, math.radians(00)])
 env.select_display_camera(GeometricCamerav1)
