@@ -90,7 +90,7 @@ class BlenderVision(ccm.Model):
                             edges.append([firstLabel,label])
                     edgeCount+=1
                 self._edges[y] = edges
-                #print(edges,"EDGES")
+                print(edges,"EDGES")
                 #break
 
 
@@ -105,11 +105,12 @@ class BlenderVision(ccm.Model):
         #print(ccm.middle)
         #import time
         #now = time.time()
-        self._objects = middleware.request('scan_imageD',[])
+        self._objects = middleware.request('scan_image',[])
         ###!!!Note the keys here are strings, not floats
         ###!!Converti them to float below
         self._objects = dict((float(k), v) for k,v in self._objects.items())
-        ##self.find_edges()
+
+        self.find_edges()
         ##print(self._edges)
 
         print("Obejects:",self._objects)

@@ -21,6 +21,8 @@ import bpy
 import bge
 import math
 
+import multiprocessing as mp
+
 import time
 
 from mathutils import Vector
@@ -404,7 +406,166 @@ class GeometricCamera(morse.sensors.camera.Camera):
         print(repr(time.time() - beginning) +  " TIME ASDFADFAD")
         return objects
                                
+    @service
+    def scan_image_multi(self,xyGrain=0.01,xyPrecision=0.0001,depthGrain=0.05,minDepth=0.05,maxDepth=50,processes=8):
+        def worker(minY,maxY, out_q):
+            #beginning = time.time()
+            #objects = {} #{objlable:[inside_angle,outside_angle,highest,lowest]}
+            YS = {} #{y-index: {label: [[x1,x2,d1,d2],[..],.],lable2:...}
+            normal = self.blender_cam.getScreenVect(0.5,0.5)
+            before = time.time()
+            BigGrain = 0.01#1% of the picture
+            SmallGrain = 0.0001
+            grain = BigGrain
+            stepBack = BigGrain
+            x = 0.0 #left-> right
+            y = minY #top-> bottom
+            lastHit = -1
+            rowY = 0
+            lastY = 0
+            lastX = 0
+            stateChange = 0.0
+            while y < maxY:
+                #if lastHit != -1:
+                    #print(lastHit,objects[lastHit])
+                x = 0.0
+                lastHit = -1
+                while x < 0.9999:
 
+                    #FDOprint("@x,y", [x,y])
+                    #if y >= 0.60:
+                    #    input("continue?")
+                    stepBack=BigGrain
+                    hit = self.blender_cam.getScreenRay(x,y,100)#distance of 100#I assume meters.
+                    #print(ignoreTags)
+                    #if repr(hit) == 'None':
+                    #    x += BigGrain
+                    #    continue
+                    #FDOprint("Hit is", hit)
+                    if lastHit == -1:
+                        stepBack=0.0
+
+                    if not y in YS:#change to repr(y) if needed
+                        #this is y has just started
+                        YS[y] = {}
+
+                    newState = not(hit == lastHit)
+
+                    if newState:
+                        #FDOprint(hit, "is a new state")
+                        if lastHit == -1:#a new line
+                            #FDOprint('lastHit is -1')
+                            YS[y][repr(hit)] = [x,None,self.distance_to_xy(x,y,minDepth,maxDepth,grainSize=depthGrain),None]
+
+                            #FDOprint(YS, "AFTER -1")
+                            #objects[repr(hit)][repr(y)] = [x,None]
+                            #FDOprint("added: ", objects[repr(hit)], "because -1")
+                            #print("NS", hit, objects[hit])
+
+
+                        #print("new state", x,y, "from", lastHit, "to", hit)
+                        #if not x:
+                        #    x+=grain
+                        #    lastHit = hit
+                        #    continue
+
+                        stateChange+=1
+                        if grain == SmallGrain:
+                            #FDOprint("Have a small Grain")
+                            #record (x,y)
+                            #print("n-", lastHit, objects[lastHit])
+                            #FDOprint("X-", lastHit, y,x-grain, hit, y,x)
+                            if repr(lastHit) in YS[y]:#if there is already an entry for this line with that object
+                                #FDOprint(y, "in", objects[repr(lastHit)])
+                                #FDOprint("so....")
+                                YS[y][repr(lastHit)][1]=x-grain
+                                YS[y][repr(lastHit)][3]=self.distance_to_xy(x-grain,y,minDepth,maxDepth,grainSize=depthGrain)
+                                #FDOprint(objects[repr(lastHit)][repr(y)])
+                            else:#if this object hasn't been detected on this line
+                                #FDOprint(y, "NOT in", objects[repr(lastHit)])
+                                #FDOprint("so...")
+                                YS[y][repr(lastHit)]=[x-grain,None,None,None]#because it's the most leftest
+                                #FDOprint(objects[repr(lastHit)][repr(y)])
+                            #objects[hit][y] = [x,None] #roughly... it may already have that entry
+                            if repr(hit)  in YS[y]:
+                                #FDOprint(y, "in2", objects[repr(hit)])
+                                YS[y][repr(hit)][1]=x #this MIGHT be the end of that object, but it's NOT the beggining, thus [1] in [x,None]
+                                YS[y][repr(hit)][3]=self.distance_to_xy(x,y,minDepth,maxDepth,grainSize=depthGrain)
+                                #FDOprint("so: ", objects[repr(hit)][repr(y)])
+                            else:
+                                #FDOprint(y, "NOT in2", objects[repr(hit)])
+                                YS[y][repr(hit)]=[x,None,self.distance_to_xy(x,y,minDepth,maxDepth,grainSize=depthGrain),None] #if this line is not in there, add it
+                                #FDOprint("so: ", objects[repr(hit)][repr(y)])
+
+                            grain = BigGrain
+                            #FDOprint("set to bigGrain")
+                            x+=grain
+                            lastHit = hit
+                            #FDOprint("lasthit = ", hit)
+                        else:#grain is big, new state
+                            #FDOprint("Big Grain")
+                            #FDOprint(YS, 'YS AFTER BIG GRAINss')
+                            x-=stepBack
+                            #FDOprint("stepback", stepBack)
+                            #objects[hit].append([x,None,None])
+                            grain=SmallGrain
+                            #FDOprint("change to SmallGrain")
+                            if not x and not y:
+                                grain=BigGrain
+                                #FDOprint("change back to BigGrain1")
+                            if lastHit == -1:
+                                grain=BigGrain
+                                #FDOprint("change back to BigGrain2")
+                            x+=grain
+                            #The lastHit should remain the same because we stepped back but if we do that, it will be -1
+                            if grain == SmallGrain:
+                                lastHit = lastHit #remains the same because we're moving forward slowly from before the new detection
+                                #FDOprint("lastHit = the same", lastHit)
+                            else:
+                                #FDOprint("lastHit changed to hit->", hit)
+                                lastHit = hit#if it's a bigGrain, we're moving forward
+                    else:
+                        #FDOprint("same object found")
+                        x+=grain
+                        #input("x to " + repr(x) + "continue?")
+                        #return "same state" + repr([x,y])
+                    #if not newState:
+                    #    lastHit = hit
+                #FDOprint (YS, "YS...")
+                YS[y][repr(hit)][1]=x#The end (most right) of that line
+                YS[y][repr(hit)][3]=self.distance_to_xy(x,y,minDepth,maxDepth,grainSize=depthGrain)
+                #FDOprint("End of the line", objects[repr(hit)][repr(y)], "for", hit, "and", y)
+                #FDOlastY = y
+
+                y+=grain
+                rowY+=1#a counter for the objects[hit][rowY]
+            #print(repr(time.time() - beginning) +  " TIME ASDFADFAD")
+            #print(type(list(YS.keys())[0]))
+            #self.completed(status.SUCCESS,"data sent")
+            out_q.put(YS)
+
+        start = time.time()
+        out_q = mp.Queue()
+        procs = []
+
+        for i in range(processes):
+            p = mp.Process(target=worker,args=(i/processes,i/processes+(1/processes),out_q))
+            procs.append(p)
+            p.start()
+
+        resultdict = {}
+        for i in range(processes):
+                resultdict.update(out_q.get())
+
+        for p in procs:
+            p.join()
+        print(time.time() - start, ": TIME")
+        return resultdict
+
+
+
+
+    @service
     def default_scan_image(self,xyGrain=0.01,xyPrecision=0.0001,depthGrain=0.05,minDepth=0.05,maxDepth=50):
         '''Scans carefully from the Screen. Any object tagged to be skipped, is skipped.
             args:
