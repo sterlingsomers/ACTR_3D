@@ -59,9 +59,10 @@ class BlenderVision(ccm.Model):
         print(x)
     
     def almost_equal(self,x1,x2):
-        return abs(x1-x2) < 0.01
+        return abs(x1-x2) < 0.01 #1cm?
 
     def shares_edge(self,list1,list2):
+        print(list1, list2)
         if self.almost_equal(list1[0],list2[0]):
             return 1
         if self.almost_equal(list1[0],list2[1]):
@@ -110,15 +111,15 @@ class BlenderVision(ccm.Model):
         ###!!Converti them to float below
         self._objects = dict((float(k), v) for k,v in self._objects.items())
 
-        self.find_edges()
+        #self.find_edges()
         ##print(self._edges)
 
         print("Obejects:",self._objects)
 
 
-        #for y in sorted(self._objects.keys()):
-        #    print(y)
-        #print(self._objects.keys(), "HEYSSSSSS")
+        for y in sorted(self._objects.keys()):
+            print(y,self._objects[y],"WTF...")
+        #print(self,._objects.keys(), "HEYSSSSSS")
         #print("Time:")
         #print(time.time() - now)
         #print(self._objects, "objects")
