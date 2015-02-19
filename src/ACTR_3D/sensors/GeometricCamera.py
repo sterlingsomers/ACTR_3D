@@ -20,6 +20,7 @@ import scipy
 import bpy
 import bge
 import math
+from decimal import *
 
 import multiprocessing as mp
 
@@ -145,6 +146,7 @@ class GeometricCamera(morse.sensors.camera.Camera):
         #print("x",x,"y",y,"minD",minD,"maxD",maxD,"grainSize",grainSize)
         while minD <= maxD:
             hit = self.blender_cam.getScreenRay(x,y,minD)
+
             if hit:
                 return minD
             minD+=grainSize#1cm?
@@ -304,7 +306,7 @@ class GeometricCamera(morse.sensors.camera.Camera):
             x = 0.0
             lastHit = -1
             while x < 0.9999:
-                
+
                 #FDOprint("@x,y", [x,y])
                 #if y >= 0.60:
                 #    input("continue?")
@@ -407,7 +409,7 @@ class GeometricCamera(morse.sensors.camera.Camera):
         return objects
                                
     @service
-    def scan_image_multi(self,xyGrain=0.01,xyPrecision=0.0001,depthGrain=0.05,minDepth=0.05,maxDepth=50,processes=1):
+    def scan_image_multi(self,xyGrain=0.01,xyPrecision=0.002,depthGrain=0.01,minDepth=0.05,maxDepth=50,processes=8):
         def worker(minY,maxY, out_q):
             #beginning = time.time()
             #objects = {} #{objlable:[inside_angle,outside_angle,highest,lowest]}
@@ -415,7 +417,7 @@ class GeometricCamera(morse.sensors.camera.Camera):
             normal = self.blender_cam.getScreenVect(0.5,0.5)
             before = time.time()
             BigGrain = 0.01#1% of the picture
-            SmallGrain = 0.0001
+            SmallGrain = xyPrecision
             grain = BigGrain
             stepBack = BigGrain
             x = 0.0 #left-> right
@@ -566,35 +568,44 @@ class GeometricCamera(morse.sensors.camera.Camera):
 
 
     @service
-    def default_scan_image(self,xyGrain=0.01,xyPrecision=0.0001,depthGrain=0.05,minDepth=0.05,maxDepth=50):
+    def default_scan_image(self,xyGrain=0.01,xyPrecision=0.002,depthGrain=0.01,minDepth=0.05,maxDepth=50):
         '''Scans carefully from the Screen. Any object tagged to be skipped, is skipped.
             args:
                     ignoreTage: list of tags to ignore'''
         #depthGrain = depthGrain
+
+        getcontext().prec = 4
+        import pdb
+        #pdb.set_trace()
 
         beginning = time.time()
         #objects = {} #{objlable:[inside_angle,outside_angle,highest,lowest]}
         YS = {} #{y-index: {label: [[x1,x2,d1,d2],[..],.],lable2:...}
         normal = self.blender_cam.getScreenVect(0.5,0.5)
         before = time.time()
-        BigGrain = 0.01#1% of the picture
-        SmallGrain = 0.0001
+        BigGrain = Decimal(0.01)#1% of the picture
+        SmallGrain = Decimal(xyPrecision)
         grain = BigGrain
         stepBack = BigGrain
-        x = 0.0 #left-> right
-        y = 0.0 #top-> bottom
+        x = Decimal(0.0) #left-> right
+        y = Decimal(0.0) #top-> bottom
         lastHit = -1
         rowY = 0
         lastY = 0
         lastX = 0
         stateChange = 0.0
         while y < 0.9999:
+            #if y >= 0.62:
+            #pdb.set_trace()
             #if lastHit != -1:
                 #print(lastHit,objects[lastHit])
-            x = 0.0
+            x = Decimal(0.0)
             lastHit = -1
-            while x < 0.9999:
-
+            while x < Decimal(0.9999):
+                x = Decimal(x)
+                y = Decimal(y)
+                #x=round(x,4)
+                #y=round(y,3)
                 #FDOprint("@x,y", [x,y])
                 #if y >= 0.60:
                 #    input("continue?")
@@ -606,20 +617,24 @@ class GeometricCamera(morse.sensors.camera.Camera):
                 #    continue
                 #FDOprint("Hit is", hit)
                 if lastHit == -1:
-                    stepBack=0.0
+                    stepBack=Decimal(0.0)
 
-                if not y in YS:#change to repr(y) if needed
+                if not float(y) in YS:#change to repr(y) if needed
                     #this is y has just started
-                    YS[y] = {}
+                    YS[float(y)] = {}
 
                 newState = not(hit == lastHit)
 
                 if newState:
+                    #if y >= 0.62:
+                    #    pdb.set_trace()
                     #FDOprint(hit, "is a new state")
                     if lastHit == -1:#a new line
                         #FDOprint('lastHit is -1')
-                        YS[y][repr(hit)] = [x,None,self.distance_to_xy(x,y,minDepth,maxDepth,grainSize=depthGrain),None]
 
+                        YS[float(y)][repr(hit)] = [float(x),None,float(self.distance_to_xy(x,y,minDepth,maxDepth,grainSize=depthGrain)),None]
+                        #if repr(hit) == 'None':
+                        #    print("added:",repr(hit),[x,None,self.distance_to_xy(x,y,minDepth,maxDepth,grainSize=depthGrain),None])
                         #FDOprint(YS, "AFTER -1")
                         #objects[repr(hit)][repr(y)] = [x,None]
                         #FDOprint("added: ", objects[repr(hit)], "because -1")
@@ -638,26 +653,39 @@ class GeometricCamera(morse.sensors.camera.Camera):
                         #record (x,y)
                         #print("n-", lastHit, objects[lastHit])
                         #FDOprint("X-", lastHit, y,x-grain, hit, y,x)
-                        if repr(lastHit) in YS[y]:#if there is already an entry for this line with that object
+                        if repr(lastHit) in YS[float(y)]:#if there is already an entry for this line with that object
                             #FDOprint(y, "in", objects[repr(lastHit)])
-                            #FDOprint("so....")
-                            YS[y][repr(lastHit)][1]=x-grain
-                            YS[y][repr(lastHit)][3]=self.distance_to_xy(x-grain,y,minDepth,maxDepth,grainSize=depthGrain)
+                            #FDOprint("so....")\
+
+                            #print("Before: ",YS[y])
+
+                            YS[float(y)][repr(lastHit)][1]=float(x-grain)
+                            YS[float(y)][repr(lastHit)][3]=float(self.distance_to_xy(x-grain,y,minDepth,maxDepth,grainSize=depthGrain))
+                            #if repr(lastHit) == 'None':
+                            #    print("After:", YS[y]['None'])
                             #FDOprint(objects[repr(lastHit)][repr(y)])
                         else:#if this object hasn't been detected on this line
                             #FDOprint(y, "NOT in", objects[repr(lastHit)])
                             #FDOprint("so...")
-                            YS[y][repr(lastHit)]=[x-grain,None,None,None]#because it's the most leftest
+                            YS[float(y)][repr(lastHit)]=[float(x-grain),None,None,None]#because it's the most leftest
+                            #if repr(hit) == 'None':
+                            #    print("After2:", YS[y]['None'])
                             #FDOprint(objects[repr(lastHit)][repr(y)])
                         #objects[hit][y] = [x,None] #roughly... it may already have that entry
-                        if repr(hit)  in YS[y]:
+                        if repr(hit)  in YS[float(y)]:
                             #FDOprint(y, "in2", objects[repr(hit)])
-                            YS[y][repr(hit)][1]=x #this MIGHT be the end of that object, but it's NOT the beggining, thus [1] in [x,None]
-                            YS[y][repr(hit)][3]=self.distance_to_xy(x,y,minDepth,maxDepth,grainSize=depthGrain)
+                            YS[float(y)][repr(hit)][1]=float(x) #this MIGHT be the end of that object, but it's NOT the beggining, thus [1] in [x,None]
+                            YS[float(y)][repr(hit)][3]=float(self.distance_to_xy(x,y,minDepth,maxDepth,grainSize=depthGrain))
+                            #if repr(hit) == 'None':
+                            #    print("After3:", YS[y]['None'])
                             #FDOprint("so: ", objects[repr(hit)][repr(y)])
                         else:
-                            #FDOprint(y, "NOT in2", objects[repr(hit)])
-                            YS[y][repr(hit)]=[x,None,self.distance_to_xy(x,y,minDepth,maxDepth,grainSize=depthGrain),None] #if this line is not in there, add it
+                            #FDOprint(y, "NOTs in2", objects[repr(hit)])
+                            YS[float(y)][repr(hit)]=[float(x),None,float(self.distance_to_xy(x,y,minDepth,maxDepth,grainSize=depthGrain)),None] #if this line is not in there, add it
+                            #if repr(hit) == 'None':
+                            #    print("After4:", YS[y]['None'],
+                            #          self.blender_cam.getScreenRay(x,y,100),
+                            #          self.distance_to_xy(x,y,minDepth,maxDepth,grainSize=depthGrain))
                             #FDOprint("so: ", objects[repr(hit)][repr(y)])
 
                         grain = BigGrain
@@ -679,7 +707,7 @@ class GeometricCamera(morse.sensors.camera.Camera):
                         if lastHit == -1:
                             grain=BigGrain
                             #FDOprint("change back to BigGrain2")
-                        x+=grain
+                        #x+=grain
                         #The lastHit should remain the same because we stepped back but if we do that, it will be -1
                         if grain == SmallGrain:
                             lastHit = lastHit #remains the same because we're moving forward slowly from before the new detection
@@ -695,8 +723,10 @@ class GeometricCamera(morse.sensors.camera.Camera):
                 #if not newState:
                 #    lastHit = hit
             #FDOprint (YS, "YS...")
-            YS[y][repr(hit)][1]=x#The end (most right) of that line
-            YS[y][repr(hit)][3]=self.distance_to_xy(x,y,minDepth,maxDepth,grainSize=depthGrain)
+            YS[float(y)][repr(hit)][1]=float(x)#The end (most right) of that line
+            YS[float(y)][repr(hit)][3]=float(self.distance_to_xy(x,y,minDepth,maxDepth,grainSize=depthGrain))
+            #if repr(hit) == 'None':
+            #    print("After:", YS[y]['None'])
             #FDOprint("End of the line", objects[repr(hit)][repr(y)], "for", hit, "and", y)
             #FDOlastY = y
 
@@ -705,7 +735,7 @@ class GeometricCamera(morse.sensors.camera.Camera):
         print(repr(time.time() - beginning) +  " TIME ASDFADFAD")
         #print(type(list(YS.keys())[0]))
         #self.completed(status.SUCCESS,"data sent")
-        return YS
+        return YS#dict((float(k), v) for k,v in self._objects.items())
 
     @service
     def get_visible_angles(self, label):
