@@ -141,16 +141,35 @@ class GeometricCamera(morse.sensors.camera.Camera):
 
     @service
     def distance_to_xy(self,x,y,minD,maxD,grainSize=0.01):
-        '''The x,y (screen) should be current.  
-        This finds the distance to an object, given x,y coordinate. None if empty space'''
-        #print("x",x,"y",y,"minD",minD,"maxD",maxD,"grainSize",grainSize)
+        #import pdb
+        #pdb.set_trace()
+        #pdb.set_trace()
+        grainSize = Decimal(grainSize).quantize(Decimal('.01'),rounding=ROUND_HALF_DOWN)
+        bigGrain = grainSize * 100
+        minD = Decimal(minD)
+        maxD = Decimal(maxD)
         while minD <= maxD:
             hit = self.blender_cam.getScreenRay(x,y,minD)
-
-            if hit:
-                return minD
-            minD+=grainSize#1cm?
-        return maxD
+            if not hit == None:
+                if bigGrain == grainSize:
+                    return float(minD)
+                else:
+                    minD -= bigGrain
+                    bigGrain = bigGrain/10
+            minD+=bigGrain
+        return float(maxD)
+    # @service
+    # def distance_to_xy(self,x,y,minD,maxD,grainSize=0.01):
+    #     '''The x,y (screen) should be current.
+    #     This finds the distance to an object, given x,y coordinate. None if empty space'''
+    #     #print("x",x,"y",y,"minD",minD,"maxD",maxD,"grainSize",grainSize)
+    #     while minD <= maxD:
+    #         hit = self.blender_cam.getScreenRay(x,y,minD)
+    #
+    #         if hit:
+    #             return minD
+    #         minD+=grainSize#1cm?
+    #     return maxD
 
     @service
     def xScan(self,openingDepth,y):
@@ -575,7 +594,7 @@ class GeometricCamera(morse.sensors.camera.Camera):
         #depthGrain = depthGrain
 
         getcontext().prec = 4
-        import pdb
+        #import pdb
         #pdb.set_trace()
 
         beginning = time.time()
