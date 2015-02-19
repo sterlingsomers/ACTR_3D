@@ -114,7 +114,7 @@ class BlenderVision(ccm.Model):
         #self.find_edges()
         ##print(self._edges)
 
-        print("Obejects:",self._objects)
+        #print("Obejects:",self._objects)
 
 
         for y in sorted(self._objects.keys()):
