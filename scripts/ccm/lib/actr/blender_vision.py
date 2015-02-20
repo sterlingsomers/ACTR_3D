@@ -1,6 +1,8 @@
 #import Morse
 #from pymorse import Morse
 
+import matplotlib.pyplot as plt
+import numpy as np
 
 import ccm
 from ccm.pattern import Pattern
@@ -110,7 +112,7 @@ class BlenderVision(ccm.Model):
         ###!!!Note the keys here are strings, not floats
         ###!!Converti them to float below
         self._objects = dict((float(k), v) for k,v in self._objects.items())
-
+        self._ignoreLabels = ['None','Ground']
         #self.find_edges()
         ##print(self._edges)
 
@@ -119,6 +121,127 @@ class BlenderVision(ccm.Model):
 
         for y in sorted(self._objects.keys()):
             print(y,self._objects[y],"WTF...")
+
+        #Just to plot some stuff
+        #######################
+        ####PLOTTING###########
+        #
+        # #Find all labels
+        # labels = set()
+        # for y in self._objects.keys():
+        #     for label in self._objects[y]:
+        #         labels.add(label)
+        #
+        # import pdb
+        # #pdb.set_trace()
+        # if 'None' in labels:
+        #     labels.remove('None')
+        # diffs = {}
+        # thisValue = 0.0
+        # lastValue = 0.0
+        # labels = list(labels)
+        # for label in labels:
+        #     lastValue = -1.0
+        #     raws=[]
+        #     for y in sorted(self._objects.keys()):
+        #         if label in self._objects[y].keys():
+        #             thisValue = self._objects[y][label][2]
+        #             #if label == 'Ground' and y > 0.2:
+        #             #    pdb.set_trace()
+        #             #raws.append(thisValue)
+        #             if not label in diffs.keys():
+        #                 diffs[label] = [[],[]]
+        #             if lastValue < 0:
+        #                 lastValue = thisValue
+        #                 continue
+        #             if np.isnan(np.average(np.array(diffs[label][0]))) and lastValue >= 0:
+        #                 diffs[label][0].append(abs(thisValue-lastValue))
+        #                 diffs[label][1].append(y)
+        #                 lastValue = thisValue
+        #                 continue
+        #             if abs(thisValue-lastValue) <= 2:
+        #                 diffs[label][0].append(abs(thisValue-lastValue))
+        #                 diffs[label][1].append(y)
+        #                 lastValue = thisValue
+        # self._ignoreLabels = ['None']#Ignore None from now on
+        #
+        # for lbl in diffs.keys():
+        #     plt.plot(diffs[lbl][1],diffs[lbl][0],label=lbl)
+        #     z = np.polyfit(diffs[lbl][1],diffs[lbl][0],3,full=True)
+        #     p = np.poly1d(z[0])
+        #     xp = np.linspace(min(diffs[lbl][1]),max(diffs[lbl][1]),100)
+        #     plt.plot(xp,p(xp),'--')
+        #     print(lbl + 'z: ' + repr(z[1]))
+        #     if z[1][0] > 0.1:
+        #         self._ignoreLabels.append(lbl)
+        # plt.show()
+
+
+                # for ky in self._objects[y]:
+                #     #if ky == 'target':
+                #         #pdb.set_trace()
+                #     if not ky in diffs:
+                #         diffs[ky] = [[],[]]
+                #     thisValue = self._objects[y][ky][2]
+                #     if abs(thisValue-lastValue) < 1:
+                #         diffs[ky][0].append(abs(thisValue-lastValue))
+                #         diffs[ky][1].append(y)
+                #     lastValue = thisValue
+
+
+
+        #Collect the ground, near centre
+        # diffValues = []
+        # Grounds = []
+        # ys = []
+        # lastValue = 0.0
+        # thisValue = 0.0
+        # for y in sorted(self._objects.keys()):
+        #
+        #     try:
+        #         thisValue = self._objects[y]['target'][2]
+        #     except KeyError:
+        #             continue
+        #     if not abs(thisValue-lastValue) > 1:
+        #         diffValues.append(abs(thisValue-lastValue))
+        #         ys.append(y)
+        #     lastValue = thisValue
+        #
+        # diffValues = np.array(diffValues)
+        # print("AVERAGE",np.average(diffValues))
+        # ys = np.array(ys)
+        # z = np.polyfit(ys,diffValues,2,full=True)
+        # print("Z", z)
+        # p = np.poly1d(z[0])
+        # #print(ys)
+        # #print(len(y))
+        # print(diffValues)
+        # xp = np.linspace(min(ys),max(ys),100)
+        # plt.plot(ys,diffValues,'-',xp,p(xp),'--')
+        # plt.show()
+
+        #Standard Deviations
+        # vals = {}
+        # for y in sorted(self._objects.keys()):
+        #     for ky in self._objects[y]:
+        #         if not ky in vals:
+        #             vals[ky] = []
+        #         vals[ky].append(self._objects[y][ky][3])
+        # #print("stds",vals)
+        # stds = []
+        # plt.plot(vals['RightWall'])
+        # plt.show()
+        # for key in vals.keys():
+        #     print(key)
+        #     dVals = np.array(vals[key])
+        #     stds.append(np.std(dVals))
+        # print("STDS",stds)
+        # stds.sort()
+
+
+
+
+
         #print(self,._objects.keys(), "HEYSSSSSS")
         #print("Time:")
         #print(time.time() - now)
