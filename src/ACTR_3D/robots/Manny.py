@@ -60,7 +60,7 @@ class Manny(morse.core.robot.Robot):
                             vzlist.append(vz)
 
         #print(max(vxlist),min(vxlist),max(vylist),min(vylist),max(vzlist),min(vzlist))
-
+        #return self.bge_object.worldOrientation
         return [max(vxlist)-min(vxlist),max(vylist)-min(vylist),max(vzlist)-min(vzlist)]
 
 

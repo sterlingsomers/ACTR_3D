@@ -97,6 +97,11 @@ class BlenderVision(ccm.Model):
                 #break
 
 
+    def find_opening(self):
+        for y in sorted(self._objects.keys()):
+            for ky in self._objects[y]:
+                if ky in self._ignoreLabels:
+                    continue
 
 
     def process_image(self):
@@ -119,8 +124,8 @@ class BlenderVision(ccm.Model):
         #print("Obejects:",self._objects)
 
 
-        for y in sorted(self._objects.keys()):
-            print(y,self._objects[y],"WTF...")
+        #for y in sorted(self._objects.keys()):
+        #    print(y,self._objects[y],"WTF...")
 
         #Just to plot some stuff
         #######################
@@ -295,7 +300,7 @@ class BlenderVision(ccm.Model):
         for obj in self._internalChunks:
             print("one")
             if matcher.match(obj)!=None:
-                print("Not None")
+                print("Not None", obj)
         #self._internalEnvironment.__convert()
         #print(dir(self._internalEnvironment), "InternalEnvironment")
         #print(self._internalEnvironment.poop.isa,"poooooooop")

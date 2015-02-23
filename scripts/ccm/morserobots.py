@@ -34,7 +34,8 @@ class morse_middleware():
             
         self.action_dict = {'set_rotation_ribs':['self.robot_simulation.robot.torso','.set_rotation'],
                             'get_image':['self.robot_simulation.robot.GeometricCamerav1','.get_image'],
-                            'scan_image':['self.robot_simulation.robot.GeometricCamerav1','.scan_image_multi']}
+                            'scan_image':['self.robot_simulation.robot.GeometricCamerav1','.scan_image_multi'],
+                            'getBoundingBox':['self.robot_simulation.robot','.getBoundingBox']}
         #self.action_dict = {'scan_imageD':['self.robot_simulation.robot.GeometricCamerav1', '.scan_imageD'],
 		#		'set_speed':['self.robot_simulation.robot','.set_speed'],
         #        'move_forward':['self.robot_simulation.robot','.move_forward'],
@@ -137,7 +138,7 @@ class morse_middleware():
             raise Exception("Blocking request already made.")#make something more informative        
         self.mustTick = True
         #print("setting mustTrick", self.mustTick)
-        print("Sending...", self.action_dict[datastr][1], argslist)
+        #print("Sending...", self.action_dict[datastr][1], argslist)
         rStr = self.action_dict[datastr][0] + self.action_dict[datastr][1] + '(' + ','.join(argslist) + ').result()'
         result = eval(rStr)
         print("Recieved", result)
