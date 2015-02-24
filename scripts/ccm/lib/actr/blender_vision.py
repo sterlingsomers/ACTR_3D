@@ -14,11 +14,19 @@ import re
 import numpy
 import math
 
+from decimal import *
 
 #vision_cam = ccm.middle.robot.GeometricCamerav1
 #from test2 import simu
 
 from ccm.morserobots import middleware
+
+def rolling_window(a,window):
+    shape = a.shape[:-1] + (a.shape[-1] - window + 1, window)
+    strides = a.strides + (a.strides[-1],)
+
+    return numpy.lib.stride_tricks.as_strided(a, shape=shape, strides=strides)
+
 
 class InternalEnvironment(ccm.Model):
     dial=ccm.Model(isa='dial',value=-1000)
@@ -96,12 +104,91 @@ class BlenderVision(ccm.Model):
                 print(edges,"EDGES")
                 #break
 
+    def find_feature(self,**kwargs):
+        if self.busy: return
 
-    def find_opening(self):
+        self.error = False
+
+        if 'feature' in kwargs and kwargs['feature'] == 'opening':
+            if 'depth' in kwargs:
+
+                openings = self.find_opening(depth=float(kwargs['depth']))
+                for key in sorted(openings.keys()):
+                    print(openings[key])
+
+        #Result Error if not 'feature' (for now)
+        else:
+            self._b1.clear()
+            self.error=True
+
+
+    def similar_depth(self,list1,list2,depth=0.0):
+        '''Returns True if list1[2:] and list2[2:] have similar depths.
+           Similarity is based on <= depth/5'''
+        ##print("Depth/5",depth/5)
+        ##print(list1,list2)
+        return abs(list1[2] - list2[2]) < depth/5 or \
+               abs(list1[2] - list2[3]) < depth/5 or \
+               abs(list1[3] - list2[2]) < depth/5 or \
+               abs(list1[3] - list2[3]) < depth/5
+
+
+    def within_depth(self,list1,list2,depth=0.0):
+        '''Returns True if list1[2:] and list2[2:] have a minimum difference of depth'''
+        return abs(list1[2] - list2[2]) < depth or \
+               abs(list1[2] - list2[3]) < depth or \
+               abs(list1[3] - list2[2]) < depth or \
+               abs(list1[3] - list2[3]) < depth
+
+
+
+
+    def find_opening(self,depth=0.0):
+        '''Uses numpy for now.'''
+        self.scan()
+        openings = {}
+        #Decimal Precision
+        getcontext().prec = 3
+        fullRange = numpy.array([])
+        similar_key_major = []
+        #print( "DEPTH", depth)
         for y in sorted(self._objects.keys()):
-            for ky in self._objects[y]:
-                if ky in self._ignoreLabels:
-                    continue
+            fullX = numpy.arange(Decimal(0.0),Decimal(1.0),Decimal(0.002))
+            if len(self._objects[y].keys()) > 1:
+                similar_keys_minor = []
+                for ky,ty in rolling_window(numpy.array(sorted(self._objects[y],key=lambda lst: min(self._objects[y][lst][2:]))),2):#self._objects[y]:
+
+                    if ky in self._ignoreLabels or ty in self._ignoreLabels:
+                        continue
+                    if self.similar_depth(self._objects[y][ky],self._objects[y][ty],depth):
+                        similar_keys_minor.append(ky)
+                        similar_keys_minor.append(ty)
+                #print(similar_keys_minor)
+                for key in similar_keys_minor:
+                    #print(key)
+                    #print(self._objects[y][key],"ASDFASDFA")
+                    #print("FULLX",fullX)
+                    t = numpy.arange(Decimal(self._objects[y][key][0]),Decimal(self._objects[y][key][1]),Decimal(0.002))
+
+                    fullX = numpy.setdiff1d(fullX,t)
+                    #print("FullX AFTER",len(fullX))
+                for key in self._objects[y].keys():
+                    if key in similar_keys_minor:
+                        continue
+                    else:
+                        #Are they beyond the distance?
+                        if self.within_depth(self._objects[y][key],self._objects[y][similar_keys_minor[0]],depth):
+                            pass #not sure
+                        else:
+                            openings[y] = [min(fullX),max(fullX)]
+                #At this point I should have a collection of objects with similar depths
+
+                    #print(self._objects[y][ky])
+                    #fullX = numpy.setdiff1d(fullX,numpy.arange(self._objects[y][ky][0],self._objects[y][ky][1],0.01))
+            else:
+                pass #not sure what to do if there's only 1 object.
+            #print("FR",len(fullRange))
+        return openings
 
 
     def process_image(self):
