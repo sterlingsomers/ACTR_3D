@@ -21,6 +21,9 @@ from decimal import *
 
 from ccm.morserobots import middleware
 
+#Decimal Precision
+getcontext().prec = 3
+
 def rolling_window(a,window):
     shape = a.shape[:-1] + (a.shape[-1] - window + 1, window)
     strides = a.strides + (a.strides[-1],)
@@ -46,7 +49,9 @@ class BlenderVision(ccm.Model):
         self._objects = {}
         self._edges = {}
         self._internalChunks = []
-
+        self._screenLeft = numpy.arange(Decimal(0.60),Decimal(1.0),Decimal(0.002))
+        self._screenCenter = numpy.arange(Decimal(0.30),Decimal(0.60),Decimal(0.002))
+        self._screenRight = numpy.arange(Decimal(0.0),Decimal(0.30),Decimal(0.002))
         self._internalChunks.append(ccm.Model(isa='dial'))
 
         #self._internalEnvironment = InternalEnvironment(self._b1)
@@ -105,6 +110,7 @@ class BlenderVision(ccm.Model):
                 #break
 
     def find_feature(self,**kwargs):
+        chunkValues = set()
         if self.busy: return
 
         self.error = False
@@ -113,24 +119,42 @@ class BlenderVision(ccm.Model):
             if 'depth' in kwargs:
 
                 openings = self.find_opening(depth=float(kwargs['depth']))
+                print("openings..................")
+
                 for key in sorted(openings.keys()):
                     print(openings[key])
+                    if numpy.intersect1d(self._screenLeft,numpy.arange(openings[key][0],openings[key][1],Decimal(0.002))).any():
+                        chunkValues.add('screenLeft')
+                    if numpy.intersect1d(self._screenCenter,numpy.arange(openings[key][0],openings[key][1],Decimal(0.002))).any():
+                        chunkValues.add('screenCenter')
+                    if numpy.intersect1d(self._screenRight,numpy.arange(openings[key][0],openings[key][1],Decimal(0.002))).any():
+                        chunkValues.add('screenRight')
 
         #Result Error if not 'feature' (for now)
         else:
             self._b1.clear()
             self.error=True
 
+        # self.busy=True
+        # d=self.delay
+        # if self.delay_sd is not None:
+        #     d=max(0,self.random.gauss(d,self.delay_sd))
+        # yield d
+        # self.busy=False
+        self._b1.set(kwargs['feature']+':'+'_'.join(chunkValues))
+
 
     def similar_depth(self,list1,list2,depth=0.0):
         '''Returns True if list1[2:] and list2[2:] have similar depths.
            Similarity is based on <= depth/5'''
-        ##print("Depth/5",depth/5)
-        ##print(list1,list2)
-        return abs(list1[2] - list2[2]) < depth/5 or \
-               abs(list1[2] - list2[3]) < depth/5 or \
-               abs(list1[3] - list2[2]) < depth/5 or \
-               abs(list1[3] - list2[3]) < depth/5
+        #print("similar_depth")
+        #print("Depth/5",depth/5)
+        #print(list1,list2)
+        dividend = 5
+        return abs(list1[2] - list2[2]) < depth/dividend or \
+               abs(list1[2] - list2[3]) < depth/dividend or \
+               abs(list1[3] - list2[2]) < depth/dividend or \
+               abs(list1[3] - list2[3]) < depth/dividend
 
 
     def within_depth(self,list1,list2,depth=0.0):
@@ -147,23 +171,26 @@ class BlenderVision(ccm.Model):
         '''Uses numpy for now.'''
         self.scan()
         openings = {}
-        #Decimal Precision
-        getcontext().prec = 3
+
         fullRange = numpy.array([])
         similar_key_major = []
         #print( "DEPTH", depth)
         for y in sorted(self._objects.keys()):
-            fullX = numpy.arange(Decimal(0.0),Decimal(1.0),Decimal(0.002))
+            fullX = numpy.arange(Decimal('0.000'),Decimal('1.0'),Decimal('0.002'))
             if len(self._objects[y].keys()) > 1:
                 similar_keys_minor = []
                 for ky,ty in rolling_window(numpy.array(sorted(self._objects[y],key=lambda lst: min(self._objects[y][lst][2:]))),2):#self._objects[y]:
-
+                    #print("DDDDDD",y,ky,ty,similar_keys_minor)
                     if ky in self._ignoreLabels or ty in self._ignoreLabels:
                         continue
+
                     if self.similar_depth(self._objects[y][ky],self._objects[y][ty],depth):
                         similar_keys_minor.append(ky)
                         similar_keys_minor.append(ty)
-                #print(similar_keys_minor)
+
+                if not similar_keys_minor:
+                    continue
+                print(similar_keys_minor)
                 for key in similar_keys_minor:
                     #print(key)
                     #print(self._objects[y][key],"ASDFASDFA")
@@ -203,7 +230,8 @@ class BlenderVision(ccm.Model):
         self._objects = middleware.request('scan_image',[])
         ###!!!Note the keys here are strings, not floats
         ###!!Converti them to float below
-        self._objects = dict((float(k), v) for k,v in self._objects.items())
+        #self._objects = dict((float(k), v) for k,v in self._objects.items())
+        self._objects = dict((float(k), dict((kk,[Decimal(x).quantize(Decimal('0.001'),rounding=ROUND_HALF_UP) for x in kv]) for kk,kv in v.items())) for k,v in self._objects.items())
         self._ignoreLabels = ['None','Ground']
         #self.find_edges()
         ##print(self._edges)
@@ -211,8 +239,8 @@ class BlenderVision(ccm.Model):
         #print("Obejects:",self._objects)
 
 
-        #for y in sorted(self._objects.keys()):
-        #    print(y,self._objects[y],"WTF...")
+        for y in sorted(self._objects.keys()):
+            print(y,self._objects[y],"WTF...")
 
         #Just to plot some stuff
         #######################
