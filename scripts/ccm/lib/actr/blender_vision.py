@@ -22,7 +22,7 @@ from decimal import *
 from ccm.morserobots import middleware
 
 #Decimal Precision
-getcontext().prec = 3
+getcontext().prec = 5
 
 def rolling_window(a,window):
     shape = a.shape[:-1] + (a.shape[-1] - window + 1, window)
@@ -224,6 +224,7 @@ class BlenderVision(ccm.Model):
 
 
     def scan(self,delay=0.00):
+
         #print(ccm.middle)
         #import time
         #now = time.time()
@@ -231,7 +232,7 @@ class BlenderVision(ccm.Model):
         ###!!!Note the keys here are strings, not floats
         ###!!Converti them to float below
         #self._objects = dict((float(k), v) for k,v in self._objects.items())
-        self._objects = dict((float(k), dict((kk,[Decimal(x).quantize(Decimal('0.001'),rounding=ROUND_HALF_UP) for x in kv]) for kk,kv in v.items())) for k,v in self._objects.items())
+        self._objects = dict((float(k), dict((kk,[Decimal(x).quantize(Decimal('.001'),rounding=ROUND_HALF_UP) for x in kv]) for kk,kv in v.items())) for k,v in self._objects.items())
         self._ignoreLabels = ['None','Ground']
         #self.find_edges()
         ##print(self._edges)
