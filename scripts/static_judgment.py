@@ -28,7 +28,7 @@ class VisionMethods(ccm.ProductionSystem):
     def init():
         fake_buffer.set('fake')#should be 'fake'
 
-    def repeat(fake_buffer='fake'):
+    def repeat(fake_buffer='notnot'):
         #This could be used during movement, actively doing the task
 
         self.parent.vision_module.scan()
@@ -77,7 +77,7 @@ class MyModel(ACTR):
         b_unit_task.set('unit_task:none')
         b_operator.set('operator:none')
         b_cue.set('cue:none')
-        goal.set('stop')
+        #goal.set('stop')
 
         #import math
         #input new model stuffs here:
@@ -92,13 +92,16 @@ class MyModel(ACTR):
         #self.motor_module.set_rotation('arm_upper.R','0',repr(math.radians(35)))
 
         #get bounding box here.
-        #self.middleware.request('getBoundingBox', [])
+        #self.cd momiddleware.request('getBoundingBox', [])
 
     def estimate_passability_retrieveUT(b_plan_unit='planning_unit:find_target', b_unit_task='unit_task:none',
                                         b_operator='operator:none'):
         print("fire estimate_passsability_retrieveUT")
         DM.request('planning_unit:find_target unit_task:?')
         b_operator.set('operator:retrieveUT')
+        #vision_module.find_opening()
+        motor_module.request('width:?')
+        #self.middleware.request('getBoundingBox', [])
         #b_cue.set('cue:retrieving_task')
         #goal.set('stop')
         #b_plan_unit.set('planning_unit:none')
@@ -113,10 +116,23 @@ class MyModel(ACTR):
     def estimate_passability_find_opening(b_plan_unit='planning_unit:find_target', b_unit_task='unit_task:find_target',
                                             b_operator='operator:none'):
         #vision_module.cScan()
-        print("estimate_passability_find_opening")
+        #print("estimate_passability_find_opening")
         #vision_module.request('isa:dial')
+        #goal.set('stop')
+        motor_module.lower_arms()
+        b_operator.set('operator:get_body_size')
+
+    def estimate_passability_find_opening_get_body_size(b_plan_unit='planning_unit:find_target', b_unit_task='unit_task:find_target',
+                                            b_operator='operator:get_body_size'):
+        #motor_module.get_bounding_box()
+        motor_module.request('width:?')
+        b_operator.set('operator:find_opening')
+
+    def estimate_passability_find_opening_use_body_size(b_plan_unit='planning_unit:find_target', b_unit_task='unit_task:find_target',
+                                            b_operator='operator:find_opening',b_motor='width:?x'):
+        #motor_module.get_bounding_box()
+        vision_module.find_feature(feature='opening', depth=x)
         goal.set('stop')
-        b_plan_unit.set('planning_unit:none')
         
 
     #def estimate_passability_two(b_plan_unit='planning_unit:estimate_passability',

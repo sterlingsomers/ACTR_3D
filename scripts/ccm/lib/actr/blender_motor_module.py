@@ -2,7 +2,7 @@
 
 
 import ccm
-#from ccm.pattern import Pattern
+from ccm.pattern import Pattern
 
 import re
 
@@ -18,6 +18,9 @@ class BlenderMotorModule(ccm.Model):
         self.delay_sd=delay_sd
         self.error=False
         self.busy=False
+        self._internalChunks = []
+        self._boundingBox = None
+        self.get_bounding_box()
         #self.blender_camera = Morse().robot.GeometricCamerav1
 
     def rotate_torso(self,axis,radians):
@@ -31,8 +34,86 @@ class BlenderMotorModule(ccm.Model):
         #print("this is happening....")
         x = torso.set_rotation('ribs',1,radians).result()
             
+    def get_bounding_box(self):
+        self._boundingBox = middleware.request('getBoundingBox', [])
+        self._internalChunks.append(ccm.Model(type='proprioception',
+                                              width=repr(self._boundingBox[0]),
+                                              depth=repr(self._boundingBox[1]),
+                                              height=repr(self._boundingBox[2])))
+        # self._internalChunks.append(ccm.Model(isa='dial'))
+
     def move(self):
         pass
+
+    def request(self,pattern=''):
+        print("REQUEST")
+        if self.busy: return
+
+        matcher = Pattern(pattern)
+        print("Matcher",matcher)
+
+        self.error=False
+        r=[]
+        for obj in self._internalChunks:
+            print("one")
+            if matcher.match(obj)!= None:
+                r.append(obj)
+
+        self.busy = True
+        d = self.delay
+        if self.delay_sd is not None:
+            d=max(0,self.random.gauss(d,self.delay_sd))
+        yield d
+        self.busy=False
+        if len(r) == 0:
+            self._b1.clear()
+            self.error = True
+        else:
+            obj=self.random.choice(r)
+            self._b1.set(obj)
+    # if self.busy: return
+    #
+    # matcher=Pattern(pattern)
+    #
+    # self.error=False
+    # r=[]
+    # for obj in self.parent.parent.get_children():
+    #   if matcher.match(obj)!=None:
+    #     print("Not None")
+    #     if not hasattr(obj,'salience') and not hasattr(obj,'visible'):
+    #       continue
+    #
+    #     if hasattr(obj,'salience'):
+    #       if self.random.random()>obj.salience:
+    #         continue
+    #     if hasattr(obj,'visible'):
+    #       if obj.visible==False:
+    #         continue
+    #     if hasattr(obj,'value'):
+    #       if obj.value==None:
+    #         continue
+    #     r.append(obj)
+    #
+    # self.busy=True
+    # d=self.delay
+    # if self.delay_sd is not None:
+    #     d=max(0,self.random.gauss(d,self.delay_sd))
+    # yield d
+    # self.busy=False
+    #
+    # if len(r)==0:
+    #   self._buffer.clear()
+    #   self.error=True
+    # else:
+    #   obj=self.random.choice(r)
+    #   if obj not in self.parent.parent.get_children():
+    #     self._buffer.clear()
+    #     self.error=True
+    #   elif hasattr(obj,'visible') and obj.visible==False:
+    #     self._buffer.clear()
+    #     self.error=True
+    #   else:
+    #     self._buffer.set(obj)
 
     def lower_arms(self):
         '''Lower the arms'''

@@ -1,6 +1,8 @@
 #import Morse
 #from pymorse import Morse
 
+import matplotlib.pyplot as plt
+import numpy as np
 
 import ccm
 from ccm.pattern import Pattern
@@ -12,11 +14,22 @@ import re
 import numpy
 import math
 
+from decimal import *
 
 #vision_cam = ccm.middle.robot.GeometricCamerav1
 #from test2 import simu
 
 from ccm.morserobots import middleware
+
+#Decimal Precision
+getcontext().prec = 5
+
+def rolling_window(a,window):
+    shape = a.shape[:-1] + (a.shape[-1] - window + 1, window)
+    strides = a.strides + (a.strides[-1],)
+
+    return numpy.lib.stride_tricks.as_strided(a, shape=shape, strides=strides)
+
 
 class InternalEnvironment(ccm.Model):
     dial=ccm.Model(isa='dial',value=-1000)
@@ -36,7 +49,9 @@ class BlenderVision(ccm.Model):
         self._objects = {}
         self._edges = {}
         self._internalChunks = []
-
+        self._screenLeft = numpy.arange(Decimal(0.60),Decimal(1.0),Decimal(0.002))
+        self._screenCenter = numpy.arange(Decimal(0.30),Decimal(0.60),Decimal(0.002))
+        self._screenRight = numpy.arange(Decimal(0.0),Decimal(0.30),Decimal(0.002))
         self._internalChunks.append(ccm.Model(isa='dial'))
 
         #self._internalEnvironment = InternalEnvironment(self._b1)
@@ -94,7 +109,113 @@ class BlenderVision(ccm.Model):
                 print(edges,"EDGES")
                 #break
 
+    def find_feature(self,**kwargs):
+        chunkValues = set()
+        if self.busy: return
 
+        self.error = False
+
+        if 'feature' in kwargs and kwargs['feature'] == 'opening':
+            if 'depth' in kwargs:
+
+                openings = self.find_opening(depth=float(kwargs['depth']))
+                print("openings..................")
+
+                for key in sorted(openings.keys()):
+                    print(openings[key])
+                    if numpy.intersect1d(self._screenLeft,numpy.arange(openings[key][0],openings[key][1],Decimal(0.002))).any():
+                        chunkValues.add('screenLeft')
+                    if numpy.intersect1d(self._screenCenter,numpy.arange(openings[key][0],openings[key][1],Decimal(0.002))).any():
+                        chunkValues.add('screenCenter')
+                    if numpy.intersect1d(self._screenRight,numpy.arange(openings[key][0],openings[key][1],Decimal(0.002))).any():
+                        chunkValues.add('screenRight')
+
+        #Result Error if not 'feature' (for now)
+        else:
+            self._b1.clear()
+            self.error=True
+
+        # self.busy=True
+        # d=self.delay
+        # if self.delay_sd is not None:
+        #     d=max(0,self.random.gauss(d,self.delay_sd))
+        # yield d
+        # self.busy=False
+        self._b1.set(kwargs['feature']+':'+'_'.join(chunkValues))
+
+
+    def similar_depth(self,list1,list2,depth=0.0):
+        '''Returns True if list1[2:] and list2[2:] have similar depths.
+           Similarity is based on <= depth/5'''
+        #print("similar_depth")
+        #print("Depth/5",depth/5)
+        #print(list1,list2)
+        dividend = 5
+        return abs(list1[2] - list2[2]) < depth/dividend or \
+               abs(list1[2] - list2[3]) < depth/dividend or \
+               abs(list1[3] - list2[2]) < depth/dividend or \
+               abs(list1[3] - list2[3]) < depth/dividend
+
+
+    def within_depth(self,list1,list2,depth=0.0):
+        '''Returns True if list1[2:] and list2[2:] have a minimum difference of depth'''
+        return abs(list1[2] - list2[2]) < depth or \
+               abs(list1[2] - list2[3]) < depth or \
+               abs(list1[3] - list2[2]) < depth or \
+               abs(list1[3] - list2[3]) < depth
+
+
+
+
+    def find_opening(self,depth=0.0):
+        '''Uses numpy for now.'''
+        self.scan()
+        openings = {}
+
+        fullRange = numpy.array([])
+        similar_key_major = []
+        #print( "DEPTH", depth)
+        for y in sorted(self._objects.keys()):
+            fullX = numpy.arange(Decimal('0.000'),Decimal('1.0'),Decimal('0.002'))
+            if len(self._objects[y].keys()) > 1:
+                similar_keys_minor = []
+                for ky,ty in rolling_window(numpy.array(sorted(self._objects[y],key=lambda lst: min(self._objects[y][lst][2:]))),2):#self._objects[y]:
+                    #print("DDDDDD",y,ky,ty,similar_keys_minor)
+                    if ky in self._ignoreLabels or ty in self._ignoreLabels:
+                        continue
+
+                    if self.similar_depth(self._objects[y][ky],self._objects[y][ty],depth):
+                        similar_keys_minor.append(ky)
+                        similar_keys_minor.append(ty)
+
+                if not similar_keys_minor:
+                    continue
+                print(similar_keys_minor)
+                for key in similar_keys_minor:
+                    #print(key)
+                    #print(self._objects[y][key],"ASDFASDFA")
+                    #print("FULLX",fullX)
+                    t = numpy.arange(Decimal(self._objects[y][key][0]),Decimal(self._objects[y][key][1]),Decimal(0.002))
+
+                    fullX = numpy.setdiff1d(fullX,t)
+                    #print("FullX AFTER",len(fullX))
+                for key in self._objects[y].keys():
+                    if key in similar_keys_minor:
+                        continue
+                    else:
+                        #Are they beyond the distance?
+                        if self.within_depth(self._objects[y][key],self._objects[y][similar_keys_minor[0]],depth):
+                            pass #not sure
+                        else:
+                            openings[y] = [min(fullX),max(fullX)]
+                #At this point I should have a collection of objects with similar depths
+
+                    #print(self._objects[y][ky])
+                    #fullX = numpy.setdiff1d(fullX,numpy.arange(self._objects[y][ky][0],self._objects[y][ky][1],0.01))
+            else:
+                pass #not sure what to do if there's only 1 object.
+            #print("FR",len(fullRange)).
+        return openings
 
 
     def process_image(self):
@@ -103,14 +224,16 @@ class BlenderVision(ccm.Model):
 
 
     def scan(self,delay=0.00):
+
         #print(ccm.middle)
         #import time
         #now = time.time()
         self._objects = middleware.request('scan_image',[])
         ###!!!Note the keys here are strings, not floats
         ###!!Converti them to float below
-        self._objects = dict((float(k), v) for k,v in self._objects.items())
-
+        #self._objects = dict((float(k), v) for k,v in self._objects.items())
+        self._objects = dict((float(k), dict((kk,[Decimal(x).quantize(Decimal('.001'),rounding=ROUND_HALF_UP) for x in kv]) for kk,kv in v.items())) for k,v in self._objects.items())
+        self._ignoreLabels = ['None','Ground']
         #self.find_edges()
         ##print(self._edges)
 
@@ -119,6 +242,127 @@ class BlenderVision(ccm.Model):
 
         for y in sorted(self._objects.keys()):
             print(y,self._objects[y],"WTF...")
+
+        #Just to plot some stuff
+        #######################
+        ####PLOTTING###########
+        #
+        # #Find all labels
+        # labels = set()
+        # for y in self._objects.keys():
+        #     for label in self._objects[y]:
+        #         labels.add(label)
+        #
+        # import pdb
+        # #pdb.set_trace()
+        # if 'None' in labels:
+        #     labels.remove('None')
+        # diffs = {}
+        # thisValue = 0.0
+        # lastValue = 0.0
+        # labels = list(labels)
+        # for label in labels:
+        #     lastValue = -1.0
+        #     raws=[]
+        #     for y in sorted(self._objects.keys()):
+        #         if label in self._objects[y].keys():
+        #             thisValue = self._objects[y][label][2]
+        #             #if label == 'Ground' and y > 0.2:
+        #             #    pdb.set_trace()
+        #             #raws.append(thisValue)
+        #             if not label in diffs.keys():
+        #                 diffs[label] = [[],[]]
+        #             if lastValue < 0:
+        #                 lastValue = thisValue
+        #                 continue
+        #             if np.isnan(np.average(np.array(diffs[label][0]))) and lastValue >= 0:
+        #                 diffs[label][0].append(abs(thisValue-lastValue))
+        #                 diffs[label][1].append(y)
+        #                 lastValue = thisValue
+        #                 continue
+        #             if abs(thisValue-lastValue) <= 2:
+        #                 diffs[label][0].append(abs(thisValue-lastValue))
+        #                 diffs[label][1].append(y)
+        #                 lastValue = thisValue
+        # self._ignoreLabels = ['None']#Ignore None from now on
+        #
+        # for lbl in diffs.keys():
+        #     plt.plot(diffs[lbl][1],diffs[lbl][0],label=lbl)
+        #     z = np.polyfit(diffs[lbl][1],diffs[lbl][0],3,full=True)
+        #     p = np.poly1d(z[0])
+        #     xp = np.linspace(min(diffs[lbl][1]),max(diffs[lbl][1]),100)
+        #     plt.plot(xp,p(xp),'--')
+        #     print(lbl + 'z: ' + repr(z[1]))
+        #     if z[1][0] > 0.1:
+        #         self._ignoreLabels.append(lbl)
+        # plt.show()
+
+
+                # for ky in self._objects[y]:
+                #     #if ky == 'target':
+                #         #pdb.set_trace()
+                #     if not ky in diffs:
+                #         diffs[ky] = [[],[]]
+                #     thisValue = self._objects[y][ky][2]
+                #     if abs(thisValue-lastValue) < 1:
+                #         diffs[ky][0].append(abs(thisValue-lastValue))
+                #         diffs[ky][1].append(y)
+                #     lastValue = thisValue
+
+
+
+        #Collect the ground, near centre
+        # diffValues = []
+        # Grounds = []
+        # ys = []
+        # lastValue = 0.0
+        # thisValue = 0.0
+        # for y in sorted(self._objects.keys()):
+        #
+        #     try:
+        #         thisValue = self._objects[y]['target'][2]
+        #     except KeyError:
+        #             continue
+        #     if not abs(thisValue-lastValue) > 1:
+        #         diffValues.append(abs(thisValue-lastValue))
+        #         ys.append(y)
+        #     lastValue = thisValue
+        #
+        # diffValues = np.array(diffValues)
+        # print("AVERAGE",np.average(diffValues))
+        # ys = np.array(ys)
+        # z = np.polyfit(ys,diffValues,2,full=True)
+        # print("Z", z)
+        # p = np.poly1d(z[0])
+        # #print(ys)
+        # #print(len(y))
+        # print(diffValues)
+        # xp = np.linspace(min(ys),max(ys),100)
+        # plt.plot(ys,diffValues,'-',xp,p(xp),'--')
+        # plt.show()
+
+        #Standard Deviations
+        # vals = {}
+        # for y in sorted(self._objects.keys()):
+        #     for ky in self._objects[y]:
+        #         if not ky in vals:
+        #             vals[ky] = []
+        #         vals[ky].append(self._objects[y][ky][3])
+        # #print("stds",vals)
+        # stds = []
+        # plt.plot(vals['RightWall'])
+        # plt.show()
+        # for key in vals.keys():
+        #     print(key)
+        #     dVals = np.array(vals[key])
+        #     stds.append(np.std(dVals))
+        # print("STDS",stds)
+        # stds.sort()
+
+
+
+
+
         #print(self,._objects.keys(), "HEYSSSSSS")
         #print("Time:")
         #print(time.time() - now)
@@ -172,7 +416,7 @@ class BlenderVision(ccm.Model):
         for obj in self._internalChunks:
             print("one")
             if matcher.match(obj)!=None:
-                print("Not None")
+                print("Not None", obj)
         #self._internalEnvironment.__convert()
         #print(dir(self._internalEnvironment), "InternalEnvironment")
         #print(self._internalEnvironment.poop.isa,"poooooooop")
