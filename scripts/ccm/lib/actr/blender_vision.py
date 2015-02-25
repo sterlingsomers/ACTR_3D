@@ -214,7 +214,7 @@ class BlenderVision(ccm.Model):
                     #fullX = numpy.setdiff1d(fullX,numpy.arange(self._objects[y][ky][0],self._objects[y][ky][1],0.01))
             else:
                 pass #not sure what to do if there's only 1 object.
-            #print("FR",len(fullRange))
+            #print("FR",len(fullRange)).
         return openings
 
 
