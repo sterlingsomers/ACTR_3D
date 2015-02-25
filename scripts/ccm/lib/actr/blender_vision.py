@@ -119,10 +119,10 @@ class BlenderVision(ccm.Model):
             if 'depth' in kwargs:
 
                 openings = self.find_opening(depth=float(kwargs['depth']))
-                print("openings..................")
+                #print("openings..................")
 
                 for key in sorted(openings.keys()):
-                    print(openings[key])
+                    #print(openings[key])
                     if numpy.intersect1d(self._screenLeft,numpy.arange(openings[key][0],openings[key][1],Decimal(0.002))).any():
                         chunkValues.add('screenLeft')
                     if numpy.intersect1d(self._screenCenter,numpy.arange(openings[key][0],openings[key][1],Decimal(0.002))).any():
@@ -190,7 +190,7 @@ class BlenderVision(ccm.Model):
 
                 if not similar_keys_minor:
                     continue
-                print(similar_keys_minor)
+                #print(similar_keys_minor)
                 for key in similar_keys_minor:
                     #print(key)
                     #print(self._objects[y][key],"ASDFASDFA")
@@ -240,8 +240,8 @@ class BlenderVision(ccm.Model):
         #print("Obejects:",self._objects)
 
 
-        for y in sorted(self._objects.keys()):
-            print(y,self._objects[y],"WTF...")
+        #for y in sorted(self._objects.keys()):
+        #    print(y,self._objects[y],"WTF...")
 
         #Just to plot some stuff
         #######################
