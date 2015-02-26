@@ -46,7 +46,7 @@ class Manny(morse.core.robot.Robot):
         for child in children:#self.bge_object.childrenRecursive:
             #print(child)
             if "part" in child.name or child.name == 'robot':
-                #print(child)
+                print(child)
                 for mesh in child.meshes:
 
                     for m_index in range(len(mesh.materials)):

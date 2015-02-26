@@ -74,11 +74,54 @@ class MyModel(ACTR):
               
         #DM.add('planning_unit:prepare_for_Take_off unit_task:starter cue:break_on')
         
-        b_plan_unit.set('planning_unit:find_target')
-        b_unit_task.set('unit_task:none')
-        b_operator.set('operator:none')
-        b_cue.set('cue:none')
+
+        goal.set('setup:one')
+
+
+    ######Calibration########
+    def setup_one(goal='setup:one'):
+        import math
+        motor_module.rotate_torso('1',repr(math.radians(90.0)))
+        motor_module.get_bounding_box()
+        goal.set('setup:two')
         #goal.set('stop')
+
+    def setup_two(goal='setup:two'):
+        motor_module.request('type:proprioception feature:bounding_box width:?')
+        goal.set('setup:three')
+
+    def setup_three(goal='setup:three',b_motor='width:?w height:?h depth:?d'):
+
+        b_cue.set('width:' + w + ' height:' + h + ' depth:'+d)
+        motor_module.request('type:proprioception feature:rotation bone:torso rotation0:?')
+        goal.set('stop')
+
+    def setup_four(goal='setup:four',b_motor='rotation0:?rZero rotation1:?rOne rotation2:rTwo'):
+        b_cue.set(b_cue.chunk + 'rotation0:' + rZero)
+        DM.add(b_cue.chunk)
+        goal.set('setup:five')
+
+    def setup_five(goal='setup:five'):
+        import math
+        motor_module.rotate_torso('1',repr(math.radians(0.0)))
+        motor_module.get_bounding_box()
+
+
+
+
+        motor_module.request('type:proprioception width:?')
+        goal.set('stop')
+
+
+
+
+
+
+        #b_plan_unit.set('planning_unit:find_target')
+        #b_unit_task.set('unit_task:none')
+        #b_operator.set('operator:none')
+        #b_cue.set('cue:none')
+
 
         #import math
         #input new model stuffs here:
@@ -143,15 +186,18 @@ class MyModel(ACTR):
                                             b_unit_task='unit_task:none',
                                             b_operator='operator:none'):
         DM.request('planning_unit:assess_width unit_task:?')
-        goal.set('stop')
+        import math
+        motor_module.rotate_torso('1',repr(math.radians(00.0)))
+        b_operator.set('operator:retrieveUT')
         
     def estimate_passability_assess_width_recall_UT(b_plan_unit='planning_unit:assess_width',
                                             b_unit_task='unit_task:none',
-                                            b_operator='operator:none'):
+                                            b_operator='operator:retrieveUT'):
         #DM.request('planning_unit:assess_width unit_task:?')
         #b_oprator.set('operator:retrieveUT')
-        import math
-        motor_module.rotate_torso('1',repr(math.radians(0)))
+
+        motor_module.get_bounding_box()
+        motor_module.request('width:?')
         goal.set('stop')
     #def estimate_passability_two(b_plan_unit='planning_unit:estimate_passability',
     #                             b_unit_task='unit_task:get_task',

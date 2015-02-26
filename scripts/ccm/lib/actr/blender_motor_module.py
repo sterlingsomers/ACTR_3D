@@ -19,13 +19,31 @@ class BlenderMotorModule(ccm.Model):
         self.error=False
         self.busy=False
         self._internalChunks = []
-        self._boundingBox = None
+        self._boundingBox = []
         self.get_bounding_box()
+        self._internalChunks.append(ccm.Model(type='proprioception',
+                                              feature='rotation',
+                                              bone='torso',
+                                              rotation0='0.0',
+                                              rotation1='0.0',
+                                              rotation2='0.0'))
+
+        #self._boundingBox = middleware.request('getBoundingBox', [])
+        self._internalChunks.append(ccm.Model(type='proprioception',
+                                              feature='bounding_box',
+                                              width=repr(0.0),
+                                              depth=repr(0.0),
+                                              height=repr(0.0)))
         #self.blender_camera = Morse().robot.GeometricCamerav1
 
     def rotate_torso(self,axis,radians):
         '''Rotate ribs on axis by radians'''
         middleware.send('set_rotation_ribs',[repr('ribs'),axis,radians])
+        pattern='type:proprioception bone:torso'
+        matcher=Pattern(pattern)
+        for obj in self._internalChunks:
+            if matcher.match(obj)!=None:
+                obj.rotation0=radians
 
 
     def rotate_shoulders_to(self,radians):
@@ -33,13 +51,26 @@ class BlenderMotorModule(ccm.Model):
             Negative rotations are possible.'''
         #print("this is happening....")
         x = torso.set_rotation('ribs',1,radians).result()
+
             
     def get_bounding_box(self):
         self._boundingBox = middleware.request('getBoundingBox', [])
-        self._internalChunks.append(ccm.Model(type='proprioception',
-                                              width=repr(self._boundingBox[0]),
-                                              depth=repr(self._boundingBox[1]),
-                                              height=repr(self._boundingBox[2])))
+        pattern='type:proprioception feature:rotation bone:torso'
+        matcher=Pattern(pattern)
+        objs = 0
+        for obj in self._internalChunks:
+            if matcher.match(obj)!= None:
+                objs+=1
+                obj.width=repr(self._boundingBox[1])
+                obj.depth=repr(self._boundingBox[0])
+                obj.height=repr(self._boundingBox[2])
+            if objs > 1:
+                raise Exception("There shouldn't be more than one match...")
+
+        # self._internalChunks.append(ccm.Model(type='proprioception',
+        #                                       width=repr(self._boundingBox[0]),
+        #                                       depth=repr(self._boundingBox[1]),
+        #                                       height=repr(self._boundingBox[2])))
         # self._internalChunks.append(ccm.Model(isa='dial'))
 
     def move(self):
@@ -55,7 +86,7 @@ class BlenderMotorModule(ccm.Model):
         self.error=False
         r=[]
         for obj in self._internalChunks:
-            print("one")
+            #print("one",obj)
             if matcher.match(obj)!= None:
                 r.append(obj)
 
