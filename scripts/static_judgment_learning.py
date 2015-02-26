@@ -75,33 +75,42 @@ class MyModel(ACTR):
         #DM.add('planning_unit:prepare_for_Take_off unit_task:starter cue:break_on')
         
 
-        goal.set('setup:one')
+        goal.set('setup:zero')
 
 
     ######Calibration########
+    def setup_zero(goal='setup:zero'):
+        motor_module.lower_arms()
+        goal.set('setup:one')
+
     def setup_one(goal='setup:one'):
         import math
-        motor_module.rotate_torso('1',repr(math.radians(90.0)))
-        motor_module.get_bounding_box()
+        motor_module.rotate_torso('1',repr(math.radians(45.0)))
         goal.set('setup:two')
-        #goal.set('stop')
 
     def setup_two(goal='setup:two'):
-        motor_module.request('type:proprioception feature:bounding_box width:?')
+        motor_module.get_bounding_box()
         goal.set('setup:three')
+        #goal.set('stop')
 
-    def setup_three(goal='setup:three',b_motor='width:?w height:?h depth:?d'):
+
+    def setup_three(goal='setup:three'):
+        motor_module.request('type:proprioception feature:bounding_box width:?')
+        goal.set('setup:four')
+
+    def setup_four(goal='setup:four',b_motor='width:?w height:?h depth:?d'):
 
         b_cue.set('width:' + w + ' height:' + h + ' depth:'+d)
         motor_module.request('type:proprioception feature:rotation bone:torso rotation0:?')
         goal.set('stop')
 
-    def setup_four(goal='setup:four',b_motor='rotation0:?rZero rotation1:?rOne rotation2:rTwo'):
-        b_cue.set(b_cue.chunk + 'rotation0:' + rZero)
+    def setup_five(goal='setup:five',b_motor='feature:rotation bone:torso rotation0:?rZero rotation1:?rOne rotation2:?rTwo'):
+        b_cue.chunk['rotation0'] = rZero
+        #b_cue.set(b_cue.chunk + 'rotation0:' + rZero)
         DM.add(b_cue.chunk)
-        goal.set('setup:five')
+        goal.set('stop')
 
-    def setup_five(goal='setup:five'):
+    def setup_six(goal='setup:six'):
         import math
         motor_module.rotate_torso('1',repr(math.radians(0.0)))
         motor_module.get_bounding_box()

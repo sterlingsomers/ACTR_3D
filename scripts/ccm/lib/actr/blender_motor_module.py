@@ -54,8 +54,9 @@ class BlenderMotorModule(ccm.Model):
 
             
     def get_bounding_box(self):
+        print("get_bounding_box")
         self._boundingBox = middleware.request('getBoundingBox', [])
-        pattern='type:proprioception feature:rotation bone:torso'
+        pattern='type:proprioception feature:bounding_box'
         matcher=Pattern(pattern)
         objs = 0
         for obj in self._internalChunks:
@@ -66,6 +67,7 @@ class BlenderMotorModule(ccm.Model):
                 obj.height=repr(self._boundingBox[2])
             if objs > 1:
                 raise Exception("There shouldn't be more than one match...")
+        print("get_bounding_box done.")
 
         # self._internalChunks.append(ccm.Model(type='proprioception',
         #                                       width=repr(self._boundingBox[0]),
@@ -95,6 +97,7 @@ class BlenderMotorModule(ccm.Model):
         if self.delay_sd is not None:
             d=max(0,self.random.gauss(d,self.delay_sd))
         yield d
+        print("YEILDED", d)
         self.busy=False
         if len(r) == 0:
             self._b1.clear()
