@@ -9,6 +9,13 @@ class morse_middleware():
     def __init__(self):
         #from .morseconnection import robot_simulation
             #.robot_simulation
+
+
+
+
+
+
+
         if robot_simulation == None:
             raise Exception("pymorse was not detected, or connection was not successful.")
 
@@ -29,14 +36,18 @@ class morse_middleware():
                 'xScan':True,
                 'getBoundingBox':True,
                 'get_image':True,
-                'scan_image':True
+                'scan_image':True,
+                'save_state':True,
+                'load_state':True
                 }
             
         self.action_dict = {'set_rotation_ribs':['self.robot_simulation.robot.torso','.set_rotation'],
                             'get_image':['self.robot_simulation.robot.GeometricCamerav1','.get_image'],
                             'scan_image':['self.robot_simulation.robot.GeometricCamerav1','.scan_image_multi'],
                             'getBoundingBox':['self.robot_simulation.robot','.getBoundingBox'],
-                            'lower_arms':['self.robot_simulation.robot.torso','.lower_arms']}
+                            'lower_arms':['self.robot_simulation.robot.torso','.lower_arms'],
+                            'save_state':['self.robot_simulation.robot','.save_state'],
+                            'load_state':['self.robot_simulation.robot','.load_state']}
         #self.action_dict = {'scan_imageD':['self.robot_simulation.robot.GeometricCamerav1', '.scan_imageD'],
 		#		'set_speed':['self.robot_simulation.robot','.set_speed'],
         #        'move_forward':['self.robot_simulation.robot','.move_forward'],
@@ -141,6 +152,7 @@ class morse_middleware():
         #print("setting mustTrick", self.mustTick)
         #print("Sending...", self.action_dict[datastr][1], argslist)
         rStr = self.action_dict[datastr][0] + self.action_dict[datastr][1] + '(' + ','.join(argslist) + ').result()'
+        #print("RSTR", rstr)
         result = eval(rStr)
         print("Recieved", result)
         #if 'return' in dir(result):

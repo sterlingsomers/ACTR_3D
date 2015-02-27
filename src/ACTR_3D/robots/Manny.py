@@ -33,8 +33,15 @@ class Manny(morse.core.robot.Robot):
         # Do here robot specific initializations
         logger.info('Component initialized')
 
+    @service
+    def save_state(self):
+        bge.logic.saveGlobalDict()
+        return 1
 
-
+    @service
+    def load_state(self):
+        bge.logic.loadGlobalDict()
+        return 1
 
     @service
     def getBoundingBox(self):
