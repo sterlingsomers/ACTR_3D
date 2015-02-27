@@ -34,6 +34,8 @@ class Manny(morse.core.robot.Robot):
         logger.info('Component initialized')
 
 
+
+
     @service
     def getBoundingBox(self):
 
