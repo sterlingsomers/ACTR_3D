@@ -21,6 +21,12 @@ class BlenderMotorModule(ccm.Model):
         self._internalChunks = []
         self._boundingBox = []
         self.get_bounding_box()
+        #Tick
+        #middleware.tick()
+
+        self._bones = self.get_bones()
+        #Tick
+
         self._internalChunks.append(ccm.Model(type='proprioception',
                                               feature='rotation',
                                               bone='torso',
@@ -36,12 +42,19 @@ class BlenderMotorModule(ccm.Model):
                                               height=repr(0.0)))
         #self.blender_camera = Morse().robot.GeometricCamerav1
 
+
+    def get_bones(self):
+        '''This will retrieve all the bones' names'''
+        return middleware.request('get_bones',[])
+
+
     def rotate_torso(self,axis,radians):
         '''Rotate ribs on axis by radians'''
         middleware.send('set_rotation_ribs',[repr('ribs'),axis,radians])
         pattern='type:proprioception bone:torso'
         matcher=Pattern(pattern)
         for obj in self._internalChunks:
+            #if axis='0.0'
             if matcher.match(obj)!=None:
                 obj.rotation0=radians
 

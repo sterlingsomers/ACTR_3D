@@ -29,14 +29,16 @@ class morse_middleware():
                 'xScan':True,
                 'getBoundingBox':True,
                 'get_image':True,
-                'scan_image':True
+                'scan_image':True,
+                'get_bones':True
                 }
             
         self.action_dict = {'set_rotation_ribs':['self.robot_simulation.robot.torso','.set_rotation'],
                             'get_image':['self.robot_simulation.robot.GeometricCamerav1','.get_image'],
                             'scan_image':['self.robot_simulation.robot.GeometricCamerav1','.scan_image_multi'],
                             'getBoundingBox':['self.robot_simulation.robot','.getBoundingBox'],
-                            'lower_arms':['self.robot_simulation.robot.torso','.lower_arms']}
+                            'lower_arms':['self.robot_simulation.robot.torso','.lower_arms'],
+                            'get_bones':['self.robot_simulation.robot','.getBones']}
         #self.action_dict = {'scan_imageD':['self.robot_simulation.robot.GeometricCamerav1', '.scan_imageD'],
 		#		'set_speed':['self.robot_simulation.robot','.set_speed'],
         #        'move_forward':['self.robot_simulation.robot','.move_forward'],
@@ -137,7 +139,7 @@ class morse_middleware():
             raise Exception(datastr + " is not in request_dict. Command does not exist or must be added.")
         if self.mustTick:
             raise Exception("Blocking request already made.")#make something more informative        
-        self.mustTick = True
+        self.mustTick = self.active
         #print("setting mustTrick", self.mustTick)
         #print("Sending...", self.action_dict[datastr][1], argslist)
         rStr = self.action_dict[datastr][0] + self.action_dict[datastr][1] + '(' + ','.join(argslist) + ').result()'
@@ -145,8 +147,8 @@ class morse_middleware():
         print("Recieved", result)
         #if 'return' in dir(result):
         #    result = result.result()
-        while result == None:
-           time.sleep(0.0001)
+        #while result == None:
+        #   time.sleep(0.0001)
         return result
 
 
@@ -198,6 +200,7 @@ class morse_middleware():
             self.modules_in_use = {}
             for rate in range(self.rate):
                 print("Middleware tick!")
+                self.active=True
                 #self.robot_simulation.tick()
                 if self.send_queue:
                     print("Popping send queue")

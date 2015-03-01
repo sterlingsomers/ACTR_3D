@@ -34,7 +34,15 @@ class Manny(morse.core.robot.Robot):
         logger.info('Component initialized')
 
 
-
+    @service
+    def getBones(self):
+        children = self.bge_object.childrenRecursive
+        children.append(self.bge_object)
+        returnList = []
+        for child in children:
+            if "part" in child.name and "joint" in child.name:
+                returnList.append(child.name)
+        return returnList
 
     @service
     def getBoundingBox(self):
@@ -48,7 +56,7 @@ class Manny(morse.core.robot.Robot):
         for child in children:#self.bge_object.childrenRecursive:
             #print(child)
             if "part" in child.name or child.name == 'robot':
-                print(child)
+                #print(child)
                 for mesh in child.meshes:
 
                     for m_index in range(len(mesh.materials)):

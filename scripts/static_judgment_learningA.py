@@ -113,18 +113,18 @@ class MyModel(ACTR):
         DM.add(b_cue.chunk)
         goal.set('setup:six')
 
-'''Notes:
-    We can see already a problem with this approach.
-    The amount of information to be stored in DM would be very high
-        including multiple bones and their rotation
-        and then some way of storing whether it is a min or max width.
-        It makes this approach very difficult to support.
-    The logic would be:
-    a) is there an opning of sufficient depth
-        b) what is the width of that opening?
-    c) without >,< operators, cannot check whether there is a stored DM with that depth
-    b-alternate) given a pre-stored minimum width, is the opening bigger.
-        In that case, the < > operators are in the module.'''
+# '''Notes:
+#     We can see already a problem with this approach.
+#     The amount of information to be stored in DM would be very high
+#         including multiple bones and their rotation
+#         and then some way of storing whether it is a min or max width.
+#         It makes this approach very difficult to support.
+#     The logic would be:
+#     a) is there an opning of sufficient depth
+#         b) what is the width of that opening?
+#     c) without >,< operators, cannot check whether there is a stored DM with that depth
+#     b-alternate) given a pre-stored minimum width, is the opening bigger.
+#         In that case, the < > operators are in the module.'''
 
     def setup_six(goal='setup:six'):
         #import math
