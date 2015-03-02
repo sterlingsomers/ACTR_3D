@@ -40,7 +40,7 @@ class Manny(morse.core.robot.Robot):
         children.append(self.bge_object)
         returnList = []
         for child in children:
-            if "part" in child.name and "joint" in child.name:
+            if "part" in child.name:
                 returnList.append(child.name)
         return returnList
 

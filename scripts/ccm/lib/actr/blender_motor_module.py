@@ -1,5 +1,6 @@
 #from pymorse import Morse
 
+from math import pi
 
 import ccm
 from ccm.pattern import Pattern
@@ -25,6 +26,7 @@ class BlenderMotorModule(ccm.Model):
         #middleware.tick()
 
         self._bones = self.get_bones()
+        self._boneProperties = {'part.torso':[[0,0],[-pi/4,pi/4],[0,0]]}
         #Tick
 
         self._internalChunks.append(ccm.Model(type='proprioception',
@@ -50,6 +52,18 @@ class BlenderMotorModule(ccm.Model):
 
     def rotate_torso(self,axis,radians):
         '''Rotate ribs on axis by radians'''
+        #Check the max rotation
+
+        minR,maxR = self._boneProperties['part.torso'][int(axis)]
+        #print("MINR", minR)
+        if float(radians) > maxR:
+            #print("SET TO MAX")
+            radians = str(maxR)
+        if float(radians) < minR:
+            #print("SET TO MIN")
+            radians = str(minR)
+
+        #print("RADIANS",radians)
         middleware.send('set_rotation_ribs',[repr('ribs'),axis,radians])
         pattern='type:proprioception bone:torso'
         matcher=Pattern(pattern)
