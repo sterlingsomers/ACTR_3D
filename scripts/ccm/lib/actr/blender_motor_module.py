@@ -3,11 +3,14 @@
 from math import pi
 
 import ccm
+from ccm.lib.actr import Buffer
 from ccm.pattern import Pattern
 
 import re
 
 from ccm.morserobots import middleware
+
+
 
 
 
@@ -22,6 +25,9 @@ class BlenderMotorModule(ccm.Model):
         self._internalChunks = []
         self._boundingBox = []
         self.get_bounding_box()
+
+        # self._monitor = MotorMonitor()
+
         #Tick
         #middleware.tick()
 

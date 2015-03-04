@@ -21,6 +21,20 @@ class MyEnvironment(ccm.Model):
 #class VisionModule(ccm.Model):
 #    poop=ccm.Model(isa='dial',value=-1000)
 
+
+class MotorMonitor(ccm.ProductionSystem):
+
+    production_time = 0.01
+    fake_buffer = Buffer()
+
+    def init():
+        fake_buffer.set('fake')#should be 'fake'
+
+    def repeat(fake_buffer='fake'):
+        #This could be used during movement, actively doing the task
+
+        print("MONITORING")
+
 class VisionMethods(ccm.ProductionSystem):
     production_time = 0.030
     fake_buffer = Buffer()
@@ -61,6 +75,7 @@ class MyModel(ACTR):
     motor_module = BlenderMotorModule(b_motor)
     
     vm = VisionMethods()
+    mm = MotorMonitor()
     
     DMbuffer=Buffer()
     DM=Memory(DMbuffer,latency=0.0)
@@ -245,6 +260,7 @@ model.middleware = middleware
 #vInternal = VisualEnvironment()
 env = MyEnvironment()
 env.agent = model
+
 ccm.log_everything(env)
 model.goal.set('action:greet')
 
