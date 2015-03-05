@@ -198,7 +198,7 @@ class morse_middleware():
             self.modules_in_use = {}
             for rate in range(self.rate):
                 print("Middleware tick!")
-                #self.robot_simulation.tick()
+                self.robot_simulation.tick()
                 if self.send_queue:
                     print("Popping send queue")
                     snd = self.send_queue.pop(0)
