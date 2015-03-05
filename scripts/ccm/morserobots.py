@@ -92,39 +92,7 @@ class morse_middleware():
                     eval(rStr)
                                 
             
-#    def send(self, datastr, argslist):
-#        '''send a command, no response required. If a blocking command, pushed to next tick cycle.'''
-#        if not type(argslist) == list:
-#            raise Exception("argslist parameter must be a list")
-#        if not all(isinstance(x,str) for x in argslist):
-#           raise Exception("All arguments have to be strings")
-#        if datastr in self.send_dict:
-#            if not self.mustTick:
-#            #Can run it now, but must block future
-#                if not self.send_dict[datastr]:
-#                    #It is non-blocking
-#                    rStr = self.action_dict[datastr][0] + '(' + ','.join(argslist) + ')'
-#                    eval(rStr)
-#                else:
-#                    #it is blocking
-#                    self.mustTick = True
-#                    rStr = self.action_dict[datastr][0] + '(' + ','.join(argslist) + ')'
-#                    eval(rStr)
-#                    #no return, it's a command being sent. Assume it worked.
-#            else:
-#                if self.mode == 'best_effort':
-#                    print("!!!!!! Adding", datastr, "to QUEUE")
-#                    self.send_queue.append([datastr,argslist])
-#                else:
-#                    raise Exception(datastr + " dropped. Use best_effort mode to use multiple blocking sends.")
-#
-#
-#        else:
-#            raise Exception(datastr + " is not in send_dict. It is not available.")
-                    
-        
-            
-        
+
         
     def request(self, datastr, argslist):
        

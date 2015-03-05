@@ -88,6 +88,10 @@ class BlenderMotorModule(ccm.Model):
             
     def get_bounding_box(self):
         print("get_bounding_box")
+        if self.busy:
+            return
+
+        self.busy = True
         self._boundingBox = middleware.request('getBoundingBox', [])
         pattern='type:proprioception feature:bounding_box'
         matcher=Pattern(pattern)

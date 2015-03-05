@@ -32,8 +32,8 @@ class MotorMonitor(ccm.ProductionSystem):
 
     def repeat(fake_buffer='fake'):
         #This could be used during movement, actively doing the task
-
-        print("MONITORING")
+        bb = middleware.request('getBoundingBox', [])
+        print("MONITORING", bb)
 
 class VisionMethods(ccm.ProductionSystem):
     production_time = 0.030
@@ -101,7 +101,7 @@ class MyModel(ACTR):
     def setup_one(goal='setup:one'):
         import math
         motor_module.rotate_torso('1',repr(math.radians(-90.0)))
-        goal.set('setup:two')
+        goal.set('stop')
 
     def setup_two(goal='setup:two'):
         motor_module.get_bounding_box()
