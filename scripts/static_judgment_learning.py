@@ -108,7 +108,7 @@ class MyModel(ACTR):
         b_cue.chunk['rotation0'] = rZero
         b_cue.chunk['bone'] = 'torso'
         b_cue.chunk['feature'] = 'rotation'
-        #b_cue.set(b_cue.chunk + 'rotation0:' + rZero)
+        #b_cue.set(bcd A_cue.chunk + 'rotation0:' + rZero)
         print(b_cue.chunk)
         DM.add(b_cue.chunk)
         goal.set('setup:six')
