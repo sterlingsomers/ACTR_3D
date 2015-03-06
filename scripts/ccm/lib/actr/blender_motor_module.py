@@ -34,11 +34,28 @@ class BlenderMotorModule(ccm.Model):
         self._bones = self.get_bones()
         self._boneProperties = {'part.torso':[[0,0],[-pi/4,pi/4],[0,0]]}
         #Tick
-
+        self._internalChunks.append(ccm.Model(type='proprioception',
+                                              feature='rotation',
+                                              bone='shoulder.R',
+                                              rotation0='0.0',
+                                              rotation0_quality='min',
+                                              rotation1='0.0',
+                                              rotation2='0.0',
+                                              rotation2_quality='min'))
+        self._internalChunks.append(ccm.Model(type='proprioception',
+                                              feature='rotation',
+                                              bone='shoulder.L',
+                                              rotation0='0.0',
+                                              rotation0_quality='min',
+                                              rotation1='0.0',
+                                              rotation2='0.0',
+                                              rotation2_quality='min'))
         self._internalChunks.append(ccm.Model(type='proprioception',
                                               feature='rotation',
                                               bone='torso',
                                               rotation0='0.0',
+                                              rotation0_quality='none',
+                                              rotation0_direction='none'
                                               rotation1='0.0',
                                               rotation2='0.0'))
 
@@ -60,13 +77,25 @@ class BlenderMotorModule(ccm.Model):
         '''Rotate ribs on axis by radians'''
         #Check the max rotation
 
+        print("rotate_torso called.")
+
+        if self.busy:
+            print("Busy.")
+            return
+        self.busy = True
+
+        maxReached = False
+        minReached = False
+
         minR,maxR = self._boneProperties['part.torso'][int(axis)]
         #print("MINR", minR)
         if float(radians) > maxR:
             #print("SET TO MAX")
+            maxReached=True
             radians = str(maxR)
         if float(radians) < minR:
             #print("SET TO MIN")
+            minReached=True
             radians = str(minR)
 
         #print("RADIANS",radians)
@@ -77,7 +106,18 @@ class BlenderMotorModule(ccm.Model):
             #if axis='0.0'
             if matcher.match(obj)!=None:
                 obj.rotation0=radians
+                if float(radians) < 0:
+                    obj.rotation0_direction='right'
+                if maxReached:
+                    obj.rotation0_quality='max'
+                if minReached:
+                    obj.rotation0_quality='min'
 
+        self.busy=False
+        print("Rotate torso complete")
+
+    def compress_shoulder(self,name,axis,radians):
+        middleware.send('compress_shoulder',[repr('shoulder.' + name),axis,radians])
 
     def rotate_shoulders_to(self,radians):
         '''Rotates the shoulders by some percentage of maximum rotation.
@@ -104,6 +144,7 @@ class BlenderMotorModule(ccm.Model):
                 obj.height=repr(self._boundingBox[2])
             if objs > 1:
                 raise Exception("There shouldn't be more than one match...")
+        self.busy = False
         print("get_bounding_box done.")
 
         # self._internalChunks.append(ccm.Model(type='proprioception',

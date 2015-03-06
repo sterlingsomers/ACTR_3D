@@ -20,7 +20,8 @@ class morse_middleware():
                         'move_forward':False,
                         'set_rotation':False,
                         'lower_arms':True,
-                        'set_rotation_ribs':False} #{function_name:blocking?}
+                        'set_rotation_ribs':False,
+                        'compress_shoulder':True} #{function_name:blocking?}
 
         self.request_dict = {'scan_imageD':True,
                 'getScreenVector':True,
@@ -38,7 +39,8 @@ class morse_middleware():
                             'scan_image':['self.robot_simulation.robot.GeometricCamerav1','.scan_image_multi'],
                             'getBoundingBox':['self.robot_simulation.robot','.getBoundingBox'],
                             'lower_arms':['self.robot_simulation.robot.torso','.lower_arms'],
-                            'get_bones':['self.robot_simulation.robot','.getBones']}
+                            'get_bones':['self.robot_simulation.robot','.getBones'],
+                            'compress_shoulder':['self.robot_simulation.robot.torso', '.set_rotation']}
         #self.action_dict = {'scan_imageD':['self.robot_simulation.robot.GeometricCamerav1', '.scan_imageD'],
 		#		'set_speed':['self.robot_simulation.robot','.set_speed'],
         #        'move_forward':['self.robot_simulation.robot','.move_forward'],
@@ -77,9 +79,9 @@ class morse_middleware():
                     self.modules_in_use[self.action_dict[datastr][0]] = datastr #set it as in use
                     #print(self.modules_in_use)
                     rStr = self.action_dict[datastr][0] + self.action_dict[datastr][1] + '(' + ','.join(argslist) + ')'
-                    #print(rStr)
+                    print(rStr)
                     eval(rStr)
-                    self.mustTick=True
+                    self.mustTick=self.active
             else: #if it's not blocking, we need to add it's location to a list, and check if it is already in the list
                 if self.action_dict[datastr][0] in self.modules_in_use:
                     raise Exception("Module " + self.action_dict[datastr][0] + " is already in use this cycle by "
@@ -87,6 +89,7 @@ class morse_middleware():
                 else:
                     self.modules_in_use[self.action_dict[datastr][0]] = datastr #set it as in use
                     #print(self.modules_in_use)
+                    print("datastr",datastr)
                     rStr = self.action_dict[datastr][0] + self.action_dict[datastr][1] + '(' + ','.join(argslist) + ')'
                     #print(rStr)
                     eval(rStr)
@@ -120,37 +123,7 @@ class morse_middleware():
         return result
 
 
-#    def request(self, datastr, argslist):
-#        '''Request data. Most actions require a tick. Parallel actions will occur in random order, in following cycles.'''
-#        if not type(argslist) == list:
-#            raise Exception("argslist parameter must be a list")
-#        if not all(isinstance(x,str) for x in argslist):
-#            raise Exception("All arguments have to be strings")
-#        if self.mustTick:#blocking command send/request has been made already
-#            raise Exception("A blocking even has already occured.")#
-#
-#        if datastr in self.request_dict:
-#            if self.request_dict[datastr]:#is it blocking?
-#                if self.mustTick:#already blocking?
-#                    raise Exception("A blocking event has already occured")
-#                self.mustTick = True
-#                rStr = self.action_dict[datastr][0] + '(' + ','.join(argslist) + ')'
-#                result = eval(rStr)
-#                if 'return' in dir(result):
-#                    result = result.result()
-#                return result #must be returned right away because it's a request
-#            else:
-#                #no mustTick, it's not blocking
-#                rStr = self.action_dict[datastr][0] + '(' + ','.join(argslist) + ')'
-#                result = eval(rStr)
-#                if 'return' in dir(result):
-#                    result = result.result()
-#                return result
-#                
-#                
-#            
-#        else:
-#            raise Exception(datastr, "is not in request_dict. It is not available.")
+
 
 
     def set_mode(self,mode,rate):
@@ -161,6 +134,7 @@ class morse_middleware():
 
     def tick(self,sync=False):
         #eimport time
+        self.active=True
         if self.mode == 'best_effort':
             #print("mustTick - in tick", self.mustTick)
             self.mustTick = False
@@ -175,20 +149,7 @@ class morse_middleware():
                     self.send(snd[0],snd[1])
             if self.send_queue:
                 raise Exception("Send queue not clear. Too many commands per cycle.")
-#    def tick(self,sync=False):
-#        if self.mode == 'best_effort':
-#            self.mustTick = False
-#            for rate in range(self.rate):
-#                print("Middleware Tick!")
-#                self.robot_simulation.tick()
-#                if self.send_queue:
-#                    snd = self.send_queue.pop(0)
-#                    print(self.action_dict[snd[0]], "!@#$!@#$", snd[1])
-#                    rStr = self.action_dict[snd[0]][0]  +'(' + ','.join(snd[1]) + ')'
-#                    eval(rStr)
-#                
-#            if self.send_queue:
-#                raise Exception("Send queue not cleared. Too many send commands in 1 cycle.")
+
                 
                 
                 
