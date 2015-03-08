@@ -55,7 +55,7 @@ class BlenderMotorModule(ccm.Model):
                                               bone='torso',
                                               rotation0='0.0',
                                               rotation0_quality='none',
-                                              rotation0_direction='none'
+                                              rotation0_direction='none',
                                               rotation1='0.0',
                                               rotation2='0.0'))
 
@@ -72,6 +72,9 @@ class BlenderMotorModule(ccm.Model):
         '''This will retrieve all the bones' names'''
         return middleware.request('get_bones',[])
 
+    def set_rotations(self,bone_list,axis_list,radians_list):
+        print("set_rotations")
+        middleware.send('set_rotations',[repr(bone_list),repr(axis_list),repr(radians_list)])
 
     def rotate_torso(self,axis,radians):
         '''Rotate ribs on axis by radians'''

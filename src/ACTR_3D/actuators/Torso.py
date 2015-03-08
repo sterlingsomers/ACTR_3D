@@ -87,6 +87,24 @@ class Torso(morse.core.actuator.Actuator):
 #        tmp = self._rib.joint_rotation
 #        tmp[1] = tmp[1] + rotation
 #        self._rib.joint_rotation = tmp 
+
+    @service
+    def set_rotations(self,joint_list,axis_list,radians_list):
+        '''Rotate each joint in joint_list on relative index in axis list by relative index on radians list'''
+        print("SET ROTATIONs",joint_list,axis_list,radians_list)
+        channels = [self._get_revolute(j) for j in joint_list]
+        print("channels",channels)
+        #Should have returned an error if there is no such joint
+        #print(zip(channels,axis_list,radians_list))
+        for channel,axis,radian in zip(channels,axis_list,radians_list):
+            print(channel,axis,radian)
+            tmp = channel.joint_rotation
+            print("HERE1")
+            tmp[int(axis)] = float(radian)
+            channel.joint_rotation = tmp
+            print("HERE10")
+        return 1
+
     @service
     def set_rotation(self, joint, axis, radians):
         '''Access a joint by name and rotate it by radians on axis (0,1,2)

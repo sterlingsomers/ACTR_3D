@@ -19,6 +19,7 @@ class morse_middleware():
         self.send_dict = {'set_speed':True,
                         'move_forward':False,
                         'set_rotation':False,
+                        'set_rotations':False,
                         'lower_arms':True,
                         'set_rotation_ribs':False,
                         'compress_shoulder':True} #{function_name:blocking?}
@@ -35,6 +36,7 @@ class morse_middleware():
                 }
             
         self.action_dict = {'set_rotation_ribs':['self.robot_simulation.robot.torso','.set_rotation'],
+                            'set_rotations':['self.robot_simulation.robot.torso','.set_rotations'],
                             'get_image':['self.robot_simulation.robot.GeometricCamerav1','.get_image'],
                             'scan_image':['self.robot_simulation.robot.GeometricCamerav1','.scan_image_multi'],
                             'getBoundingBox':['self.robot_simulation.robot','.getBoundingBox'],

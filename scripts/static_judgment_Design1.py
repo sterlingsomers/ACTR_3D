@@ -101,9 +101,12 @@ class MyModel(ACTR):
     def setup_one(goal='setup:one'):
         import math
         #print(motor_module.get_bones())
+        motor_module.set_rotations(['shoulder.L','shoulder.R','ribs'],['2','2','1'],[repr(math.radians(-30)),repr(math.radians(-30)),
+                                                                                     repr(math.radians(-90))])
         #motor_module.compress_shoulder('L','2',repr(math.radians(-30.0)))
+        #motor_module.compress_shoulder('R','2',repr(math.radians(-30.0)))
 
-        motor_module.rotate_torso('1',repr(math.radians(-90.0)))
+        #motor_module.rotate_torso('1',repr(math.radians(-90.0)))
         goal.set('setup:two')
 
 
