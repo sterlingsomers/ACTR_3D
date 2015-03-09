@@ -48,7 +48,7 @@ class Manny(morse.core.robot.Robot):
         import math
         self.robot_children[0].lower_arms()
         self.robot_children[0].set_rotation('ribs',1,math.radians(90))
-        self.robot_children[0].set_rotation('ribs',1,math.radians(-45))
+        self.robot_children[0].set_rotation('ribs',1,math.radians(-25))
         #print("ASDF",self.components[4].lower_arms())
         # children = [child for child in self.bge_object.childrenRecursive]# if 'part.' in child.name]
         # for child in children:
