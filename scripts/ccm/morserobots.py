@@ -58,40 +58,47 @@ class morse_middleware():
         self.send_queue = [] #contains [[datastr,argslist],[datastr,argslist]]
         self.request_queue = []
         
-    def send(self, datastr, argslist):
-        print("Trying to send", datastr)
-        if not type(argslist) == list:
-            raise Exception("arglist parameter must be a list")
-        if not all(isinstance(x,str) for x in argslist):
-            raise Exception("All arguments have to be strings")
-        if not datastr in self.send_dict:
-            raise Exception(datastr + " is not in send_dict. Command does not exist or must be added.")
-        if self.mustTick:#Something has blocked
-            self.send_queue.append([datastr,argslist])
-        else:
-            if self.send_dict[datastr]: #it is blocking
-                if self.action_dict[datastr][0] in self.modules_in_use:
-                    raise Exception("Module " + self.action_dict[datastr][0] + " is already in use this cycle by "
-                    + self.modules_in_use[self.action_dict[datastr][0]])
-                else:
-                    self.modules_in_use[self.action_dict[datastr][0]] = datastr #set it as in use
-                    #print(self.modules_in_use)
-                    rStr = self.action_dict[datastr][0] + self.action_dict[datastr][1] + '(' + ','.join(argslist) + ')'
-                    #print(rStr)
-                    eval(rStr)
-                    self.mustTick=True
-            else: #if it's not blocking, we need to add it's location to a list, and check if it is already in the list
-                if self.action_dict[datastr][0] in self.modules_in_use:
-                    raise Exception("Module " + self.action_dict[datastr][0] + " is already in use this cycle by "
-                    + self.modules_in_use[self.action_dict[datastr][0]])
-                else:
-                    self.modules_in_use[self.action_dict[datastr][0]] = datastr #set it as in use
-                    #print(self.modules_in_use)
-                    rStr = self.action_dict[datastr][0] + self.action_dict[datastr][1] + '(' + ','.join(argslist) + ')'
-                    #print(rStr)
-                    eval(rStr)
+
+
+    # def send(self, datastr, argslist):
+    #     print("Trying to send", datastr)
+    #     if not type(argslist) == list:
+    #         raise Exception("arglist parameter must be a list")
+    #     if not all(isinstance(x,str) for x in argslist):
+    #         raise Exception("All arguments have to be strings")
+    #     if not datastr in self.send_dict:
+    #         raise Exception(datastr + " is not in send_dict. Command does not exist or must be added.")
+    #     if self.mustTick:#Something has blocked
+    #         self.send_queue.append([datastr,argslist])
+    #     else:
+    #         if self.send_dict[datastr]: #it is blocking
+    #             if self.action_dict[datastr][0] in self.modules_in_use:
+    #                 raise Exception("Module " + self.action_dict[datastr][0] + " is already in use this cycle by "
+    #                 + self.modules_in_use[self.action_dict[datastr][0]])
+    #             else:
+    #                 self.modules_in_use[self.action_dict[datastr][0]] = datastr #set it as in use
+    #                 #print(self.modules_in_use)
+    #                 rStr = self.action_dict[datastr][0] + self.action_dict[datastr][1] + '(' + ','.join(argslist) + ')'
+    #                 #print(rStr)
+    #                 eval(rStr)
+    #                 self.mustTick=True
+    #         else: #if it's not blocking, we need to add it's location to a list, and check if it is already in the list
+    #             if self.action_dict[datastr][0] in self.modules_in_use:
+    #                 raise Exception("Module " + self.action_dict[datastr][0] + " is already in use this cycle by "
+    #                 + self.modules_in_use[self.action_dict[datastr][0]])
+    #             else:
+    #                 self.modules_in_use[self.action_dict[datastr][0]] = datastr #set it as in use
+    #                 #print(self.modules_in_use)
+    #                 rStr = self.action_dict[datastr][0] + self.action_dict[datastr][1] + '(' + ','.join(argslist) + ')'
+    #                 #print(rStr)
+    #                 eval(rStr)
                                 
             
+    def send(self,function_name,**kwargs):
+
+
+        self.send_queue.append([function_name,kwargs])
+
 
         
     def request(self, datastr, argslist):
@@ -120,37 +127,6 @@ class morse_middleware():
         return result
 
 
-#    def request(self, datastr, argslist):
-#        '''Request data. Most actions require a tick. Parallel actions will occur in random order, in following cycles.'''
-#        if not type(argslist) == list:
-#            raise Exception("argslist parameter must be a list")
-#        if not all(isinstance(x,str) for x in argslist):
-#            raise Exception("All arguments have to be strings")
-#        if self.mustTick:#blocking command send/request has been made already
-#            raise Exception("A blocking even has already occured.")#
-#
-#        if datastr in self.request_dict:
-#            if self.request_dict[datastr]:#is it blocking?
-#                if self.mustTick:#already blocking?
-#                    raise Exception("A blocking event has already occured")
-#                self.mustTick = True
-#                rStr = self.action_dict[datastr][0] + '(' + ','.join(argslist) + ')'
-#                result = eval(rStr)
-#                if 'return' in dir(result):
-#                    result = result.result()
-#                return result #must be returned right away because it's a request
-#            else:
-#                #no mustTick, it's not blocking
-#                rStr = self.action_dict[datastr][0] + '(' + ','.join(argslist) + ')'
-#                result = eval(rStr)
-#                if 'return' in dir(result):
-#                    result = result.result()
-#                return result
-#                
-#                
-#            
-#        else:
-#            raise Exception(datastr, "is not in request_dict. It is not available.")
 
 
     def set_mode(self,mode,rate):
@@ -168,27 +144,14 @@ class morse_middleware():
             self.modules_in_use = {}
             for rate in range(self.rate):
                 print("Middleware tick!")
-                self.robot_simulation.tick()
                 if self.send_queue:
-                    print("Popping send queue")
-                    snd = self.send_queue.pop(0)
-                    self.send(snd[0],snd[1])
+                    self.robot_simulation.robot.accept_send_request(self.send_queue)
+                    self.send_queue = []
+                self.robot_simulation.tick()
+
             if self.send_queue:
                 raise Exception("Send queue not clear. Too many commands per cycle.")
-#    def tick(self,sync=False):
-#        if self.mode == 'best_effort':
-#            self.mustTick = False
-#            for rate in range(self.rate):
-#                print("Middleware Tick!")
-#                self.robot_simulation.tick()
-#                if self.send_queue:
-#                    snd = self.send_queue.pop(0)
-#                    print(self.action_dict[snd[0]], "!@#$!@#$", snd[1])
-#                    rStr = self.action_dict[snd[0]][0]  +'(' + ','.join(snd[1]) + ')'
-#                    eval(rStr)
-#                
-#            if self.send_queue:
-#                raise Exception("Send queue not cleared. Too many send commands in 1 cycle.")
+
                 
                 
                 

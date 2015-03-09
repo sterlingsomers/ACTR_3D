@@ -51,6 +51,20 @@ class BlenderMotorModule(ccm.Model):
         #self.blender_camera = Morse().robot.GeometricCamerav1
 
 
+    def lower_arms(self,**kwargs):
+        pass
+
+
+    def send(self,function_name,**kwargs):
+        '''Checks for function_name in motor module. Calls function_name with kwargs on ACTR side.
+            Sends function_name command through middleware to perform function on Morse side.'''
+        #ACTR SIDE
+        func = getattr(self,function_name)
+        func(**kwargs)
+
+        #Middleware Side
+        middleware.send(function_name,**kwargs)
+
     def get_bones(self):
         '''This will retrieve all the bones' names'''
         return middleware.request('get_bones',[])
@@ -70,7 +84,7 @@ class BlenderMotorModule(ccm.Model):
             radians = str(minR)
 
         #print("RADIANS",radians)
-        middleware.send('set_rotation_ribs',[repr('ribs'),axis,radians])
+        middleware.send('rotate_torso',axis=axis, radians=radians)
         pattern='type:proprioception bone:torso'
         matcher=Pattern(pattern)
         for obj in self._internalChunks:
@@ -186,10 +200,10 @@ class BlenderMotorModule(ccm.Model):
     #   else:
     #     self._buffer.set(obj)
 
-    def lower_arms(self):
-        '''Lower the arms'''
-        print("Motormodule_sending lower arms")
-        middleware.send('lower_arms',[])
+    # def lower_arms(self):
+    #     '''Lower the arms'''
+    #     print("Motormodule_sending lower arms")
+    #     middleware.send('lower_arms',[])
 
     def set_speed(self,speed=0.01):
         '''Move forward @speed in m/s'''

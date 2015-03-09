@@ -28,11 +28,11 @@ class MotorMonitor(ccm.ProductionSystem):
     fake_buffer = Buffer()
 
     def init():
-        fake_buffer.set('fake')#should be 'fake'
+        fake_buffer.set('asdf')#should be 'fake'
 
     def repeat(fake_buffer='fake'):
         #This could be used during movement, actively doing the task
-        bb = middleware.request('getBoundingBox', [])
+        #bb = middleware.request('getBoundingBox', [])
         print("MONITORING", bb)
 
 class VisionMethods(ccm.ProductionSystem):
@@ -95,12 +95,14 @@ class MyModel(ACTR):
 
     ######Calibration########
     def setup_zero(goal='setup:zero'):
-        motor_module.lower_arms()
-        goal.set('setup:one')
+        import math
+        motor_module.send('lower_arms')
+        motor_module.send('rotate_torso',axis=1,radians=math.radians(-90))
+        goal.set('stop')
 
     def setup_one(goal='setup:one'):
-        import math
-        motor_module.rotate_torso('1',repr(math.radians(-90.0)))
+        #import math
+        #motor_module.rotate_torso('1',repr(math.radians(-90.0)))
         goal.set('stop')
 
     def setup_two(goal='setup:two'):

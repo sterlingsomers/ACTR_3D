@@ -33,6 +33,30 @@ class Manny(morse.core.robot.Robot):
         # Do here robot specific initializations
         logger.info('Component initialized')
 
+        self.module_map = {}
+        self.robot_children = []#[child for child in self.bge_object.childrenRecursive if 'robot.' in child.name]
+        #for child in self._children:
+        #    if child.name == 'robot.torso':
+        #        self.module_map['robot.torso'] = child
+        #self.func_map = {'lower_arms':self.module_map['robot.torso']}
+
+
+
+    @service
+    def accept_send_request(self,queue):
+        print("QUEUE...",self.robot_children)
+        import math
+        self.robot_children[0].lower_arms()
+        self.robot_children[0].set_rotation('ribs',1,math.radians(90))
+        #print("ASDF",self.components[4].lower_arms())
+        # children = [child for child in self.bge_object.childrenRecursive]# if 'part.' in child.name]
+        # for child in children:
+        #     if child.name == 'part.torso':
+        #         print("ACCEPT HERE")
+        #         print(child.name)
+        #         print(dir(child))
+
+
 
     @service
     def getBones(self):

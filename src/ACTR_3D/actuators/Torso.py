@@ -34,7 +34,7 @@ class Torso(morse.core.actuator.Actuator):
         self._segments = []
         segment = self.bge_object.children[0]
 
-
+        self.robot_parent.robot_children.append(self)
 
         for i in range(1):
             self._segments.append(segment)
@@ -87,7 +87,7 @@ class Torso(morse.core.actuator.Actuator):
 #        tmp = self._rib.joint_rotation
 #        tmp[1] = tmp[1] + rotation
 #        self._rib.joint_rotation = tmp 
-    @service
+
     def set_rotation(self, joint, axis, radians):
         '''Access a joint by name and rotate it by radians on axis (0,1,2)
             ribs,1-> shoulder rotation
@@ -102,7 +102,10 @@ class Torso(morse.core.actuator.Actuator):
         return radians   
 
 
-    @service
+
+
+
+
     def lower_arms(self):
         print("lower arms...")
         self.set_rotation('arm_upper.L',0,math.radians(-45))
