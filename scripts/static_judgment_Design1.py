@@ -97,7 +97,10 @@ class MyModel(ACTR):
     def setup_zero(goal='setup:zero'):
         import math
         motor_module.send('lower_arms')
-        motor_module.send('rotate_torso',axis=1,radians=math.radians(-90))
+        motor_module.send('set_rotation',bone='ribs',axis=1,radians=math.radians(-90))
+        #####
+        #Could change this to 'rotate_torso' and use a mapping to map 'rotate_torso' to 'set_rotation'
+
         goal.set('stop')
 
     def setup_one(goal='setup:one'):

@@ -34,7 +34,8 @@ class Torso(morse.core.actuator.Actuator):
         self._segments = []
         segment = self.bge_object.children[0]
 
-        self.robot_parent.robot_children.append(self)
+        self.robot_parent.func_map['lower_arms'] = self
+        self.robot_parent.func_map['set_rotation'] = self
 
         for i in range(1):
             self._segments.append(segment)
@@ -88,13 +89,13 @@ class Torso(morse.core.actuator.Actuator):
 #        tmp[1] = tmp[1] + rotation
 #        self._rib.joint_rotation = tmp 
 
-    def set_rotation(self, joint, axis, radians):
+    def set_rotation(self, bone, axis, radians):
         '''Access a joint by name and rotate it by radians on axis (0,1,2)
             ribs,1-> shoulder rotation
             shoulder.L,2 -> sub/shoulder compression/expansion (left)
             shoulder.R,0 -> sub/shoulder compression/expansion (right)
             Fix why different axes?'''
-        channel = self._get_revolute(joint)
+        channel = self._get_revolute(bone)
         
         tmp = channel.joint_rotation
         tmp[axis] = radians
@@ -104,7 +105,8 @@ class Torso(morse.core.actuator.Actuator):
 
 
 
-
+    # def rotate_torso(self,**kwargs):
+    #     self.set_rotation(kwargs)
 
     def lower_arms(self):
         print("lower arms...")

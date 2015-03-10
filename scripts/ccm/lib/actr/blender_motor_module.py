@@ -28,8 +28,7 @@ class BlenderMotorModule(ccm.Model):
 
         # self._monitor = MotorMonitor()
 
-        #Tick
-        #middleware.tick()
+        self.movement_constraints = {'rotate_torso':[]}
 
         self._bones = self.get_bones()
         self._boneProperties = {'part.torso':[[0,0],[-pi/4,pi/4],[0,0]]}
@@ -63,6 +62,7 @@ class BlenderMotorModule(ccm.Model):
         func(**kwargs)
 
         #Middleware Side
+
         middleware.send(function_name,**kwargs)
 
     def get_bones(self):
@@ -84,7 +84,7 @@ class BlenderMotorModule(ccm.Model):
             radians = str(minR)
 
         #print("RADIANS",radians)
-        middleware.send('rotate_torso',axis=axis, radians=radians)
+        #middleware.send('rotate_torso',axis=axis, radians=radians)
         pattern='type:proprioception bone:torso'
         matcher=Pattern(pattern)
         for obj in self._internalChunks:
@@ -221,6 +221,8 @@ class BlenderMotorModule(ccm.Model):
 
     def set_rotation(self,bone,axis,radians):
         '''Rotate bone on axis by radians'''
-        middleware.send('set_rotation',[repr(bone),axis,radians])
-        
+        pass
+        #Handle the ACT-R Stuff here
+        #  middleware.send('set_rotation',[repr(bone),axis,radians])
+
 

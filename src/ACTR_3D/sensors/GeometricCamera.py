@@ -74,6 +74,7 @@ class GeometricCamera(morse.sensors.camera.Camera):
         # Call the constructor of the parent class
         morse.sensors.camera.Camera.__init__(self, obj, parent)
         self.visual_objects = {}
+
         # Locate the Blender camera object associated with this sensor
         main_obj = self.bge_object
         for obj in main_obj.children:
