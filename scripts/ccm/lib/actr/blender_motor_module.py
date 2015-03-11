@@ -51,7 +51,7 @@ class BlenderMotorModule(ccm.Model):
         #self.blender_camera = Morse().robot.GeometricCamerav1
 
 
-    def lower_arms(self,**kwargs):
+    def lower_arms(self,function_name,**kwargs):
         pass
 
 
@@ -62,39 +62,44 @@ class BlenderMotorModule(ccm.Model):
 
 
         func = getattr(self,function_name)
-        func(**kwargs)
+        func(function_name,**kwargs)
 
         #Middleware Side
-        kwargs.update(self.function_map[function_name][1])
+        #Each method should on this side should take care of that
+        #So that any restrictions can be handled first
+        #kwargs.update(self.function_map[function_name][1])
 
-        middleware.send(self.function_map[function_name][0],**kwargs)
+        #middleware.send(self.function_map[function_name][0],**kwargs)
 
     def get_bones(self):
         '''This will retrieve all the bones' names'''
         return middleware.request('get_bones',[])
 
 
-    def rotate_torso(self,axis,radians):
+    def rotate_torso(self,function_name,**kwargs):
         '''Rotate ribs on axis by radians'''
         #Check the max rotation
+        kwargs.update(self.function_map[function_name][1])
+        print("KW", kwargs)
 
-        minR,maxR = self._boneProperties['part.torso'][int(axis)]
+        minR,maxR = self._boneProperties['part.torso'][kwargs['axis']]
         #print("MINR", minR)
-        if float(radians) > maxR:
+        if kwargs['radians'] > maxR:
             #print("SET TO MAX")
-            radians = str(maxR)
-        if float(radians) < minR:
+            kwargs['radians'] = maxR
+        if kwargs['radians'] < minR:
             #print("SET TO MIN")
-            radians = str(minR)
+            kwargs['radians'] = minR
 
         #print("RADIANS",radians)
+        middleware.send(self.function_map[function_name][0],**kwargs)
         #middleware.send('rotate_torso',axis=axis, radians=radians)
         pattern='type:proprioception bone:torso'
         matcher=Pattern(pattern)
         for obj in self._internalChunks:
             #if axis='0.0'
             if matcher.match(obj)!=None:
-                obj.rotation0=radians
+                obj.rotation0=kwargs['radians']
 
 
     def rotate_shoulders_to(self,radians):

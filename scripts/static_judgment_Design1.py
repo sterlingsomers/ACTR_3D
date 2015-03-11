@@ -98,6 +98,8 @@ class MyModel(ACTR):
         import math
         motor_module.send('lower_arms')
         motor_module.send('rotate_torso',axis=1,radians=math.radians(-90))
+        motor_module.send('rotate_torso',axis=1,radians=math.radians(-0.0))
+        motor_module.send('rotate_torso',axis=1,radians=math.radians(-90.0))
         #####
         #Could change this to 'rotate_torso' and use a mapping to map 'rotate_torso' to 'set_rotation'
 
