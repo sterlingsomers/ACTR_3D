@@ -42,7 +42,7 @@ class BlenderMotorModule(ccm.Model):
                                               rotation1='0.0',
                                               rotation2='0.0'))
 
-        #self._boundingBox = middleware.request('getBoundingBox', [])
+        ##self._boundingBox = middleware.request('getBoundingBox', [])
         self._internalChunks.append(ccm.Model(type='proprioception',
                                               feature='bounding_box',
                                               width=repr(0.0),
