@@ -34,10 +34,29 @@ class BlenderMotorModule(ccm.Model):
         self._bones = self.get_bones()
         self._boneProperties = {'part.torso':[[0,0],[-pi/4,pi/4],[0,0]]}
         #Tick
+        self._internalChunks.append(cmm.Model(type='proprioception',
+                                              feature='rotation',
+                                              bone='shoulder.R',
+                                              rotation0='0.0',
+                                              rotation0_quality='min',
+                                              rotation1='0.0',
+                                              rotation2='0.0',
+                                              rotation_quality='min'))
+
+        self._internalChunks.append(cmm.Model(type='proprioception',
+                                              feature='rotation',
+                                              bone='shoulder.L',
+                                              rotation0='0.0',
+                                              rotation0_quality='min',
+                                              rotation1='0.0',
+                                              rotation2='0.0',
+                                              rotation_quality='min'))
 
         self._internalChunks.append(ccm.Model(type='proprioception',
                                               feature='rotation',
                                               bone='torso',
+                                              rotation0_quality='none',
+                                              rotation0_direction='none',
                                               rotation0='0.0',
                                               rotation1='0.0',
                                               rotation2='0.0'))
@@ -79,6 +98,13 @@ class BlenderMotorModule(ccm.Model):
     def rotate_torso(self,function_name,**kwargs):
         '''Rotate ribs on axis by radians'''
         #Check the max rotation
+        if self.busy:
+            return
+        self.busy = True
+
+        maxReached = False
+        minReached = False
+
         kwargs.update(self.function_map[function_name][1])
         print("KW", kwargs)
 
@@ -86,9 +112,11 @@ class BlenderMotorModule(ccm.Model):
         #print("MINR", minR)
         if kwargs['radians'] > maxR:
             #print("SET TO MAX")
+            maxReached=True
             kwargs['radians'] = maxR
         if kwargs['radians'] < minR:
             #print("SET TO MIN")
+            minReached = True
             kwargs['radians'] = minR
 
         #print("RADIANS",radians)
@@ -100,7 +128,16 @@ class BlenderMotorModule(ccm.Model):
             #if axis='0.0'
             if matcher.match(obj)!=None:
                 obj.rotation0=kwargs['radians']
+                if kwargs['radians'] < 0:
+                    object.rotation_direction = 'right'
+                if maxReached:
+                    obj.rotation0_quality='max'
+                if minReached:
+                    obj.rotation0_quality='min'
+        self.busy=False
 
+    def compress_shoulder(self,function_name,**kwargs):
+        pass
 
     def rotate_shoulders_to(self,radians):
         '''Rotates the shoulders by some percentage of maximum rotation.
