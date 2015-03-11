@@ -27,8 +27,9 @@ class BlenderMotorModule(ccm.Model):
         self.get_bounding_box()
 
         # self._monitor = MotorMonitor()
-
-        self.movement_constraints = {'rotate_torso':[]}
+                             #internal name  #external       #addition arguments for external
+        self.function_map = {'rotate_torso':['set_rotation',{'bone':'ribs'}],
+                             'lower_arms':['lower_arms',{}]}
 
         self._bones = self.get_bones()
         self._boneProperties = {'part.torso':[[0,0],[-pi/4,pi/4],[0,0]]}
@@ -58,12 +59,15 @@ class BlenderMotorModule(ccm.Model):
         '''Checks for function_name in motor module. Calls function_name with kwargs on ACTR side.
             Sends function_name command through middleware to perform function on Morse side.'''
         #ACTR SIDE
+
+
         func = getattr(self,function_name)
         func(**kwargs)
 
         #Middleware Side
+        kwargs.update(self.function_map[function_name][1])
 
-        middleware.send(function_name,**kwargs)
+        middleware.send(self.function_map[function_name][0],**kwargs)
 
     def get_bones(self):
         '''This will retrieve all the bones' names'''
