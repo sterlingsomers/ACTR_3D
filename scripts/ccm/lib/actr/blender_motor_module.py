@@ -34,7 +34,29 @@ class BlenderMotorModule(ccm.Model):
         self._bones = self.get_bones()
         self._boneProperties = {'part.torso':[[0,0],[-pi/4,pi/4],[0,0]]}
         #Tick
-        self._internalChunks.append(cmm.Model(type='proprioception',
+        self._internalChunks.append(ccm.Model(type='proprioception',
+                                              feature='rotation',
+                                              bone='upper_arm.R',
+                                              rotation0='0.0',
+                                              rotation0_quality='none',
+                                              rotation1='0.0',
+                                              rotation1_quality='none',
+                                              rotation2='0.0',
+                                              rotatoin_2_quality='none',
+                                              overall_quality='none'))
+
+        self._internalChunks.append(ccm.Model(type='proprioception',
+                                              feature='rotation',
+                                              bone='upper_arm.L',
+                                              rotation0='0.0',
+                                              rotation0_quality='none',
+                                              rotation1='0.0',
+                                              rotation1_quality='none',
+                                              rotation2='0.0',
+                                              rotation_2_quality='none',
+                                              overall_quality='none'))
+
+        self._internalChunks.append(ccm.Model(type='proprioception',
                                               feature='rotation',
                                               bone='shoulder.R',
                                               rotation0='0.0',
@@ -43,7 +65,7 @@ class BlenderMotorModule(ccm.Model):
                                               rotation2='0.0',
                                               rotation_quality='min'))
 
-        self._internalChunks.append(cmm.Model(type='proprioception',
+        self._internalChunks.append(ccm.Model(type='proprioception',
                                               feature='rotation',
                                               bone='shoulder.L',
                                               rotation0='0.0',
@@ -71,7 +93,45 @@ class BlenderMotorModule(ccm.Model):
 
 
     def lower_arms(self,function_name,**kwargs):
-        pass
+        '''
+        This function lowers the arms completly.
+        :param function_name: 'lower_arms'
+        :param kwargs: {}
+        :return: Moves the arms by so they are pointing downward
+        :special note: The arms currently do not map properly to the desired arms for the model.
+           Because the armature start somewhere near 45 (or -45) deg., when you lower the
+            arms, you have to lower them to -45 (or 45) deg.,. On the ACT-R side, I'm calling
+            this 0 deg. '''
+
+        print("LOWER ARMS", kwargs)
+        if self.busy:
+            return
+        self.busy = True
+
+        # minR,maxR = self._boneProperties['part.torso'][kwargs['axis']]
+        # #print("MINR", minR)
+        # if kwargs['radians'] > maxR:
+        #     #print("SET TO MAX")
+        #     maxReached=True
+        #     kwargs['radians'] = maxR
+        # if kwargs['radians'] < minR:
+        #     #print("SET TO MIN")
+        #     minReached = True
+        #     kwargs['radians'] = minR
+
+        paterns = ['type:proprioception bone:upper_arm.R',
+                   'type:proprioception bone:upper_arm.L']
+        for pattern in patterns:
+        matcher=Pattern(pattern)
+            for obj in self._internalChunks:
+                #if axis='0.0'
+                if matcher.match(obj)!=None:
+                    obj.rotation0='0'
+                    obj.overall_quality='lowered'
+        self.busy=False
+
+
+        middleware.send(self.function_map[function_name][0],**kwargs)
 
 
     def send(self,function_name,**kwargs):
@@ -98,10 +158,11 @@ class BlenderMotorModule(ccm.Model):
     def rotate_torso(self,function_name,**kwargs):
         '''Rotate ribs on axis by radians'''
         #Check the max rotation
+        print("ROTATE TORSO")
         if self.busy:
             return
         self.busy = True
-
+        print("ROTATE TORSO2")
         maxReached = False
         minReached = False
 
@@ -129,7 +190,7 @@ class BlenderMotorModule(ccm.Model):
             if matcher.match(obj)!=None:
                 obj.rotation0=kwargs['radians']
                 if kwargs['radians'] < 0:
-                    object.rotation_direction = 'right'
+                    obj.rotation_direction = 'right'
                 if maxReached:
                     obj.rotation0_quality='max'
                 if minReached:
@@ -165,6 +226,7 @@ class BlenderMotorModule(ccm.Model):
             if objs > 1:
                 raise Exception("There shouldn't be more than one match...")
         print("get_bounding_box done.")
+        self.busy = False
 
         # self._internalChunks.append(ccm.Model(type='proprioception',
         #                                       width=repr(self._boundingBox[0]),
