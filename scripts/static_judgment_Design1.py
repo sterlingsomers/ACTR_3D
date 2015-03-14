@@ -96,21 +96,23 @@ class MyModel(ACTR):
     ######Calibration########
     def setup_zero(goal='setup:zero'):
         import math
+        motor_module.get_bounding_box()
         motor_module.send('lower_arms')
-        motor_module.send('rotate_torso',axis=1,radians=math.radians(-90))
-        motor_module.send('rotate_torso',axis=1,radians=math.radians(-0.0))
-        motor_module.send('rotate_torso',axis=1,radians=math.radians(-90.0))
+        motor_module.send('rotate_torso',axis=1,radians=math.radians(-90))#right
+        motor_module.send('extend_shoulder',bone='shoulder.R',radians=math.radians(30.0))
+        motor_module.send('compress_shoulder',bone='shoulder.L',radians=math.radians(0.0))
+
         #Try compressing shoulder here.Should be Axis2
 
         #####
         #Could change this to 'rotate_torso' and use a mapping to map 'rotate_torso' to 'set_rotation'
 
-        goal.set('stop')
+        goal.set('setup:one')
 
     def setup_one(goal='setup:one'):
-        #import math
-        #motor_module.rotate_torso('1',repr(math.radians(-90.0)))
-        goal.set('stop')
+        motor_module.get_bounding_box()
+
+        goal.set('setup:two')
 
     def setup_two(goal='setup:two'):
         motor_module.get_bounding_box()

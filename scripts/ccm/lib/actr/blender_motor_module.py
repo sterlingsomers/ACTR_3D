@@ -29,10 +29,14 @@ class BlenderMotorModule(ccm.Model):
         # self._monitor = MotorMonitor()
                              #internal name  #external       #addition arguments for external
         self.function_map = {'rotate_torso':['set_rotation',{'bone':'ribs'}],
-                             'lower_arms':['lower_arms',{}]}
+                             'lower_arms':['lower_arms',{}],
+                             'extend_shoulder':['set_rotation',{'axis':2}]}
 
         self._bones = self.get_bones()
-        self._boneProperties = {'part.torso':[[0,0],[-pi/4,pi/4],[0,0]]}
+                                    #NAME      #min/max by axis: 0, 1, 2
+        self._boneProperties = {'part.torso':[[0,0],[-pi/4,pi/4],[0,0]],
+                                'shoulder.L':[[0,0],[-pi/6,pi/6],[0,0]],
+                                'shoulder.R':[[0,0],[0,0],[-pi/6,pi/6]]}
         #Tick
         self._internalChunks.append(ccm.Model(type='proprioception',
                                               feature='rotation',
@@ -119,16 +123,16 @@ class BlenderMotorModule(ccm.Model):
         #     minReached = True
         #     kwargs['radians'] = minR
 
-        paterns = ['type:proprioception bone:upper_arm.R',
+        patterns = ['type:proprioception bone:upper_arm.R',
                    'type:proprioception bone:upper_arm.L']
         for pattern in patterns:
-        matcher=Pattern(pattern)
+            matcher=Pattern(pattern)
             for obj in self._internalChunks:
                 #if axis='0.0'
                 if matcher.match(obj)!=None:
                     obj.rotation0='0'
                     obj.overall_quality='lowered'
-        self.busy=False
+            self.busy=False
 
 
         middleware.send(self.function_map[function_name][0],**kwargs)
@@ -191,11 +195,66 @@ class BlenderMotorModule(ccm.Model):
                 obj.rotation0=kwargs['radians']
                 if kwargs['radians'] < 0:
                     obj.rotation_direction = 'right'
+                elif kwargs['raidans'] > 0:
+                    obj.rotation_direction = 'left'
                 if maxReached:
                     obj.rotation0_quality='max'
                 if minReached:
                     obj.rotation0_quality='min'
         self.busy=False
+
+    def extend_shoulder(self,function_name,**kwargs):
+        '''
+         This function extends the shoulder (should be in ribs rotation direction)
+         to help reduce agent width.
+         :param function_name:
+         :param kwargs: bone='shoulder.L' OR bone='shoulder.R'
+         :return:applies the shoulder extension with set_rotation on Morse side
+         '''
+        #Check the max rotation
+        print("Extend Shoulder")
+        if self.busy:
+            return
+        self.busy = True
+
+        maxReached = False
+        minReached = False
+
+
+        kwargs.update(self.function_map[function_name][1])
+        kwargs['radians'] = kwargs['radians'] * -1
+
+
+        minR,maxR = self._boneProperties[kwargs['bone']][kwargs['axis']]
+        #print("MINR", minR)
+        if kwargs['radians'] > maxR:
+            #print("SET TO MAX")
+            maxReached=True
+            kwargs['radians'] = maxR
+        if kwargs['radians'] < minR:
+            #print("SET TO MIN")
+            minReached = True
+            kwargs['radians'] = minR
+
+        #print("RADIANS",radians)
+        middleware.send(self.function_map[function_name][0],**kwargs)
+        #middleware.send('rotate_torso',axis=axis, radians=radians)
+        pattern='type:proprioception ' + 'bone:' + kwargs['bone']
+        matcher=Pattern(pattern)
+        for obj in self._internalChunks:
+            #if axis='0.0'
+            if matcher.match(obj)!=None:
+                obj.rotation0=kwargs['radians']
+                if kwargs['radians'] < 0:
+                    obj.rotation_direction = 'right'
+                elif kwargs['radians'] > 0:
+                    obj.rotation_direction = 'left'
+                if maxReached:
+                    obj.rotation0_quality='max'
+                if minReached:
+                    obj.rotation0_quality='min'
+        self.busy=False
+
 
     def compress_shoulder(self,function_name,**kwargs):
         pass
