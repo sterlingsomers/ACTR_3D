@@ -94,13 +94,13 @@ class MyModel(ACTR):
 
 
     ######Calibration########
-    def setup_zero(goal='setup:zero'):
+    def setup_zero(goal='setup:zero'):#, b_unit_task='width:minimized arms:lowered ):
         import math
         motor_module.get_bounding_box()
         motor_module.send('lower_arms')
         motor_module.send('rotate_torso',axis=1,radians=math.radians(-90))#right
-        motor_module.send('extend_shoulder',bone='shoulder.R',radians=math.radians(30.0))
-        motor_module.send('compress_shoulder',bone='shoulder.L',radians=math.radians(0.0))
+        motor_module.send('extend_shoulder',bone='shoulder.L',radians=math.radians(30.0))
+        motor_module.send('compress_shoulder',bone='shoulder.R',radians=math.radians(30.0))
 
         #Try compressing shoulder here.Should be Axis2
 
@@ -115,14 +115,15 @@ class MyModel(ACTR):
         goal.set('setup:two')
 
     def setup_two(goal='setup:two'):
-        motor_module.get_bounding_box()
+        motor_module.request('type:proprioception feature:bounding_box width:?')
         goal.set('setup:three')
         #goal.set('stop')
 
 
     def setup_three(goal='setup:three'):
-        motor_module.request('type:proprioception feature:bounding_box width:?')
-        goal.set('setup:four')
+
+        goal.set('stop')
+
 
     def setup_four(goal='setup:four',b_motor='width:?w height:?h depth:?d'):
 
