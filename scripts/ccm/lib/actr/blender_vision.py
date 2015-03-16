@@ -418,7 +418,7 @@ class BlenderVision(ccm.Model):
     def check_match(self, **kwargs):
         if 'opening' in kwargs:
             if hasattr(self,'_'+kwargs['opening']):
-                pass#here
+                pass#here add code
             else:
                 self.error=True
                 self.busy=False
