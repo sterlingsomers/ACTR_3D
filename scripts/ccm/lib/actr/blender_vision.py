@@ -415,9 +415,9 @@ class BlenderVision(ccm.Model):
     def get_visible_angles(self, label):
         print(vision_cam.get_visible_angles(label))
    
-    def check_match(self, kwargs):
+    def check_match(self, **kwargs):
         if 'opening' in kwargs:
-            if hasattr(self,'_'+kwargs[opening]):
+            if hasattr(self,'_'+kwargs['opening']):
                 pass#here
             else:
                 self.error=True
