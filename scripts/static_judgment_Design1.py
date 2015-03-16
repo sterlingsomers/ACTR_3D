@@ -99,8 +99,8 @@ class MyModel(ACTR):
         motor_module.get_bounding_box()
         motor_module.send('lower_arms')
         motor_module.send('rotate_torso',axis=1,radians=math.radians(-90))#right
-        motor_module.send('extend_shoulder',bone='shoulder.L',radians=math.radians(30.0))
-        motor_module.send('compress_shoulder',bone='shoulder.R',radians=math.radians(30.0))
+        motor_module.send('compress_shoulder',bone='shoulder.L',radians=math.radians(50.0))
+        motor_module.send('extend_shoulder',bone='shoulder.R',radians=math.radians(50.0))
 
         #Try compressing shoulder here.Should be Axis2
 
@@ -115,21 +115,20 @@ class MyModel(ACTR):
         goal.set('setup:two')
 
     def setup_two(goal='setup:two'):
-        motor_module.request('type:proprioception feature:bounding_box width:?')
+        motor_module.request('type:proprioception feature:bounding_box width:? depth:?')
         goal.set('setup:three')
         #goal.set('stop')
 
 
-    def setup_three(goal='setup:three'):
+    def setup_three(goal='setup:three', b_motor='width:?w depth:?d'):
+        vision_module.find_feature(feature='opening',depth=d)
+        goal.set('setup:four')
 
+
+    def setup_four(goal='setup:four',b_vision1='opening:?opening',b_motor='width:?w depth:?d'):
+        #b_motor should be put into another buffer or refreshed
+        vision_module.check_match(opening=opening,width=w)
         goal.set('stop')
-
-
-    def setup_four(goal='setup:four',b_motor='width:?w height:?h depth:?d'):
-
-        b_cue.set('width:' + w + ' height:' + h + ' depth:'+d)
-        motor_module.request('type:proprioception feature:rotation bone:torso rotation0:?')
-        goal.set('setup:five')
 
     def setup_five(goal='setup:five',b_motor='feature:rotation bone:torso rotation0:?rZero rotation1:?rOne rotation2:?rTwo'):
         b_cue.chunk['rotation0'] = rZero
@@ -138,7 +137,7 @@ class MyModel(ACTR):
         #b_cue.set(b_cue.chunk + 'rotation0:' + rZero)
         print(b_cue.chunk)
         DM.add(b_cue.chunk)
-        goal.set('setup:six')
+        goal.set('stop')
 
 # '''Notes:
 #     We can see already a problem with this approach.

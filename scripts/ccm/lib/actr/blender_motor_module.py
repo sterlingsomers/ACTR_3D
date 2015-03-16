@@ -5,6 +5,7 @@ from math import pi
 import ccm
 from ccm.lib.actr import Buffer
 from ccm.pattern import Pattern
+from decimal import *
 
 import re
 
@@ -37,7 +38,7 @@ class BlenderMotorModule(ccm.Model):
                                     #NAME      #min/max by axis: 0, 1, 2
         self._boneProperties = {'part.torso':[[0,0],[-pi/4,pi/4],[0,0]],
                                 'shoulder.L':[[0,0],[0,0],[-pi/6,pi/6]],
-                                'shoulder.R':[[0,0],[0,0],[-pi/6,pi/6]]}
+                                'shoulder.R':[[0,0],[0,0],[pi/6,-pi/6]]}
         #Tick
         self._internalChunks.append(ccm.Model(type='proprioception',
                                               feature='shoulders_quality',
@@ -69,19 +70,19 @@ class BlenderMotorModule(ccm.Model):
                                               feature='rotation',
                                               bone='shoulder.R',
                                               rotation0='0.0',
-                                              rotation0_quality='min',
+                                              rotation0_quality='none',
                                               rotation1='0.0',
                                               rotation2='0.0',
-                                              rotation_quality='min'))
+                                              rotation_quality='none'))
 
         self._internalChunks.append(ccm.Model(type='proprioception',
                                               feature='rotation',
                                               bone='shoulder.L',
                                               rotation0='0.0',
-                                              rotation0_quality='min',
+                                              rotation0_quality='none',
                                               rotation1='0.0',
                                               rotation2='0.0',
-                                              rotation_quality='min'))
+                                              rotation_quality='none'))
 
         self._internalChunks.append(ccm.Model(type='proprioception',
                                               feature='rotation',
@@ -180,11 +181,11 @@ class BlenderMotorModule(ccm.Model):
 
         minR,maxR = self._boneProperties['part.torso'][kwargs['axis']]
         #print("MINR", minR)
-        if kwargs['radians'] > maxR:
+        if kwargs['radians'] >= maxR:
             #print("SET TO MAX")
             maxReached=True
             kwargs['radians'] = maxR
-        if kwargs['radians'] < minR:
+        if kwargs['radians'] <= minR:
             #print("SET TO MIN")
             minReached = True
             kwargs['radians'] = minR
@@ -200,7 +201,7 @@ class BlenderMotorModule(ccm.Model):
                 obj.rotation0=kwargs['radians']
                 if kwargs['radians'] < 0:
                     obj.rotation_direction = 'right'
-                elif kwargs['raidans'] > 0:
+                elif kwargs['radians'] > 0:
                     obj.rotation_direction = 'left'
                 if maxReached:
                     obj.rotation0_quality='max'
@@ -227,19 +228,19 @@ class BlenderMotorModule(ccm.Model):
 
 
         kwargs.update(self.function_map[function_name][1])
-        if kwargs['bone'] == 'shoulder.R':
-            kwargs['radians'] = kwargs['radians'] * -1
-        elif kwargs['bone'] == 'shoulder.L':
-            kwargs['radians'] = kwargs['radians'] * 1
+        #if kwargs['bone'] == 'shoulder.R':
+        #    kwargs['radians'] = kwargs['radians'] * -1
+        #elif kwargs['bone'] == 'shoulder.L':
+        #    kwargs['radians'] = kwargs['radians'] * 1
 
 
         minR,maxR = self._boneProperties[kwargs['bone']][kwargs['axis']]
         #print("MINR", minR)
-        if kwargs['radians'] > maxR:
+        if Decimal(kwargs['radians']).quantize(Decimal('0.000'),rounding=ROUND_HALF_UP) >= Decimal(maxR).quantize(Decimal('0.000'),rounding=ROUND_HALF_UP):
             #print("SET TO MAX")
             maxReached=True
             kwargs['radians'] = maxR
-        if kwargs['radians'] < minR:
+        elif Decimal(kwargs['radians']).quantize(Decimal('0.000'),rounding=ROUND_HALF_UP) <= Decimal(minR).quantize(Decimal('0.000'),rounding=ROUND_HALF_UP):
             #print("SET TO MIN")
             minReached = True
             kwargs['radians'] = minR
@@ -257,7 +258,7 @@ class BlenderMotorModule(ccm.Model):
                     obj.rotation_direction = 'right'
                 elif kwargs['radians'] > 0:
                     obj.rotation_direction = 'left'
-                if maxReached:
+                if maxReached: #opposite for extension
                     obj.rotation0_quality='max'
                 if minReached:
                     obj.rotation0_quality='min'
@@ -283,20 +284,21 @@ class BlenderMotorModule(ccm.Model):
 
 
         kwargs.update(self.function_map[function_name][1])
-        if kwargs['bone'] == 'shoulder.R':
-            kwargs['radians'] = kwargs['radians'] * 1
-        elif kwargs['bone'] == 'shoulder.L':
+        #if kwargs['bone'] == 'shoulder.R':
+        #    kwargs['radians'] = kwargs['radians'] * 1
+        if kwargs['bone'] == 'shoulder.L':
             kwargs['radians'] = kwargs['radians'] * -1
 
 
         minR,maxR = self._boneProperties[kwargs['bone']][kwargs['axis']]
         #print("MINR", minR)
-        if kwargs['radians'] > maxR:
+        if Decimal(kwargs['radians']).quantize(Decimal('0.000'),rounding=ROUND_HALF_UP) >= Decimal(maxR).quantize(Decimal('0.000'),rounding=ROUND_HALF_UP):
             #print("SET TO MAX")
             maxReached=True
             kwargs['radians'] = maxR
-        if kwargs['radians'] < minR:
+        if Decimal(kwargs['radians']).quantize(Decimal('0.000'),rounding=ROUND_HALF_UP) <= Decimal(minR).quantize(Decimal('0.000'),rounding=ROUND_HALF_UP):
             #print("SET TO MIN")
+
             minReached = True
             kwargs['radians'] = minR
 
