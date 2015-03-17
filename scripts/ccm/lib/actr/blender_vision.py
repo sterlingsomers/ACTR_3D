@@ -114,6 +114,8 @@ class BlenderVision(ccm.Model):
         if self.busy: return
 
         self.error = False
+        openings = {}
+        #A map of y-values and x,y pairs
 
         if 'feature' in kwargs and kwargs['feature'] == 'opening':
             if 'depth' in kwargs:
@@ -142,6 +144,9 @@ class BlenderVision(ccm.Model):
         # yield d
         # self.busy=False
         self._b1.set(kwargs['feature']+':'+'_'.join(chunkValues))
+        #print("OPENINGS", openings)
+        # self._internalChunks.append(ccm.Model(feature='opening',
+        #                                       screenRight=))
 
 
     def similar_depth(self,list1,list2,depth=0.0):
@@ -169,6 +174,7 @@ class BlenderVision(ccm.Model):
 
     def find_opening(self,depth=0.0):
         '''Uses numpy for now.'''
+        #Forces a scan first
         self.scan()
         openings = {}
 
@@ -228,7 +234,11 @@ class BlenderVision(ccm.Model):
         #print(ccm.middle)
         #import time
         #now = time.time()
+
+        #'scan_image' will now use scan_image_multi
+        #a new multiprocessing version of scan_image
         self._objects = middleware.request('scan_image',[])
+
         ###!!!Note the keys here are strings, not floats
         ###!!Converti them to float below
         #self._objects = dict((float(k), v) for k,v in self._objects.items())
@@ -405,6 +415,17 @@ class BlenderVision(ccm.Model):
     def get_visible_angles(self, label):
         print(vision_cam.get_visible_angles(label))
    
+    def check_match(self, **kwargs):
+        if 'opening' in kwargs:
+            if hasattr(self,'_'+kwargs['opening']):
+                pass#here add code
+            else:
+                self.error=True
+                self.busy=False
+        else:
+            self.error=True
+            self.busy=False
+
     def request(self,pattern=''):
         print("REQUEST")
         if self.busy: return
