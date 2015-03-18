@@ -429,7 +429,7 @@ class GeometricCamera(morse.sensors.camera.Camera):
         return objects
                                
     @service
-    def scan_image_multi(self,xyGrain=0.01,xyPrecision=0.002,depthGrain=0.01,minDepth=0.05,maxDepth=50,processes=8):
+    def scan_image_multi(self,ystart=0.0,ystop=1.0,xstart=0.0,xstop=1.0,xyGrain=0.01,xyPrecision=0.002,depthGrain=0.01,minDepth=0.05,maxDepth=50,processes=8):
         def worker(minY,maxY, out_q):
             #beginning = time.time()
             #objects = {} #{objlable:[inside_angle,outside_angle,highest,lowest]}
