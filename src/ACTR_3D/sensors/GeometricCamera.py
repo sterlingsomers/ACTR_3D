@@ -280,7 +280,7 @@ class GeometricCamera(morse.sensors.camera.Camera):
                     
                     
 
-    @service
+
     def getScreenVector(self,x,y):
         normal = numpy.array(self.blender_cam.getScreenVect(0.5,0.5))
         dif = numpy.array(self.blender_cam.getScreenVect(x,y))
@@ -477,7 +477,7 @@ class GeometricCamera(morse.sensors.camera.Camera):
                         #FDOprint(hit, "is a new state")
                         if lastHit == -1:#a new line
                             #FDOprint('lastHit is -1')
-                            YS[y][repr(hit)] = [x,None,self.distance_to_xy(x,y,minDepth,maxDepth,grainSize=depthGrain),None]
+                            YS[y][repr(hit)] = [x,None,self.distance_to_xy(x,y,minDepth,maxDepth,grainSize=depthGrain),None,self.getScreenVector(x,y),None]
 
                             #FDOprint(YS, "AFTER -1")
                             #objects[repr(hit)][repr(y)] = [x,None]
@@ -502,21 +502,23 @@ class GeometricCamera(morse.sensors.camera.Camera):
                                 #FDOprint("so....")
                                 YS[y][repr(lastHit)][1]=x-grain
                                 YS[y][repr(lastHit)][3]=self.distance_to_xy(x-grain,y,minDepth,maxDepth,grainSize=depthGrain)
+                                YS[y][repr(lastHit)][5]=self.getScreenVector(x,y)
                                 #FDOprint(objects[repr(lastHit)][repr(y)])
                             else:#if this object hasn't been detected on this line
                                 #FDOprint(y, "NOT in", objects[repr(lastHit)])
                                 #FDOprint("so...")
-                                YS[y][repr(lastHit)]=[x-grain,None,None,None]#because it's the most leftest
+                                YS[y][repr(lastHit)]=[x-grain,None,None,None,None,None]#because it's the most leftest
                                 #FDOprint(objects[repr(lastHit)][repr(y)])
                             #objects[hit][y] = [x,None] #roughly... it may already have that entry
                             if repr(hit)  in YS[y]:
                                 #FDOprint(y, "in2", objects[repr(hit)])
                                 YS[y][repr(hit)][1]=x #this MIGHT be the end of that object, but it's NOT the beggining, thus [1] in [x,None]
                                 YS[y][repr(hit)][3]=self.distance_to_xy(x,y,minDepth,maxDepth,grainSize=depthGrain)
+                                YS[y][repr(hit)][5]=self.getScreenVector(x,y)
                                 #FDOprint("so: ", objects[repr(hit)][repr(y)])
                             else:
                                 #FDOprint(y, "NOT in2", objects[repr(hit)])
-                                YS[y][repr(hit)]=[x,None,self.distance_to_xy(x,y,minDepth,maxDepth,grainSize=depthGrain),None] #if this line is not in there, add it
+                                YS[y][repr(hit)]=[x,None,self.distance_to_xy(x,y,minDepth,maxDepth,grainSize=depthGrain),None,self.getScreenVector(x,y),None] #if this line is not in there, add it
                                 #FDOprint("so: ", objects[repr(hit)][repr(y)])
 
                             grain = BigGrain
@@ -556,6 +558,7 @@ class GeometricCamera(morse.sensors.camera.Camera):
                 #FDOprint (YS, "YS...")
                 YS[y][repr(hit)][1]=x#The end (most right) of that line
                 YS[y][repr(hit)][3]=self.distance_to_xy(x,y,minDepth,maxDepth,grainSize=depthGrain)
+                YS[y][repr(hit)][5]=self.getScreenVector(x,y)
                 #FDOprint("End of the line", objects[repr(hit)][repr(y)], "for", hit, "and", y)
                 #FDOlastY = y
 

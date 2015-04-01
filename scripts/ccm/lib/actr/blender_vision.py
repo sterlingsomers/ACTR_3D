@@ -118,9 +118,12 @@ class BlenderVision(ccm.Model):
         #A map of y-values and x,y pairs
 
         if 'feature' in kwargs and kwargs['feature'] == 'opening':
+            openings = self.find_opening(depth=float(kwargs['depth']))
+            if 'width' in kwargs:
+                print("ASDF", self._objects[Decimal('0.500')])
             if 'depth' in kwargs:
 
-                openings = self.find_opening(depth=float(kwargs['depth']))
+
                 #print("openings..................")
 
                 for key in sorted(openings.keys()):
@@ -185,7 +188,7 @@ class BlenderVision(ccm.Model):
             fullX = numpy.arange(Decimal('0.000'),Decimal('1.0'),Decimal('0.002'))
             if len(self._objects[y].keys()) > 1:
                 similar_keys_minor = []
-                for ky,ty in rolling_window(numpy.array(sorted(self._objects[y],key=lambda lst: min(self._objects[y][lst][2:]))),2):#self._objects[y]:
+                for ky,ty in rolling_window(numpy.array(sorted(self._objects[y],key=lambda lst: min(self._objects[y][lst][2:4]))),2):#self._objects[y]:
                     #print("DDDDDD",y,ky,ty,similar_keys_minor)
                     if ky in self._ignoreLabels or ty in self._ignoreLabels:
                         continue
@@ -198,13 +201,13 @@ class BlenderVision(ccm.Model):
                     continue
                 #print(similar_keys_minor)
                 for key in similar_keys_minor:
-                    #print(key)
+                    print("KEY",key)
                     #print(self._objects[y][key],"ASDFASDFA")
                     #print("FULLX",fullX)
                     t = numpy.arange(Decimal(self._objects[y][key][0]),Decimal(self._objects[y][key][1]),Decimal(0.002))
 
                     fullX = numpy.setdiff1d(fullX,t)
-                    #print("FullX AFTER",len(fullX))
+                    print("FullX AFTER",len(fullX))
                 for key in self._objects[y].keys():
                     if key in similar_keys_minor:
                         continue
@@ -221,6 +224,9 @@ class BlenderVision(ccm.Model):
             else:
                 pass #not sure what to do if there's only 1 object.
             #print("FR",len(fullRange)).
+        print("OBJECTS",self._objects)
+        print("OPENINGS", openings)
+        self._openings = openings
         return openings
 
 
@@ -242,7 +248,7 @@ class BlenderVision(ccm.Model):
         ###!!!Note the keys here are strings, not floats
         ###!!Converti them to float below
         #self._objects = dict((float(k), v) for k,v in self._objects.items())
-        self._objects = dict((float(k), dict((kk,[Decimal(x).quantize(Decimal('.001'),rounding=ROUND_HALF_UP) for x in kv]) for kk,kv in v.items())) for k,v in self._objects.items())
+        self._objects = dict((Decimal(k).quantize(Decimal('.001'),rounding=ROUND_HALF_UP), dict((kk,[Decimal(x).quantize(Decimal('.001'),rounding=ROUND_HALF_UP) for x in kv]) for kk,kv in v.items())) for k,v in self._objects.items())
         self._ignoreLabels = ['None','Ground']
         #self.find_edges()
         ##print(self._edges)
@@ -417,8 +423,10 @@ class BlenderVision(ccm.Model):
    
     def check_match(self, **kwargs):
         if 'opening' in kwargs:
-            if hasattr(self,'_'+kwargs['opening']):
-                pass#here add code
+            if hasattr(self,'_'+kwargs['opening']):#Is this _screenCentre
+                #In the space of the screen centre,
+                #Is there a patch that is wide enough?
+                print("PASS")
             else:
                 self.error=True
                 self.busy=False

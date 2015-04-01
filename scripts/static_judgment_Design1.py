@@ -121,13 +121,15 @@ class MyModel(ACTR):
 
 
     def setup_three(goal='setup:three', b_motor='width:?w depth:?d'):
-        vision_module.find_feature(feature='opening',depth=d)
+        vision_module.find_feature(feature='opening',depth=d,width=w)
         goal.set('setup:four')
 
 
     def setup_four(goal='setup:four',b_vision1='opening:?opening',b_motor='width:?w depth:?d'):
         #b_motor should be put into another buffer or refreshed
+        print("opening", opening)
         vision_module.check_match(opening=opening,width=w)
+        print('setup four', opening, w)
         goal.set('stop')
 
     def setup_five(goal='setup:five',b_motor='feature:rotation bone:torso rotation0:?rZero rotation1:?rOne rotation2:?rTwo'):
