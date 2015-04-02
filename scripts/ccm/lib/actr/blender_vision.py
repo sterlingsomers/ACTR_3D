@@ -209,14 +209,17 @@ class BlenderVision(ccm.Model):
                     fullX = numpy.setdiff1d(fullX,t)
                     print("FullX AFTER",len(fullX))
                 for key in self._objects[y].keys():
+                #Check against ALL the keys
                     if key in similar_keys_minor:
                         continue
                     else:
                         #Are they beyond the distance?
+                        #If they within, they're too close
+
                         if self.within_depth(self._objects[y][key],self._objects[y][similar_keys_minor[0]],depth):
-                            pass #not sure
+                            openings[y] = []
                         else:
-                            openings[y] = [min(fullX),max(fullX)]
+                            openings[y] = similar_keys_minor
                 #At this point I should have a collection of objects with similar depths
 
                     #print(self._objects[y][ky])
