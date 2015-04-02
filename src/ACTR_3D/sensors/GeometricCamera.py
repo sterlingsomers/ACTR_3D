@@ -282,6 +282,7 @@ class GeometricCamera(morse.sensors.camera.Camera):
 
 
     def getScreenVector(self,x,y):
+
         normal = numpy.array(self.blender_cam.getScreenVect(0.5,0.5))
         dif = numpy.array(self.blender_cam.getScreenVect(x,y))
         dot = numpy.dot(normal,dif)
@@ -289,7 +290,10 @@ class GeometricCamera(morse.sensors.camera.Camera):
         y_modulus = numpy.sqrt((dif*dif).sum())
         cos_angle = dot / x_modulus / y_modulus
         angle = numpy.arccos(cos_angle)
-        return math.degrees(angle)        
+        return math.degrees(angle)
+
+        #return dif
+
         #cosang = numpy.dot(normal,dif)
         #sinang = numpy.linalg.norm(numpy.cross(normal,dif))
         #return numpy.arctan2(sinang,cosang)

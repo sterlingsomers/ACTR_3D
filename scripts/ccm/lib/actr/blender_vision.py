@@ -173,6 +173,14 @@ class BlenderVision(ccm.Model):
                abs(list1[3] - list2[3]) < depth
 
 
+    def vectors_of_smallest_angles(self,listOfVectors1,listOfVectors2):
+        '''Returns the vectors which compose the smallest angle between 2 sets of vectors'''
+
+        #Get the combination of all the vectors
+        combs = [(x,y) for x in listOfVectors1 for y in listOfVectors2]
+
+
+
 
 
     def find_opening(self,depth=0.0):
@@ -219,7 +227,7 @@ class BlenderVision(ccm.Model):
                         if self.within_depth(self._objects[y][key],self._objects[y][similar_keys_minor[0]],depth):
                             openings[y] = []
                         else:
-                            openings[y] = similar_keys_minor
+                            openings[y] = []
                 #At this point I should have a collection of objects with similar depths
 
                     #print(self._objects[y][ky])
