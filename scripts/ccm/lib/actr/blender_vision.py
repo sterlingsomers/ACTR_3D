@@ -120,20 +120,38 @@ class BlenderVision(ccm.Model):
         if 'feature' in kwargs and kwargs['feature'] == 'opening':
             openings = self.find_opening(depth=float(kwargs['depth']))
             if 'width' in kwargs:
-                print("ASDF", self._objects[Decimal('0.500')])
-            if 'depth' in kwargs:
+                indices = self.indices_of_smallest_angle([self._objects[Decimal('0.500')][self._openings[Decimal('0.500')][0]][4],
+                                                   self._objects[Decimal('0.500')][self._openings[Decimal('0.500')][0]][5]],
+                                                [self._objects[Decimal('0.500')][self._openings[Decimal('0.500')][1]][4],
+                                                   self._objects[Decimal('0.500')][self._openings[Decimal('0.500')][1]][5]])
 
+                y1 = self._objects[Decimal('0.500')][self._openings[Decimal('0.500')][0]][4+indices[0]]
+                y2 = self._objects[Decimal('0.500')][self._openings[Decimal('0.500')][1]][4+indices[1]]
+                #y1 and y2 are the angle from normal to the first object [0] and the second object, respectively
+                #y is the total angle between the two
+                y = y1+y2
 
-                #print("openings..................")
+                a = self._objects[Decimal('0.500')][self._openings[Decimal('0.500')][0]][2+indices[0]]
+                b = self._objects[Decimal('0.500')][self._openings[Decimal('0.500')][1]][2+indices[1]]
+                c = math.sqrt(float(a)**2 - 2*float(a)*float(b)*math.cos(float(math.radians(y)))+float(b)**2)
+                #FDOprint(indices,' ', c)
+                #FDOprint("y",y,"a",a,"b",b,"c",c)
 
-                for key in sorted(openings.keys()):
-                    #print(openings[key])
-                    if numpy.intersect1d(self._screenLeft,numpy.arange(openings[key][0],openings[key][1],Decimal(0.002))).any():
-                        chunkValues.add('screenLeft')
-                    if numpy.intersect1d(self._screenCenter,numpy.arange(openings[key][0],openings[key][1],Decimal(0.002))).any():
-                        chunkValues.add('screenCenter')
-                    if numpy.intersect1d(self._screenRight,numpy.arange(openings[key][0],openings[key][1],Decimal(0.002))).any():
-                        chunkValues.add('screenRight')
+            #Section is commented out, no longer think it is useful
+            #depth is handled line 121
+            #if 'depth' in kwargs:
+            #
+            #
+            #     #print("openings..................")
+            #
+            #     for key in sorted(openings.keys()):
+            #         #print(openings[key])
+            #         if numpy.intersect1d(self._screenLeft,numpy.arange(openings[key][0],openings[key][1],Decimal(0.002))).any():
+            #             chunkValues.add('screenLeft')
+            #         if numpy.intersect1d(self._screenCenter,numpy.arange(openings[key][0],openings[key][1],Decimal(0.002))).any():
+            #             chunkValues.add('screenCenter')
+            #         if numpy.intersect1d(self._screenRight,numpy.arange(openings[key][0],openings[key][1],Decimal(0.002))).any():
+            #             chunkValues.add('screenRight')
 
         #Result Error if not 'feature' (for now)
         else:
@@ -158,20 +176,68 @@ class BlenderVision(ccm.Model):
         #print("similar_depth")
         #print("Depth/5",depth/5)
         #print(list1,list2)
-        dividend = 5
-        return abs(list1[2] - list2[2]) < depth/dividend or \
-               abs(list1[2] - list2[3]) < depth/dividend or \
-               abs(list1[3] - list2[2]) < depth/dividend or \
-               abs(list1[3] - list2[3]) < depth/dividend
+        #this function should suffer from the same issue, not specific (see within_depth)
+        #dividend = 5
+        #return abs(list1[2] - list2[2]) < depth/dividend or \
+        #       abs(list1[2] - list2[3]) < depth/dividend or \
+        #       abs(list1[3] - list2[2]) < depth/dividend or \
+        #       abs(list1[3] - list2[3]) < depth/dividend
+
+        allData1 = self._objects[list1[0]][list1[1]]
+        allData2 = self._objects[list2[0]][list2[1]]
+        indices = self.indices_of_smallest_angle(allData1[4:6],allData2[4:6])
+        #FDOprint("EX",list1,self._objects[list1[0]][list1[1]][2+indices[0]])
+        #FDOprint("EX",list2,self._objects[list2[0]][list2[1]][2+indices[1]])
+        #FDOprint("EX",abs(self._objects[list1[0]][list1[1]][2+indices[0]] - self._objects[list2[0]][list2[1]][2+indices[1]]))
+        #FDOprint("EX",abs(self._objects[list1[0]][list1[1]][2+indices[0]] - self._objects[list2[0]][list2[1]][2+indices[1]]) < depth/5.0)
+        return abs(self._objects[list1[0]][list1[1]][2+indices[0]] - self._objects[list2[0]][list2[1]][2+indices[1]]) < depth/5.0
 
 
     def within_depth(self,list1,list2,depth=0.0):
         '''Returns True if list1[2:] and list2[2:] have a minimum difference of depth'''
-        return abs(list1[2] - list2[2]) < depth or \
-               abs(list1[2] - list2[3]) < depth or \
-               abs(list1[3] - list2[2]) < depth or \
-               abs(list1[3] - list2[3]) < depth
+        #print("withinDepth", list1,list2)
+        #This is not specific enough.  Because the wall could be (at the farthest) close to the depth of the
+        #target.
+        #You need the actual indices
 
+        allData1 = self._objects[list1[0]][list1[1]]
+        allData2 = self._objects[list2[0]][list2[1]]
+        indices = self.indices_of_smallest_angle(allData1[4:6],allData2[4:6])
+        #This should give two values e.g. [0,1]
+        #add these indexes to the indexes of interest, in this case [2]
+        #You will get either [2] or [3] (in example [2,3]
+        #compare the depths using those indices
+        #FDOprint("DX",list1,self._objects[list1[0]][list1[1]][2+indices[0]])
+        #FDOprint("DX",list2,self._objects[list2[0]][list2[1]][2+indices[1]])
+        #FDOprint("DX",abs(self._objects[list1[0]][list1[1]][2+indices[0]] - self._objects[list2[0]][list2[1]][2+indices[1]]) < depth)
+        return abs(self._objects[list1[0]][list1[1]][2+indices[0]] - self._objects[list2[0]][list2[1]][2+indices[1]]) < depth
+        #return abs(list1[2] - list2[2]) < depth or \
+        #       abs(list1[2] - list2[3]) < depth or \
+        #       abs(list1[3] - list2[2]) < depth or \
+        #       abs(list1[3] - list2[3]) < depth
+
+
+    def indices_of_smallest_angle(self,list1,list2):
+
+        l1Index = 0
+        l2Index = 0
+        value=999
+        for i in range(2):
+            for z in range(2):
+                #print("i,z",i,' ',z)
+                #FDOprint("prevalue", list1[i]+list2[z])
+                if list1[i]+list2[z] < value:
+                    value = list1[i]+list2[z]
+                    #FDOprint("value", value)
+
+                    l1Index = i
+                    l2Index = z
+        return [l1Index,l2Index]
+
+
+    def smallest_angle(self,list1,list2):
+        '''Returns the minimum combined angle between list1[0,1] and list2[0,1]'''
+        return min([list1[0]+list2[0],list1[0]+list2[1],list1[1]+list2[0],list1[1]+list2[1]])
 
     def vectors_of_smallest_angles(self,listOfVectors1,listOfVectors2):
         '''Returns the vectors which compose the smallest angle between 2 sets of vectors'''
@@ -201,7 +267,8 @@ class BlenderVision(ccm.Model):
                     if ky in self._ignoreLabels or ty in self._ignoreLabels:
                         continue
 
-                    if self.similar_depth(self._objects[y][ky],self._objects[y][ty],depth):
+                    #if self.similar_depth(self._objects[y][ky],self._objects[y][ty],depth):
+                    if self.similar_depth([y,ky],[y,ty],depth):
                         similar_keys_minor.append(ky)
                         similar_keys_minor.append(ty)
 
@@ -209,13 +276,13 @@ class BlenderVision(ccm.Model):
                     continue
                 #print(similar_keys_minor)
                 for key in similar_keys_minor:
-                    print("KEY",key)
+                    #FDOprint("KEY",key)
                     #print(self._objects[y][key],"ASDFASDFA")
                     #print("FULLX",fullX)
                     t = numpy.arange(Decimal(self._objects[y][key][0]),Decimal(self._objects[y][key][1]),Decimal(0.002))
 
                     fullX = numpy.setdiff1d(fullX,t)
-                    print("FullX AFTER",len(fullX))
+                    #FDOprint("FullX AFTER",len(fullX))
                 for key in self._objects[y].keys():
                 #Check against ALL the keys
                     if key in similar_keys_minor:
@@ -223,11 +290,13 @@ class BlenderVision(ccm.Model):
                     else:
                         #Are they beyond the distance?
                         #If they within, they're too close
-
-                        if self.within_depth(self._objects[y][key],self._objects[y][similar_keys_minor[0]],depth):
+                        #Only need 1 item below
+                        #if self.within_depth(self._objects[y][key],self._objects[y][similar_keys_minor[0]],depth):
+                        if self.within_depth([y,key],[y,similar_keys_minor[0]]):
+                            print("key",key,"This happened")
                             openings[y] = []
                         else:
-                            openings[y] = []
+                            openings[y] = similar_keys_minor
                 #At this point I should have a collection of objects with similar depths
 
                     #print(self._objects[y][ky])

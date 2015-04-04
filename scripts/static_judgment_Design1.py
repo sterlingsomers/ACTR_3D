@@ -98,9 +98,9 @@ class MyModel(ACTR):
         import math
         motor_module.get_bounding_box()
         motor_module.send('lower_arms')
-        motor_module.send('rotate_torso',axis=1,radians=math.radians(-90))#right
-        motor_module.send('compress_shoulder',bone='shoulder.L',radians=math.radians(50.0))
-        motor_module.send('extend_shoulder',bone='shoulder.R',radians=math.radians(50.0))
+        #motor_module.send('rotate_torso',axis=1,radians=math.radians(-90))#right
+        #motor_module.send('compress_shoulder',bone='shoulder.L',radians=math.radians(50.0))
+        #motor_module.send('extend_shoulder',bone='shoulder.R',radians=math.radians(50.0))
 
         #Try compressing shoulder here.Should be Axis2
 
