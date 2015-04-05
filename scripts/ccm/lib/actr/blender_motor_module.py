@@ -335,7 +335,8 @@ class BlenderMotorModule(ccm.Model):
             return
 
         self.busy = True
-        self._boundingBox = middleware.request('getBoundingBox', [])
+        self._boundingBox = [x * 1.15 for x in middleware.request('getBoundingBox', [])]
+
         pattern='type:proprioception feature:bounding_box'
         matcher=Pattern(pattern)
         objs = 0

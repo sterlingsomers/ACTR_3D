@@ -134,6 +134,11 @@ class BlenderVision(ccm.Model):
                 a = self._objects[Decimal('0.500')][self._openings[Decimal('0.500')][0]][2+indices[0]]
                 b = self._objects[Decimal('0.500')][self._openings[Decimal('0.500')][1]][2+indices[1]]
                 c = math.sqrt(float(a)**2 - 2*float(a)*float(b)*math.cos(float(math.radians(y)))+float(b)**2)
+                if not float(kwargs['width']) < c:
+                    self._b1.clear()
+                    self.error=True
+                    return
+
                 #FDOprint(indices,' ', c)
                 #FDOprint("y",y,"a",a,"b",b,"c",c)
 
@@ -144,14 +149,24 @@ class BlenderVision(ccm.Model):
             #
             #     #print("openings..................")
             #
-            #     for key in sorted(openings.keys()):
-            #         #print(openings[key])
-            #         if numpy.intersect1d(self._screenLeft,numpy.arange(openings[key][0],openings[key][1],Decimal(0.002))).any():
-            #             chunkValues.add('screenLeft')
-            #         if numpy.intersect1d(self._screenCenter,numpy.arange(openings[key][0],openings[key][1],Decimal(0.002))).any():
-            #             chunkValues.add('screenCenter')
-            #         if numpy.intersect1d(self._screenRight,numpy.arange(openings[key][0],openings[key][1],Decimal(0.002))).any():
-            #             chunkValues.add('screenRight')
+            for key in sorted(openings.keys()):
+                print("PC",key,openings[key])
+                indices = self.indices_of_smallest_angle(self._objects[key][openings[key][0]][4:6],
+                                                         self._objects[key][openings[key][1]][4:6])
+                print("DT",indices)
+                print("DT",self._objects[key][openings[key][0]][indices[0]],self._objects[key][openings[key][1]][indices[1]])
+                x1 = self._objects[key][openings[key][0]][indices[0]]
+                x2 = self._objects[key][openings[key][1]][indices[1]]
+                xs = [x1,x2]
+                xs.sort()
+                print("DT",xs)
+
+                if numpy.intersect1d(self._screenLeft,numpy.arange(xs[0],xs[1])).any():               #if openings[key]
+                    chunkValues.add('screenLeft')
+                if numpy.intersect1d(self._screenCenter,numpy.arange(xs[0],xs[1])).any():
+                    chunkValues.add('screenCenter')
+                if numpy.intersect1d(self._screenRight,numpy.arange(xs[0],xs[1])).any():
+                    chunkValues.add('screenRight')
 
         #Result Error if not 'feature' (for now)
         else:
@@ -164,6 +179,7 @@ class BlenderVision(ccm.Model):
         #     d=max(0,self.random.gauss(d,self.delay_sd))
         # yield d
         # self.busy=False
+        print("chunkvalues",chunkValues)
         self._b1.set(kwargs['feature']+':'+'_'.join(chunkValues))
         #print("OPENINGS", openings)
         # self._internalChunks.append(ccm.Model(feature='opening',

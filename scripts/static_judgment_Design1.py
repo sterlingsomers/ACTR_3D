@@ -98,7 +98,7 @@ class MyModel(ACTR):
         import math
         motor_module.get_bounding_box()
         motor_module.send('lower_arms')
-        #motor_module.send('rotate_torso',axis=1,radians=math.radians(-90))#right
+        motor_module.send('rotate_torso',axis=1,radians=math.radians(-90))#right
         #motor_module.send('compress_shoulder',bone='shoulder.L',radians=math.radians(50.0))
         #motor_module.send('extend_shoulder',bone='shoulder.R',radians=math.radians(50.0))
 
@@ -130,6 +130,10 @@ class MyModel(ACTR):
         print("opening", opening)
         vision_module.check_match(opening=opening,width=w)
         print('setup four', opening, w)
+        goal.set('stop')
+
+    def setup_four_fail(goal='setup:four', vision_module='error:True'):
+        print("FaIL")
         goal.set('stop')
 
     def setup_five(goal='setup:five',b_motor='feature:rotation bone:torso rotation0:?rZero rotation1:?rOne rotation2:?rTwo'):
