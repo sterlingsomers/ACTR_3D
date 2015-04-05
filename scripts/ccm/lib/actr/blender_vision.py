@@ -150,16 +150,16 @@ class BlenderVision(ccm.Model):
             #     #print("openings..................")
             #
             for key in sorted(openings.keys()):
-                print("PC",key,openings[key])
+                #FDOprint("PC",key,openings[key])
                 indices = self.indices_of_smallest_angle(self._objects[key][openings[key][0]][4:6],
                                                          self._objects[key][openings[key][1]][4:6])
-                print("DT",indices)
-                print("DT",self._objects[key][openings[key][0]][indices[0]],self._objects[key][openings[key][1]][indices[1]])
+                #FDOprint("DT",indices)
+                #FDOprint("DT",self._objects[key][openings[key][0]][indices[0]],self._objects[key][openings[key][1]][indices[1]])
                 x1 = self._objects[key][openings[key][0]][indices[0]]
                 x2 = self._objects[key][openings[key][1]][indices[1]]
                 xs = [x1,x2]
                 xs.sort()
-                print("DT",xs)
+                #FDOprint("DT",xs)
 
                 if numpy.intersect1d(self._screenLeft,numpy.arange(xs[0],xs[1])).any():               #if openings[key]
                     chunkValues.add('screenLeft')
@@ -309,7 +309,7 @@ class BlenderVision(ccm.Model):
                         #Only need 1 item below
                         #if self.within_depth(self._objects[y][key],self._objects[y][similar_keys_minor[0]],depth):
                         if self.within_depth([y,key],[y,similar_keys_minor[0]]):
-                            print("key",key,"This happened")
+                            #FDOprint("key",key,"This happened")
                             openings[y] = []
                         else:
                             openings[y] = similar_keys_minor
@@ -320,8 +320,8 @@ class BlenderVision(ccm.Model):
             else:
                 pass #not sure what to do if there's only 1 object.
             #print("FR",len(fullRange)).
-        print("OBJECTS",self._objects)
-        print("OPENINGS", openings)
+        #FDOprint("OBJECTS",self._objects)
+        #FDOprint("OPENINGS", openings)
         self._openings = openings
         return openings
 

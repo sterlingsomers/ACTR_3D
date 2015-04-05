@@ -99,8 +99,8 @@ class MyModel(ACTR):
         motor_module.get_bounding_box()
         motor_module.send('lower_arms')
         motor_module.send('rotate_torso',axis=1,radians=math.radians(-90))#right
-        #motor_module.send('compress_shoulder',bone='shoulder.L',radians=math.radians(50.0))
-        #motor_module.send('extend_shoulder',bone='shoulder.R',radians=math.radians(50.0))
+        motor_module.send('compress_shoulder',bone='shoulder.L',radians=math.radians(50.0))
+        motor_module.send('extend_shoulder',bone='shoulder.R',radians=math.radians(50.0))
 
         #Try compressing shoulder here.Should be Axis2
 
@@ -127,23 +127,18 @@ class MyModel(ACTR):
 
     def setup_four(goal='setup:four',b_vision1='opening:?opening',b_motor='width:?w depth:?d'):
         #b_motor should be put into another buffer or refreshed
-        print("opening", opening)
-        vision_module.check_match(opening=opening,width=w)
-        print('setup four', opening, w)
+        #print("opening", opening)
+        #vision_module.check_match(opening=opening,width=w)
+        #print('setup four', opening, w)
+        print("Agent Response: Yes")
         goal.set('stop')
 
     def setup_four_fail(goal='setup:four', vision_module='error:True'):
-        print("FaIL")
+        print("Agent Response: No")
         goal.set('stop')
 
     def setup_five(goal='setup:five',b_motor='feature:rotation bone:torso rotation0:?rZero rotation1:?rOne rotation2:?rTwo'):
-        b_cue.chunk['rotation0'] = rZero
-        b_cue.chunk['bone'] = 'torso'
-        b_cue.chunk['feature'] = 'rotation'
-        #b_cue.set(b_cue.chunk + 'rotation0:' + rZero)
-        print(b_cue.chunk)
-        DM.add(b_cue.chunk)
-        goal.set('stop')
+        pass
 
 # '''Notes:
 #     We can see already a problem with this approach.
