@@ -101,6 +101,13 @@ class BlenderMotorModule(ccm.Model):
                                               height=repr(0.0)))
         #self.blender_camera = Morse().robot.GeometricCamerav1
 
+    def print_state(self):
+        for x in self._internalChunks:
+            print("MODEL")
+            for y in x.__dict__:
+                if not '_' in y[0:2]:
+                    print(y,x.__dict__[y])
+
 
     def lower_arms(self,function_name,**kwargs):
         '''

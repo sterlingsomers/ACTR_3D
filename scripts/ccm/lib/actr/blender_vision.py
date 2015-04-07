@@ -120,10 +120,13 @@ class BlenderVision(ccm.Model):
         if 'feature' in kwargs and kwargs['feature'] == 'opening':
             openings = self.find_opening(depth=float(kwargs['depth']))
             if 'width' in kwargs:
-                indices = self.indices_of_smallest_angle([self._objects[Decimal('0.500')][self._openings[Decimal('0.500')][0]][4],
-                                                   self._objects[Decimal('0.500')][self._openings[Decimal('0.500')][0]][5]],
-                                                [self._objects[Decimal('0.500')][self._openings[Decimal('0.500')][1]][4],
-                                                   self._objects[Decimal('0.500')][self._openings[Decimal('0.500')][1]][5]])
+                # indices = self.indices_of_smallest_angle([self._objects[Decimal('0.500')][self._openings[Decimal('0.500')][0]][4],
+                #                                    self._objects[Decimal('0.500')][self._openings[Decimal('0.500')][0]][5]],
+                #                                 [self._objects[Decimal('0.500')][self._openings[Decimal('0.500')][1]][4],
+                #                                    self._objects[Decimal('0.500')][self._openings[Decimal('0.500')][1]][5]])
+
+                indices = self.indices_of_screen_position(self._objects[Decimal('0.500')][self._openings[Decimal('0.500')][0]],
+                                                          self._objects[Decimal('0.500')][self._openings[Decimal('0.500')][1]])
 
                 y1 = self._objects[Decimal('0.500')][self._openings[Decimal('0.500')][0]][4+indices[0]]
                 y2 = self._objects[Decimal('0.500')][self._openings[Decimal('0.500')][1]][4+indices[1]]
@@ -134,6 +137,8 @@ class BlenderVision(ccm.Model):
                 a = self._objects[Decimal('0.500')][self._openings[Decimal('0.500')][0]][2+indices[0]]
                 b = self._objects[Decimal('0.500')][self._openings[Decimal('0.500')][1]][2+indices[1]]
                 c = math.sqrt(float(a)**2 - 2*float(a)*float(b)*math.cos(float(math.radians(y)))+float(b)**2)
+                print("indices",indices)
+                print("C",c)
                 if not float(kwargs['width']) < c:
                     self._b1.clear()
                     self.error=True
@@ -151,8 +156,10 @@ class BlenderVision(ccm.Model):
             #
             for key in sorted(openings.keys()):
                 #FDOprint("PC",key,openings[key])
-                indices = self.indices_of_smallest_angle(self._objects[key][openings[key][0]][4:6],
-                                                         self._objects[key][openings[key][1]][4:6])
+                #indices = self.indices_of_smallest_angle(self._objects[key][openings[key][0]][4:6],
+                #                                         self._objects[key][openings[key][1]][4:6])
+                indices = self.indices_of_screen_position(self._objects[key][openings[key][0]],
+                                                          self._objects[key][openings[key][1]])
                 #FDOprint("DT",indices)
                 #FDOprint("DT",self._objects[key][openings[key][0]][indices[0]],self._objects[key][openings[key][1]][indices[1]])
                 x1 = self._objects[key][openings[key][0]][indices[0]]
@@ -201,12 +208,21 @@ class BlenderVision(ccm.Model):
 
         allData1 = self._objects[list1[0]][list1[1]]
         allData2 = self._objects[list2[0]][list2[1]]
-        indices = self.indices_of_smallest_angle(allData1[4:6],allData2[4:6])
+
+        #indices = self.indices_of_smallest_angle(allData1[4:6],allData2[4:6])
+        indices = self.indices_of_screen_position(allData1,allData2)
+        minDepth = depth/5.0
+
+        linearDepth1 = float(self._objects[list1[0]][list1[1]][2+indices[0]]) * math.cos(math.radians(self._objects[list1[0]][list1[1]][4+indices[0]]))
+        linearDepth2 = float(self._objects[list2[0]][list2[1]][2+indices[1]]) * math.cos(math.radians(self._objects[list2[0]][list2[1]][4+indices[1]]))
+        #print("linearDepth",linearDepth1,linearDepth2)
         #FDOprint("EX",list1,self._objects[list1[0]][list1[1]][2+indices[0]])
         #FDOprint("EX",list2,self._objects[list2[0]][list2[1]][2+indices[1]])
         #FDOprint("EX",abs(self._objects[list1[0]][list1[1]][2+indices[0]] - self._objects[list2[0]][list2[1]][2+indices[1]]))
         #FDOprint("EX",abs(self._objects[list1[0]][list1[1]][2+indices[0]] - self._objects[list2[0]][list2[1]][2+indices[1]]) < depth/5.0)
-        return abs(self._objects[list1[0]][list1[1]][2+indices[0]] - self._objects[list2[0]][list2[1]][2+indices[1]]) < depth/5.0
+
+        return abs(linearDepth1-linearDepth2) < 0.50
+        #return abs(self._objects[list1[0]][list1[1]][2+indices[0]] - self._objects[list2[0]][list2[1]][2+indices[1]]) < depth/4.5
 
 
     def within_depth(self,list1,list2,depth=0.0):
@@ -218,20 +234,47 @@ class BlenderVision(ccm.Model):
 
         allData1 = self._objects[list1[0]][list1[1]]
         allData2 = self._objects[list2[0]][list2[1]]
-        indices = self.indices_of_smallest_angle(allData1[4:6],allData2[4:6])
+
+
+        #indices = self.indices_of_smallest_angle(allData1[4:6],allData2[4:6])
+        #Replacement
+        indices = self.indices_of_screen_position(allData1,allData2)
+
         #This should give two values e.g. [0,1]
         #add these indexes to the indexes of interest, in this case [2]
         #You will get either [2] or [3] (in example [2,3]
         #compare the depths using those indices
+        linearDepth1 = float(self._objects[list1[0]][list1[1]][2+indices[0]]) * math.cos(math.radians(self._objects[list1[0]][list1[1]][4+indices[0]]))
+        linearDepth2 = float(self._objects[list2[0]][list2[1]][2+indices[1]]) * math.cos(math.radians(self._objects[list2[0]][list2[1]][4+indices[1]]))
         #FDOprint("DX",list1,self._objects[list1[0]][list1[1]][2+indices[0]])
         #FDOprint("DX",list2,self._objects[list2[0]][list2[1]][2+indices[1]])
         #FDOprint("DX",abs(self._objects[list1[0]][list1[1]][2+indices[0]] - self._objects[list2[0]][list2[1]][2+indices[1]]) < depth)
-        return abs(self._objects[list1[0]][list1[1]][2+indices[0]] - self._objects[list2[0]][list2[1]][2+indices[1]]) < depth
+
+        return abs(linearDepth1-linearDepth2) < depth
+
+        #return abs(self._objects[list1[0]][list1[1]][2+indices[0]] - self._objects[list2[0]][list2[1]][2+indices[1]]) < depth
+
+
         #return abs(list1[2] - list2[2]) < depth or \
         #       abs(list1[2] - list2[3]) < depth or \
         #       abs(list1[3] - list2[2]) < depth or \
         #       abs(list1[3] - list2[3]) < depth
 
+
+    def indices_of_screen_position(self,list1,list2):
+        '''Takes the entire list of data and determines the correct indices'''
+
+        l1Index = 0
+        l2Index = 0
+        value = 999
+        for i in range(2):
+            for z in range(2):
+                if abs(list1[i]-list2[z]) < value:
+                    value = abs(list1[i]-list2[z])
+
+                    l1Index = i
+                    l2Index = z
+        return [l1Index,l2Index]
 
     def indices_of_smallest_angle(self,list1,list2):
 
@@ -242,8 +285,8 @@ class BlenderVision(ccm.Model):
             for z in range(2):
                 #print("i,z",i,' ',z)
                 #FDOprint("prevalue", list1[i]+list2[z])
-                if list1[i]+list2[z] < value:
-                    value = list1[i]+list2[z]
+                if abs(list1[i]-list2[z]) < value:
+                    value = abs(list1[i]-list2[z])
                     #FDOprint("value", value)
 
                     l1Index = i
@@ -275,6 +318,9 @@ class BlenderVision(ccm.Model):
         similar_key_major = []
         #print( "DEPTH", depth)
         for y in sorted(self._objects.keys()):
+            if y == Decimal('0.500'):
+                print('0.500')
+
             fullX = numpy.arange(Decimal('0.000'),Decimal('1.0'),Decimal('0.002'))
             if len(self._objects[y].keys()) > 1:
                 similar_keys_minor = []
@@ -282,7 +328,8 @@ class BlenderVision(ccm.Model):
                     #print("DDDDDD",y,ky,ty,similar_keys_minor)
                     if ky in self._ignoreLabels or ty in self._ignoreLabels:
                         continue
-
+                    if ky == 'target' or ty == 'target':
+                        print("ASDF")
                     #if self.similar_depth(self._objects[y][ky],self._objects[y][ty],depth):
                     if self.similar_depth([y,ky],[y,ty],depth):
                         similar_keys_minor.append(ky)
@@ -320,8 +367,8 @@ class BlenderVision(ccm.Model):
             else:
                 pass #not sure what to do if there's only 1 object.
             #print("FR",len(fullRange)).
-        #FDOprint("OBJECTS",self._objects)
-        #FDOprint("OPENINGS", openings)
+        print("OBJECTS",self._objects)
+        print("OPENINGS", openings)
         self._openings = openings
         return openings
 
