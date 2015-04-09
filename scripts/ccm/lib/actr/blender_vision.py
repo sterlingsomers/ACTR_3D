@@ -119,26 +119,39 @@ class BlenderVision(ccm.Model):
 
         if 'feature' in kwargs and kwargs['feature'] == 'opening':
             openings = self.find_opening(depth=float(kwargs['depth']))
+            if openings == {}:
+                self._openings={}
+                self._b1.clear()
+                self.error = True
+                return
+
             if 'width' in kwargs:
                 # indices = self.indices_of_smallest_angle([self._objects[Decimal('0.500')][self._openings[Decimal('0.500')][0]][4],
                 #                                    self._objects[Decimal('0.500')][self._openings[Decimal('0.500')][0]][5]],
                 #                                 [self._objects[Decimal('0.500')][self._openings[Decimal('0.500')][1]][4],
                 #                                    self._objects[Decimal('0.500')][self._openings[Decimal('0.500')][1]][5]])
 
-                indices = self.indices_of_screen_position(self._objects[Decimal('0.500')][self._openings[Decimal('0.500')][0]],
-                                                          self._objects[Decimal('0.500')][self._openings[Decimal('0.500')][1]])
 
-                y1 = self._objects[Decimal('0.500')][self._openings[Decimal('0.500')][0]][4+indices[0]]
-                y2 = self._objects[Decimal('0.500')][self._openings[Decimal('0.500')][1]][4+indices[1]]
+                openingsKey = Decimal('0.500')
+                if not openingsKey in self._openings:
+                    openingsKey = Decimal('0.495')
+                    if not openingsKey in self._openings:
+                        openingsKey = Decimal('0.510')
+
+                indices = self.indices_of_screen_position(self._objects[Decimal('0.500')][self._openings[openingsKey][0]],
+                                                          self._objects[Decimal('0.500')][self._openings[openingsKey][1]])
+
+                y1 = self._objects[Decimal('0.500')][self._openings[openingsKey][0]][4+indices[0]]
+                y2 = self._objects[Decimal('0.500')][self._openings[openingsKey][1]][4+indices[1]]
                 #y1 and y2 are the angle from normal to the first object [0] and the second object, respectively
                 #y is the total angle between the two
                 y = y1+y2
 
-                a = self._objects[Decimal('0.500')][self._openings[Decimal('0.500')][0]][2+indices[0]]
-                b = self._objects[Decimal('0.500')][self._openings[Decimal('0.500')][1]][2+indices[1]]
+                a = self._objects[Decimal('0.500')][self._openings[openingsKey][0]][2+indices[0]]
+                b = self._objects[Decimal('0.500')][self._openings[openingsKey][1]][2+indices[1]]
                 c = math.sqrt(float(a)**2 - 2*float(a)*float(b)*math.cos(float(math.radians(y)))+float(b)**2)
                 print("indices",indices)
-                print("C",c)
+                print("C",c,y1,y2)
                 if not float(kwargs['width']) < c:
                     self._b1.clear()
                     self.error=True
@@ -318,8 +331,8 @@ class BlenderVision(ccm.Model):
         similar_key_major = []
         #print( "DEPTH", depth)
         for y in sorted(self._objects.keys()):
-            if y == Decimal('0.500'):
-                print('0.500')
+            # if y == Decimal('0.500'):
+            #     print('0.500')
 
             fullX = numpy.arange(Decimal('0.000'),Decimal('1.0'),Decimal('0.002'))
             if len(self._objects[y].keys()) > 1:
@@ -328,8 +341,8 @@ class BlenderVision(ccm.Model):
                     #print("DDDDDD",y,ky,ty,similar_keys_minor)
                     if ky in self._ignoreLabels or ty in self._ignoreLabels:
                         continue
-                    if ky == 'target' or ty == 'target':
-                        print("ASDF")
+                    # if ky == 'target' or ty == 'target':
+                    #     print("ASDF")
                     #if self.similar_depth(self._objects[y][ky],self._objects[y][ty],depth):
                     if self.similar_depth([y,ky],[y,ty],depth):
                         similar_keys_minor.append(ky)

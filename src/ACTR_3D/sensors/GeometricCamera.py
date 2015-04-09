@@ -145,10 +145,11 @@ class GeometricCamera(morse.sensors.camera.Camera):
         #import pdb
         #pdb.set_trace()
         #pdb.set_trace()
-        grainSize = Decimal(grainSize).quantize(Decimal('.01'),rounding=ROUND_HALF_UP)
+        #grainSize = Decimal(grainSize).quantize(Decimal('.01'),rounding=ROUND_HALF_UP)
         bigGrain = grainSize * 100
-        minD = Decimal(minD).quantize(Decimal('0.001'),rounding=ROUND_HALF_UP)
-        maxD = Decimal(maxD).quantize(Decimal('0.001'),rounding=ROUND_HALF_UP)
+        print("MINDMAXD",minD,maxD)
+        #minD = Decimal(minD).quantize(Decimal('0.01'),rounding=ROUND_HALF_UP)
+        #maxD = Decimal(maxD).quantize(Decimal('0.01'),rounding=ROUND_HALF_UP)
         while minD <= maxD:
             hit = self.blender_cam.getScreenRay(x,y,minD)
             if not hit == None:
@@ -157,7 +158,7 @@ class GeometricCamera(morse.sensors.camera.Camera):
                 else:
                     minD -= bigGrain
                     bigGrain = bigGrain/10.0
-            minD+=bigGrain
+            minD+=float(bigGrain)
         return float(maxD)
     # @service
     # def distance_to_xy(self,x,y,minD,maxD,grainSize=0.01):
