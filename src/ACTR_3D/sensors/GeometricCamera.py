@@ -146,10 +146,19 @@ class GeometricCamera(morse.sensors.camera.Camera):
         #pdb.set_trace()
         #pdb.set_trace()
         #grainSize = Decimal(grainSize).quantize(Decimal('.01'),rounding=ROUND_HALF_UP)
-        bigGrain = grainSize * 100
+        bigGrain = grainSize * 10000
+        #grainSize = grainSize/10.0
         print("MINDMAXD",minD,maxD)
         #minD = Decimal(minD).quantize(Decimal('0.01'),rounding=ROUND_HALF_UP)
         #maxD = Decimal(maxD).quantize(Decimal('0.01'),rounding=ROUND_HALF_UP)
+        #amt = -0.0001
+        #for z in range(1000):
+        #    hit = self.blender_cam.getScreenRay(x,y,amt)
+        #    if not hit == None:
+        #        return float(amt)
+        #    else:
+        #        amt = amt + grainSize/10.0
+
         while minD <= maxD:
             hit = self.blender_cam.getScreenRay(x,y,minD)
             if not hit == None:
@@ -434,7 +443,7 @@ class GeometricCamera(morse.sensors.camera.Camera):
         return objects
                                
     @service
-    def scan_image_multi(self,ystart=0.0,ystop=1.0,xstart=0.0,xstop=1.0,xyGrain=0.01,xyPrecision=0.002,depthGrain=0.01,minDepth=0.05,maxDepth=50,processes=8):
+    def scan_image_multi(self,ystart=0.0,ystop=1.0,xstart=0.0,xstop=1.0,xyGrain=0.01,xyPrecision=0.002,depthGrain=0.0001,minDepth=0.01,maxDepth=50,processes=8):
         def worker(minY,maxY, out_q):
 
             getcontext().prec = 4
@@ -508,7 +517,7 @@ class GeometricCamera(morse.sensors.camera.Camera):
                                 #FDOprint(y, "in", objects[repr(lastHit)])
                                 #FDOprint("so....")
                                 YS[float(y)][repr(lastHit)][1]=float(x-grain)
-                                YS[float(y)][repr(lastHit)][3]=self.distance_to_xy(x-grain,y,minDepth,maxDepth,grainSize=depthGrain)
+                                YS[float(y)][repr(lastHit)][3]=self.distance_to_xy(x-grain-grain,y,minDepth,maxDepth,grainSize=depthGrain)
                                 YS[float(y)][repr(lastHit)][5]=self.getScreenVector(x-grain,y)
                                 #FDOprint(objects[repr(lastHit)][repr(y)])
                             else:#if this object hasn't been detected on this line

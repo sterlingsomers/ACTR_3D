@@ -151,7 +151,7 @@ class BlenderVision(ccm.Model):
                 b = self._objects[Decimal('0.500')][self._openings[openingsKey][1]][2+indices[1]]
                 c = math.sqrt(float(a)**2 - 2*float(a)*float(b)*math.cos(float(math.radians(y)))+float(b)**2)
                 print("indices",indices)
-                print("C",c,y1,y2)
+                print("C",c,y1,y2,openingsKey)
                 if not float(kwargs['width']) < c:
                     self._b1.clear()
                     self.error=True
