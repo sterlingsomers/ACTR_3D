@@ -141,7 +141,7 @@ class MyModel(ACTR):
         pass
 
     def print_motor_state(goal='printState'):
-        #motor_module.print_state()
+        motor_module.print_state()
         goal.set('stop')
 
 # '''Notes:

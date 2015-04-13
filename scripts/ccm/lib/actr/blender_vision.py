@@ -47,6 +47,7 @@ class BlenderVision(ccm.Model):
         self.error=False
         self.busy=False
         self._objects = {}
+        self._openings = {}
         self._oldopenings = {}
         self._edges = {}
         self._internalChunks = []

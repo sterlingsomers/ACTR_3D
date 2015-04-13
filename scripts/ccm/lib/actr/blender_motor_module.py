@@ -40,6 +40,11 @@ class BlenderMotorModule(ccm.Model):
                                 'shoulder.L':[[0,0],[0,0],[-pi/6,pi/6]],
                                 'shoulder.R':[[0,0],[0,0],[pi/6,-pi/6]]}
         #Tick
+        self._internalChunks.append(ccm.Model(type='posture',
+                                              standing='yes',
+                                              prone='no',
+                                              minimal_width='no',
+                                              ))
         self._internalChunks.append(ccm.Model(type='proprioception',
                                               feature='shoulders_quality',
                                               quality='none'))
@@ -100,6 +105,10 @@ class BlenderMotorModule(ccm.Model):
                                               depth=repr(0.0),
                                               height=repr(0.0)))
         #self.blender_camera = Morse().robot.GeometricCamerav1
+
+    def update_posture(self):
+        pass
+
 
     def print_state(self):
         for x in self._internalChunks:
