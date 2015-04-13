@@ -47,6 +47,7 @@ class BlenderVision(ccm.Model):
         self.error=False
         self.busy=False
         self._objects = {}
+        self._oldopenings = {}
         self._edges = {}
         self._internalChunks = []
         self._screenLeft = numpy.arange(Decimal(0.60),Decimal(1.0),Decimal(0.002))
@@ -137,18 +138,22 @@ class BlenderVision(ccm.Model):
                     openingsKey = Decimal('0.495')
                     if not openingsKey in self._openings:
                         openingsKey = Decimal('0.510')
+                        if not openingsKey in self._openings:
+                            self._openings = self._oldopenings
+                            #Need to FIX this.
 
-                indices = self.indices_of_screen_position(self._objects[Decimal('0.500')][self._openings[openingsKey][0]],
-                                                          self._objects[Decimal('0.500')][self._openings[openingsKey][1]])
 
-                y1 = self._objects[Decimal('0.500')][self._openings[openingsKey][0]][4+indices[0]]
-                y2 = self._objects[Decimal('0.500')][self._openings[openingsKey][1]][4+indices[1]]
+                indices = self.indices_of_screen_position(self._objects[Decimal(openingsKey)][self._openings[openingsKey][0]],
+                                                          self._objects[Decimal(openingsKey)][self._openings[openingsKey][1]])
+
+                y1 = self._objects[Decimal(openingsKey)][self._openings[openingsKey][0]][4+indices[0]]
+                y2 = self._objects[Decimal(openingsKey)][self._openings[openingsKey][1]][4+indices[1]]
                 #y1 and y2 are the angle from normal to the first object [0] and the second object, respectively
                 #y is the total angle between the two
                 y = y1+y2
 
-                a = self._objects[Decimal('0.500')][self._openings[openingsKey][0]][2+indices[0]]
-                b = self._objects[Decimal('0.500')][self._openings[openingsKey][1]][2+indices[1]]
+                a = self._objects[Decimal(openingsKey)][self._openings[openingsKey][0]][2+indices[0]]
+                b = self._objects[Decimal(openingsKey)][self._openings[openingsKey][1]][2+indices[1]]
                 c = math.sqrt(float(a)**2 - 2*float(a)*float(b)*math.cos(float(math.radians(y)))+float(b)**2)
                 print("indices",indices)
                 print("C",c,y1,y2,openingsKey)
@@ -324,6 +329,7 @@ class BlenderVision(ccm.Model):
     def find_opening(self,depth=0.0):
         '''Uses numpy for now.'''
         #Forces a scan first
+        self._oldopenings = self._openings
         self.scan()
         openings = {}
 
