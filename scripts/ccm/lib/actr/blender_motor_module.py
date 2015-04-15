@@ -41,11 +41,11 @@ class BlenderMotorModule(ccm.Model):
                                 'shoulder.R':[[0,0],[0,0],[pi/6,-pi/6]]}
         #Tick
         self._internalChunks.append(ccm.Model(type='posture',
-                                              standing='yes',
+                                              standing='true',
                                               prone='no',
-                                              minimal_width='no',
-                                              walkable='yes',
-                                              runnable='yes',
+                                              minimal_width='false',
+                                              walkable='true',
+                                              runnable='true',
 
                                               ))
         self._internalChunks.append(ccm.Model(type='proprioception',

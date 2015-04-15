@@ -119,6 +119,7 @@ class morse_middleware():
         #print("setting mustTrick", self.mustTick)
         #print("Sending...", self.action_dict[datastr][1], argslist)
         rStr = self.action_dict[datastr][0] + self.action_dict[datastr][1] + '(' + ','.join(argslist) + ').result()'
+
         result = eval(rStr)
         print("Recieved", result)
         #if 'return' in dir(result):
@@ -149,6 +150,7 @@ class morse_middleware():
                     self.robot_simulation.robot.accept_send_request(self.send_queue)
                     self.send_queue = []
                 self.robot_simulation.tick()
+                #time.sleep(0.01)
 
             if self.send_queue:
                 raise Exception("Send queue not clear. Too many commands per cycle.")
