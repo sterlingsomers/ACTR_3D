@@ -38,7 +38,7 @@ class BlenderMotorModule(ccm.Model):
                                     #NAME      #min/max by axis: 0, 1, 2
         self._boneProperties = {'part.torso':[[0,0],[-pi/4,pi/4],[0,0]],
                                 'shoulder.L':[[0,0],[0,0],[-pi/6,pi/6]],
-                                'shoulder.R':[[0,0],[0,0],[pi/6,-pi/6]]}
+                                'shoulder.R':[[0,0],[0,0],[-pi/6,pi/6]]}
         #Tick
         self._internalChunks.append(ccm.Model(type='posture',
                                               standing='true',
@@ -303,8 +303,8 @@ class BlenderMotorModule(ccm.Model):
 
 
         kwargs.update(self.function_map[function_name][1])
-        #if kwargs['bone'] == 'shoulder.R':
-        #    kwargs['radians'] = kwargs['radians'] * -1
+        if kwargs['bone'] == 'shoulder.R':
+            kwargs['radians'] = kwargs['radians'] * -1
         #elif kwargs['bone'] == 'shoulder.L':
         #    kwargs['radians'] = kwargs['radians'] * 1
 
@@ -312,15 +312,15 @@ class BlenderMotorModule(ccm.Model):
         minR,maxR = self._boneProperties[kwargs['bone']][kwargs['axis']]
         #print("MINR", minR)
         if Decimal(kwargs['radians']).quantize(Decimal('0.000'),rounding=ROUND_HALF_UP) >= Decimal(maxR).quantize(Decimal('0.000'),rounding=ROUND_HALF_UP):
-            #print("SET TO MAX")
+            print("SET TO MAX")
             maxReached=True
             kwargs['radians'] = maxR
         elif Decimal(kwargs['radians']).quantize(Decimal('0.000'),rounding=ROUND_HALF_UP) <= Decimal(minR).quantize(Decimal('0.000'),rounding=ROUND_HALF_UP):
-            #print("SET TO MIN")
+            print("SET TO MIN")
             minReached = True
             kwargs['radians'] = minR
 
-        #print("RADIANS",radians)
+        print("RADIANS",kwargs['radians'])
         middleware.send(self.function_map[function_name][0],**kwargs)
         #middleware.send('rotate_torso',axis=axis, radians=radians)
         pattern='type:proprioception ' + 'bone:' + kwargs['bone']
@@ -369,16 +369,16 @@ class BlenderMotorModule(ccm.Model):
         minR,maxR = self._boneProperties[kwargs['bone']][kwargs['axis']]
         #print("MINR", minR)
         if Decimal(kwargs['radians']).quantize(Decimal('0.000'),rounding=ROUND_HALF_UP) >= Decimal(maxR).quantize(Decimal('0.000'),rounding=ROUND_HALF_UP):
-            #print("SET TO MAX")
+            print("SET TO MAX")
             maxReached=True
             kwargs['radians'] = maxR
         if Decimal(kwargs['radians']).quantize(Decimal('0.000'),rounding=ROUND_HALF_UP) <= Decimal(minR).quantize(Decimal('0.000'),rounding=ROUND_HALF_UP):
-            #print("SET TO MIN")
+            print("SET TO MIN")
 
             minReached = True
             kwargs['radians'] = minR
 
-        #print("RADIANS",radians)
+        print("RADIANS",kwargs['radians'])
         middleware.send(self.function_map[function_name][0],**kwargs)
         #middleware.send('rotate_torso',axis=axis, radians=radians)
         pattern='type:proprioception ' + 'bone:' + kwargs['bone']

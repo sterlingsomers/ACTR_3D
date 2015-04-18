@@ -93,9 +93,13 @@ class MyModel(ACTR):
         goal.set('setup:zero')
 
 
+
     ######Calibration########
     def setup_zero_stop(goal='setup:zero',b_count='value:5'):
-        goal.set('stop')
+        #goal.set('stop')
+        b_plan_unit.set('planning_unit:find_target')
+        b_unit_task.set('unit_task:none')
+        b_operator.set('operator:none')
 
     def setup_zero(goal='setup:zero',b_count='value:!5'):
         b_unit_task.set('type:posture standing:true walkable:true minimal_width:true')
@@ -117,6 +121,7 @@ class MyModel(ACTR):
         motor_module.send('extend_shoulder',bone='shoulder.L',radians=math.radians(50.0))
         motor_module.send('compress_shoulder',bone='shoulder.R',radians=math.radians(50.0))
         goal.set('setup:three')
+        #goal.set('stop')
 
     def setup_two_right(goal='setup:two',b_unit_task='type:posture standing:true walkable:true minimal_width:true',
                         b_operator='direction:right'):
@@ -126,6 +131,7 @@ class MyModel(ACTR):
         motor_module.send('extend_shoulder',bone='shoulder.R',radians=math.radians(50.0))
 
         goal.set('setup:three')
+        #goal.set('stop')
 
     def setup_three(goal='setup:three'):
         motor_module.get_bounding_box()
@@ -148,122 +154,32 @@ class MyModel(ACTR):
 
 
 
+###########################
+###########################
 
 
-    # def setup_zero(goal='setup:zero'):#, b_unit_task='width:minimized arms:lowered ):
-    #     import math
-    #     motor_module.get_bounding_box()
-    #     motor_module.send('lower_arms')
-    #     motor_module.send('rotate_torso',axis=1,radians=math.radians(-90))#right
-    #     motor_module.send('compress_shoulder',bone='shoulder.L',radians=math.radians(50.0))
-    #     motor_module.send('extend_shoulder',bone='shoulder.R',radians=math.radians(50.0))
-    #
-    #     #Try compressing shoulder here.Should be Axis2
-    #
-    #     #####
-    #     #Could change this to 'rotate_torso' and use a mapping to map 'rotate_torso' to 'set_rotation'
-    #
-    #     goal.set('setup:one')
-    #
-    # def setup_one(goal='setup:one'):
-    #     motor_module.get_bounding_box()
-    #
-    #     goal.set('setup:two')
-    #
-    # def setup_two(goal='setup:two'):
-    #     motor_module.request('type:proprioception feature:bounding_box width:? depth:?')
-    #     goal.set('setup:three')
-    #     #goal.set('stop')
-    #
-    #
-    # def setup_three(goal='setup:three', b_motor='width:?w depth:?d'):
-    #     vision_module.find_feature(feature='opening',depth=d,width=w)
-    #     goal.set('setup:four')
-    #
-    #
-    # def setup_four(goal='setup:four',b_vision1='opening:?opening',b_motor='width:?w depth:?d'):
-    #     #b_motor should be put into another buffer or refreshed
-    #     #print("opening", opening)
-    #     #vision_module.check_match(opening=opening,width=w)
-    #     #print('setup four', opening, w)
-    #     print("Agent Response: Yes")
-    #     goal.set('printState')
-    #
-    # def setup_four_fail(goal='setup:four', vision_module='error:True'):
-    #     print("Agent Response: No")
-    #     goal.set('stop')
-    #
-    # def setup_five(goal='setup:five',b_motor='feature:rotation bone:torso rotation0:?rZero rotation1:?rOne rotation2:?rTwo'):
-    #     pass
-    #
-    # def print_motor_state(goal='printState'):
-    #     motor_module.print_state()
-    #     goal.set('stop')
-
-# '''Notes:
-#     We can see already a problem with this approach.
-#     The amount of information to be stored in DM would be very high
-#         including multiple bones and their rotation
-#         and then some way of storing whether it is a min or max width.
-#         It makes this approach very difficult to support.
-#     The logic would be:
-#     a) is there an opning of sufficient depth
-#         b) what is the width of that opening?
-#     c) without >,< operators, cannot check whether there is a stored DM with that depth
-#     b-alternate) given a pre-stored minimum width, is the opening bigger.
-#         In that case, the < > operators are in the module.'''
-
-
-
-
-
-        #motor_module.request('type:proprioception width:?')
-        #goal.set('stop')
-
-
-
-
-
-
-        #b_plan_unit.set('planning_unit:find_target')
-        #b_unit_task.set('unit_task:none')
-        #b_operator.set('operator:none')
-        #b_cue.set('cue:none')
-
-
-        #import math
-        #input new model stuffs here:
-        #self.motor_module.rotate_torso('0',repr(math.radians(90)))
-
-        #self.motor_module.lower_arms()
-        #self.motor_module.set_speed('0.01')
-
-        #import math
-
-        #self.motor_module.set_rotation('ribs','0',repr(math.radians(90)))
-        #self.motor_module.set_rotation('arm_upper.R','0',repr(math.radians(35)))
-
-        #get bounding box here.
-        #self.cd momiddleware.request('getBoundingBox', [])
 
     def estimate_passability_retrieveUT(b_plan_unit='planning_unit:find_target', b_unit_task='unit_task:none',
                                         b_operator='operator:none'):
+
+        import math
+        motor_module.send('rotate_torso',axis=1,radians=math.radians(0))
+        motor_module.send('compress_shoulder',bone='shoulder.L',radians=math.radians(0.0))
+        motor_module.send('extend_shoulder',bone='shoulder.R',radians=math.radians(0.0))
         print("fire estimate_passsability_retrieveUT")
         DM.request('planning_unit:find_target unit_task:?')
         b_operator.set('operator:retrieveUT')
-        #vision_module.find_opening()
-        #motor_module.request('width:?')
-        #self.middleware.request('getBoundingBox', [])
-        #b_cue.set('cue:retrieving_task')
         #goal.set('stop')
         #b_plan_unit.set('planning_unit:none')
 
     def estimate_passability_recalledUT(b_plan_unit='planning_unit:find_target', b_unit_task='unit_task:none',
                                         b_operator='operator:retrieveUT',
                                         DMbuffer='unit_task:?UT'):
+        print("fire estimate_passability_recalledUT")
         b_unit_task.set('unit_task:' + UT)
         b_operator.set('operator:none')
         DMbuffer.clear()
+        goal.set('stop')
 
     def estimate_passability_find_opening(b_plan_unit='planning_unit:find_target', b_unit_task='unit_task:find_target',
                                             b_operator='operator:none'):
