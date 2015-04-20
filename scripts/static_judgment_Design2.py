@@ -12,7 +12,7 @@ import ccm
 from ccm.lib.actr import *
 from ccm.lib.actr.blender_vision import BlenderVision
 from ccm.lib.actr.blender_motor_module import BlenderMotorModule
-#log=ccm.log()
+log=ccm.log()
 from ccm.morserobots import middleware
 
 class MyEnvironment(ccm.Model):
