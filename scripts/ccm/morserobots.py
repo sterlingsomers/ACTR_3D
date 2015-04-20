@@ -137,6 +137,9 @@ class morse_middleware():
         self.mode = mode
         self.rate = rate
 
+
+
+
     def tick(self,sync=False):
         #eimport time
         if self.mode == 'best_effort':

@@ -596,7 +596,7 @@ class GeometricCamera(morse.sensors.camera.Camera):
             #print(type(list(YS.keys())[0]))
             #self.completed(status.SUCCESS,"data sent")
             out_q.put(YS)
-
+        morse.sensors.camera.Camera.default_action(self)
         start = time.time()
         out_q = mp.Queue()
         procs = []
@@ -1171,7 +1171,7 @@ class GeometricCamera(morse.sensors.camera.Camera):
 
         Implements the component behaviour
         """
-        morse.sensors.camera.Camera.default_action(self)
+        #morse.sensors.camera.Camera.default_action(self)
                
         #x = numpy.array(morse.core.blenderapi.cameras()[self.name()].source.image)
         #pyplot.imsave('abc.png',x)

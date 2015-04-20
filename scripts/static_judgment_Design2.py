@@ -100,6 +100,7 @@ class MyModel(ACTR):
         b_plan_unit.set('planning_unit:find_target')
         b_unit_task.set('unit_task:none')
         b_operator.set('operator:none')
+        goal.clear()
 
     def setup_zero(goal='setup:zero',b_count='value:!5'):
         b_unit_task.set('type:posture standing:true walkable:true minimal_width:true')
@@ -148,7 +149,8 @@ class MyModel(ACTR):
 
     def setup_six(goal='setup:six',b_cue='width:?w depth:?d',b_motor='type:posture minimal_width:?m standing:?s',
                   b_count='value:?v'):
-        DM.add('width:'+w + ' depth:' + d + 'type:posture minimal_width' + m + ' standing:'+s)
+        print('ADDINg:','width:'+w + ' depth:' + d + ' type:posture minimal_width:' + m + ' standing:'+s)
+        DM.add('width:'+w + ' depth:' + d + ' type:posture minimal_width:' + m + ' standing:'+s)
         b_count.modify(value=repr(int(v)+1))
         goal.set('setup:zero')
 
@@ -179,56 +181,83 @@ class MyModel(ACTR):
         b_unit_task.set('unit_task:' + UT)
         b_operator.set('operator:none')
         DMbuffer.clear()
-        goal.set('stop')
+
 
     def estimate_passability_find_opening(b_plan_unit='planning_unit:find_target', b_unit_task='unit_task:find_target',
                                             b_operator='operator:none'):
-        #vision_module.cScan()
-        #print("estimate_passability_find_opening")
-        #vision_module.request('isa:dial')
-        #goal.set('stop')
-        motor_module.lower_arms()
+
+        #Make sure bounding box is most up to date
+        motor_module.get_bounding_box()
         b_operator.set('operator:get_body_size')
 
     def estimate_passability_find_opening_get_body_size(b_plan_unit='planning_unit:find_target', b_unit_task='unit_task:find_target',
                                             b_operator='operator:get_body_size'):
         #motor_module.get_bounding_box()
-        motor_module.request('width:?')
+        motor_module.request('type:proprioception feature:bounding_box width:? depth:?')
         b_operator.set('operator:find_opening')
 
+
     def estimate_passability_find_opening_use_body_size(b_plan_unit='planning_unit:find_target', b_unit_task='unit_task:find_target',
-                                            b_operator='operator:find_opening',b_motor='width:?x'):
+                                            b_operator='operator:find_opening',b_motor='width:?w depth:?d'):
         #motor_module.get_bounding_box()
-        vision_module.find_feature(feature='opening', depth=x)
+        vision_module.find_feature(feature='opening', depth=d, width=w)
         b_plan_unit.set('planning_unit:assess_width')
         b_unit_task.set('unit_task:none')
-        b_operator.set('operator:none')
+        b_operator.set('operator:vision_module_response')
+        #goal.set('stop')
 
 
 
-    def estimate_passability_assess_width_noUT(b_plan_unit='planning_unit:assess_width',
-                                            b_unit_task='unit_task:none',
-                                            b_operator='operator:none'):
-        DM.request('planning_unit:assess_width unit_task:?')
-        import math
-        motor_module.rotate_torso('1',repr(math.radians(00.0)))
-        b_operator.set('operator:retrieveUT')
-        
-    def estimate_passability_assess_width_recall_UT(b_plan_unit='planning_unit:assess_width',
-                                            b_unit_task='unit_task:none',
-                                            b_operator='operator:retrieveUT'):
-        #DM.request('planning_unit:assess_width unit_task:?')
-        #b_oprator.set('operator:retrieveUT')
-
-        motor_module.get_bounding_box()
-        motor_module.request('width:?')
+    def estimate_passability_found(b_plan_unit='planning_unit:assess_width',
+                                   b_unit_task='unit_task:none',
+                                   b_operator='operator:vision_module_response',
+                                   b_vision1='opening:?opening'):
+        print("AGENT RESPONSE: YES")
         goal.set('stop')
-    #def estimate_passability_two(b_plan_unit='planning_unit:estimate_passability',
-    #                             b_unit_task='unit_task:get_task',
-    #                             b_cue='cue:retrieving_task', DMbuffer='unit_task:?UT'):
-    #    
-    #    print(UT)
-    #    goal.set('stop')
+
+
+    def estimate_passability_not_found(b_plan_unit='planning_unit:assess_width',
+                                       b_unit_task='unit_task:none',
+                                       b_operator='operator:vision_module_response',
+                                       vision_module='error:True'):
+        b_plan_unit.set('planning_unit:recall_smallest_width')
+        b_unit_task.set('unit_task:recall_smallest_width')
+        b_operator.set('operator:probe_smallest_width')
+
+    def recall_smallest_width_probe(b_plan_unit='planning_unit:recall_smallest_width',
+                                    b_unit_task='unit_task:recall_smallest_width',
+                                    b_operator='operator:probe_smallest_width'):
+        DM.request('type:posture minimal_width:true standing:true width:? depth:?')
+        b_operator.set('operator:retrieve_smallest_width')
+
+
+    def recall_smallest_width_retrieve(b_plan_unit='planning_unit:recall_smallest_width',
+                                       b_unit_task='unit_task:recall_smallest_width',
+                                       b_operator='operator:retrieve_smallest_width',
+                                       DMbuffer='width:?w depth:?d'):
+
+        print("Sucessful Recall.")
+        b_plan_unit.set('planning_unit:find_target')
+        b_unit_task.set('unit_task:find_target')
+        b_operator.set('operator:use_recalled')
+        b_cue.set('width:' + w + ' depth:' + d)
+        #goal.set('stop')
+
+    def recall_smallest_width_retrieval_fail(b_plan_unit='planning_unit:recall_smallest_width',
+                                             b_unit_task='unit_task:recall_smallest_width',
+                                             b_operator='operator:retrieve_smallest_width',
+                                             DM='error:True'):
+        print("Recall Failed.")
+        b_plan_unit.clear()
+        goal.set('stop')
+
+    def estimate_passability_find_opening_use_recalled(b_plan_unit='planning_unit:find_target', b_unit_task='unit_task:find_target',
+                                                       b_operator='operator:use_recalled',b_cue='width:?w depth:?d'):
+        vision_module.find_feature(feature='opening', depth=d, width=w)
+        b_plan_unit.set('planning_unit:assess_width')
+        b_unit_task.set('unit_task:none')
+        b_operator.set('operator:vision_module_response')
+
 
 
 
@@ -267,6 +296,7 @@ while model.keepAlive:
     print("TICK...................")
 
     middleware.tick(sync=True)
+
 
 print("post run")
   

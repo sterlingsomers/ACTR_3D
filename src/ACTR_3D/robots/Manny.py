@@ -203,7 +203,8 @@ class Manny(morse.core.robot.Robot):
         self.apply_speed('Position', [vx,vy,vz], [rx,ry,rz /2.0])
         self.completed(status.SUCCESS, "Moving Forward")
         
-        
+        #bge.logic.setLogicTicRate(200)
+        #bge.logic.setPhysicsTicRate(200)
         # This is usually not used (responsibility of the actuators
         # and sensors). But you can add here robot-level actions.
         #pass

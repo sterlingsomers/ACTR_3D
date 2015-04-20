@@ -168,12 +168,16 @@ robot.add_default_interface('socket')
 
 # set 'fastmode' to True to switch to wireframe mode
 #env = Environment('../projects/ACTR_3D/Left_Hand_Traffic.blend')
-env = Environment('../projects/ACTR_3D/target.blend')
+env = Environment('../projects/ACTR_3D/NOtarget_v2.blend')#, fastmode = True)
 #env = Environment('indoors-1/indoor-1')
+
+#ROBOT VIEW
 import math
 env.set_camera_location([0, -10, 7])
 env.set_camera_rotation([math.radians(80), 0, math.radians(00)])
 env.select_display_camera(GeometricCamerav1)
+
+
 #pdb.set_trace()
 #env.set_time_strategy(TimeStrategies.FixedSimulationStepExternalTrigger)
 env.configure_stream_manager('socket',time_sync=True,sync_port=5000)
