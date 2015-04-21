@@ -138,7 +138,8 @@ class morse_middleware():
         self.rate = rate
 
 
-
+    def reset(self):
+        self.robot_simulation.reset()
 
     def tick(self,sync=False):
         #eimport time

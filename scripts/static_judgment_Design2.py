@@ -12,7 +12,7 @@ import ccm
 from ccm.lib.actr import *
 from ccm.lib.actr.blender_vision import BlenderVision
 from ccm.lib.actr.blender_motor_module import BlenderMotorModule
-log=ccm.log()
+
 from ccm.morserobots import middleware
 
 class MyEnvironment(ccm.Model):
@@ -213,6 +213,9 @@ class MyModel(ACTR):
                                    b_operator='operator:vision_module_response',
                                    b_vision1='opening:?opening'):
         print("AGENT RESPONSE: YES")
+        b_plan_unit.clear()
+        b_unit_task.clear()
+        b_operator.clear()
         goal.set('stop')
 
 
@@ -268,6 +271,7 @@ class MyModel(ACTR):
         
         
 
+log=ccm.log(html=True)
 model=MyModel()
 model.middleware = middleware
 #vInternal = VisualEnvironment()
@@ -286,6 +290,7 @@ middleware.set_mode('best_effort',2)
 #best effort will try to clear the stack
 #will tick n times for every tick. the defaul py must be set right.
 
+
 #initial sync
 middleware.tick()
 
@@ -299,8 +304,12 @@ while model.keepAlive:
 
 
 print("post run")
-  
-   
+ccm.finished()
+
+#middleware.robot_simulation.quit()
+#middleware.robot_simulation.close()
+middleware.robot_simulation.reset()
+middleware.robot_simulation.close()
 
 
 
