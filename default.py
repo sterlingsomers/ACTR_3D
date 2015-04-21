@@ -4,11 +4,11 @@
 
 Feel free to edit this template as you like!
 """
-import pdb
+#import pdb
 
-import bpy
+#import bpy
 import math
-
+from morse.builder import *
 #from ACTR_3D.builer.robots import Mannequin
 from ACTR_3D.builder.robots import Manny
 from ACTR_3D.builder.robots import Car
@@ -18,7 +18,7 @@ from ACTR_3D.builder.sensors import GeometricCamera
 #from ACT_v1.builder.sensors.Collision import Collision as LocalCollision
 #from ACT_v1.builder.actuators import Torso
 
-from morse.builder import *
+
 #from ACT_v1.builder.actuators import Draw1
 #from ACT_v1.builder.sensors import SemanticCamera#Geometriccamerav1
 from morse.core.morse_time import TimeStrategies
@@ -164,6 +164,7 @@ robot.add_service('socket')
 # Check here: http://www.openrobots.org/morse/doc/stable/user/integration.html 
 # the other available interfaces (like ROS, YARP...)
 robot.add_default_interface('socket')
+robot.scale = [0.9,0.9,0.9]
 
 
 # set 'fastmode' to True to switch to wireframe mode

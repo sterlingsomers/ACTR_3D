@@ -4,7 +4,16 @@
 #import Morse
 #from pymorse import Morse
 
-
+from subprocess import call
+import os
+import time
+import subprocess
+import shlex
+os.chdir('/home/sterling/morse/projects')
+subprocess.Popen(shlex.split('morse run ACTR_3D'), stdout=subprocess.PIPE)
+#call(['morse','run','ACTR_3D'])
+time.sleep(3)
+os.chdir('/home/sterling/morse/projects/ACTR_3D/scripts')
 #import ACT-R Stuff
 import ccm
 
@@ -271,6 +280,10 @@ class MyModel(ACTR):
         
         
 
+
+
+
+
 log=ccm.log(html=True)
 model=MyModel()
 model.middleware = middleware
@@ -287,6 +300,7 @@ model.keepAlive = True
 print("Pre-run")
 
 middleware.set_mode('best_effort',2)
+
 #best effort will try to clear the stack
 #will tick n times for every tick. the defaul py must be set right.
 
@@ -305,11 +319,20 @@ while model.keepAlive:
 
 print("post run")
 ccm.finished()
-
+print("here0")
+del ccm
 #middleware.robot_simulation.quit()
 #middleware.robot_simulation.close()
-middleware.robot_simulation.reset()
-middleware.robot_simulation.close()
+#middleware.robot_simulation.reset()
+#print("here1")
+
+#time.sleep(1)
+#print("here2")
+#middleware.robot_simulation.close()
+#middleware.robot_simulation.close()
+middleware.tick(sync=True)
+middleware.robot_simulation.quit()
+
 
 
 
