@@ -39,6 +39,7 @@ class Manny(morse.core.robot.Robot):
         #     if child.name == 'robot.torso':
         #         self.module_map['robot.torso'] = child
         self.func_map = {}
+        self.func_map['move_forward'] = self
 
 
 
@@ -62,6 +63,12 @@ class Manny(morse.core.robot.Robot):
         #         print(child.name)
         #         print(dir(child))
 
+
+    @service
+    def accept_data_request(self,queue):
+        for item in queue:
+            meth = getattr(self.func_map[item[0]],item[0])
+            meth(**item[1])
 
 
     @service
@@ -202,7 +209,8 @@ class Manny(morse.core.robot.Robot):
         
         self.apply_speed('Position', [vx,vy,vz], [rx,ry,rz /2.0])
         self.completed(status.SUCCESS, "Moving Forward")
-        
+
+        #bge.logic.setFrameRate(200)
         #bge.logic.setLogicTicRate(200)
         #bge.logic.setPhysicsTicRate(200)
         # This is usually not used (responsibility of the actuators

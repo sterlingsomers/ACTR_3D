@@ -32,7 +32,8 @@ class BlenderMotorModule(ccm.Model):
         self.function_map = {'rotate_torso':['set_rotation',{'bone':'ribs'}],
                              'lower_arms':['lower_arms',{}],
                              'extend_shoulder':['set_rotation',{'axis':2}],
-                             'compress_shoulder':['set_rotation',{'axis':2}]}
+                             'compress_shoulder':['set_rotation',{'axis':2}],
+                             'move_forward':['move_forward',{}]}
 
         self._bones = self.get_bones()
                                     #NAME      #min/max by axis: 0, 1, 2
@@ -121,6 +122,15 @@ class BlenderMotorModule(ccm.Model):
         matcher3=Pattern(pattern3)
         matcher4=Pattern(pattern4)
         matcher5=Pattern(pattern5)
+
+        pattern = 'type:posture'
+        matcher = Pattern(pattern)
+        for obj in self._internalChunks:
+            #if axis='0.0'
+            if matcher.match(obj)!=None:
+                obj.minimal_width = 'false'
+
+
 
         matches = [matcher1,matcher2,matcher3,matcher4,matcher5]
         objs = []
@@ -412,7 +422,7 @@ class BlenderMotorModule(ccm.Model):
             return
 
         self.busy = True
-        self._boundingBox = [x * 1.15 for x in middleware.request('getBoundingBox', [])]
+        self._boundingBox = [x * 1.00 for x in middleware.request('getBoundingBox', [])]
 
         pattern='type:proprioception feature:bounding_box'
         matcher=Pattern(pattern)
@@ -442,10 +452,10 @@ class BlenderMotorModule(ccm.Model):
         print("REQUEST")
         if self.busy: return
 
-        for obj in self._internalChunks:
-            print("OBJ............")
-            for attr, value in obj.__dict__.items():
-                print(attr,value)
+        #for obj in self._internalChunks:
+        #    print("OBJ............")
+        #    for attr, value in obj.__dict__.items():
+        #        print(attr,value)
 
         matcher = Pattern(pattern)
         print("Matcher",matcher)
@@ -529,9 +539,10 @@ class BlenderMotorModule(ccm.Model):
     def async_test2(self,value):
         middleware.send('async_test2',[value])
 
-    def move_forward(self,distance=0.01):
+    def move_forward(self,function_name,**kwargs):
         '''Move forward by some distance'''
-        middleware.send('move_forward',[distance])
+        #middleware.send('move_forward',[distance])
+        middleware.send(self.function_map[function_name][0],**kwargs)
 
     def set_rotation(self,bone,axis,radians):
         '''Rotate bone on axis by radians'''

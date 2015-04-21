@@ -3,6 +3,23 @@ from .morseconnection import *
 import time
 
 
+import signal
+from contextlib import contextmanager
+class TimeoutException(Exception): pass
+
+@contextmanager
+def time_limit(seconds):
+    def signal_handler(signum, frame):
+        print("Time out!")
+        raise TimeoutException
+    signal.signal(signal.SIGALRM, signal_handler)
+    signal.alarm(seconds)
+    try:
+        yield
+    finally:
+        signal.alarm(0)
+
+
 class morse_middleware():
     '''The middleware to handle the connection between ACT-R and Morse.'''
     
@@ -39,7 +56,8 @@ class morse_middleware():
                             'scan_sub_image':['self.robot_simulation.robot.GeometricCamerav1','.scan_sub_image'],
                             'getBoundingBox':['self.robot_simulation.robot','.getBoundingBox'],
                             'lower_arms':['self.robot_simulation.robot.torso','.lower_arms'],
-                            'get_bones':['self.robot_simulation.robot','.getBones']}
+                            'get_bones':['self.robot_simulation.robot','.getBones'],
+                            'move_forward':['self.robot_simulation.robot','.move_forward']}
         #self.action_dict = {'scan_imageD':['self.robot_simulation.robot.GeometricCamerav1', '.scan_imageD'],
 		#		'set_speed':['self.robot_simulation.robot','.set_speed'],
         #        'move_forward':['self.robot_simulation.robot','.move_forward'],
@@ -119,8 +137,15 @@ class morse_middleware():
         #print("setting mustTrick", self.mustTick)
         #print("Sending...", self.action_dict[datastr][1], argslist)
         rStr = self.action_dict[datastr][0] + self.action_dict[datastr][1] + '(' + ','.join(argslist) + ').result()'
+        try:
+            with time_limit(2):
+                result = eval(rStr)
+        except TimeoutException:
+            for x in range(10000):
+                robot_simulation.tick()
 
-        result = eval(rStr)
+            return self.request(datastr,argslist)
+
         print("Recieved", result)
         #if 'return' in dir(result):
         #    result = result.result()
@@ -150,10 +175,18 @@ class morse_middleware():
             self.modules_in_use = {}
             for rate in range(self.rate):
                 print("Middleware tick!")
+
                 if self.send_queue:
-                    self.robot_simulation.robot.accept_send_request(self.send_queue)
+                    try:
+                        with time_limit(1):
+                            self.robot_simulation.robot.accept_send_request(self.send_queue)
+                    except TimeoutException:
+                        self.robot_simulation.tick()
+
                     self.send_queue = []
-                self.robot_simulation.tick()
+                t = self.robot_simulation.tick()
+                print(t)
+                #print("TIME:",self.robot_simulation.time())
                 #time.sleep(0.01)
 
             if self.send_queue:
