@@ -4,11 +4,11 @@
 
 Feel free to edit this template as you like!
 """
-import pdb
+#import pdb
 
-import bpy
+#import bpy
 import math
-
+from morse.builder import *
 #from ACTR_3D.builer.robots import Mannequin
 from ACTR_3D.builder.robots import Manny
 from ACTR_3D.builder.robots import Car
@@ -18,12 +18,12 @@ from ACTR_3D.builder.sensors import GeometricCamera
 #from ACT_v1.builder.sensors.Collision import Collision as LocalCollision
 #from ACT_v1.builder.actuators import Torso
 
-from morse.builder import *
+
 #from ACT_v1.builder.actuators import Draw1
 #from ACT_v1.builder.sensors import SemanticCamera#Geometriccamerav1
 from morse.core.morse_time import TimeStrategies
 
-bpymorse.set_speed(fps=200,logic_step_max=200,physics_step_max=200)
+bpymorse.set_speed(fps=200,logic_step_max=0,physics_step_max=0)
 
 # Add the MORSE mascott, MORSY.
 # Out-the-box available robots are listed here:
@@ -49,7 +49,7 @@ robot = Manny()
 
 # The list of the main methods to manipulate your components
 # is here: http://www.openrobots.org/morse/doc/stable/user/builder_overview.html
-robot.translate(0.0, 0.0, 0.0)
+robot.translate(0.0, -3.1, 0.0)
 
 
 torso = Armature(model_name='ACTR_3D/actuators/Torso.blend', armature_name='Armature')
@@ -164,16 +164,21 @@ robot.add_service('socket')
 # Check here: http://www.openrobots.org/morse/doc/stable/user/integration.html 
 # the other available interfaces (like ROS, YARP...)
 robot.add_default_interface('socket')
+robot.scale = [1.0,1.0,1.0]
 
 
 # set 'fastmode' to True to switch to wireframe mode
 #env = Environment('../projects/ACTR_3D/Left_Hand_Traffic.blend')
-env = Environment('../projects/ACTR_3D/target.blend')
+env = Environment('../projects/ACTR_3D/NOtarget_v2.blend')#, fastmode = True)
 #env = Environment('indoors-1/indoor-1')
+
+#ROBOT VIEW
 import math
-env.set_camera_location([0, -10, 7])
+env.set_camera_location([0, -15, 7])
 env.set_camera_rotation([math.radians(80), 0, math.radians(00)])
 env.select_display_camera(GeometricCamerav1)
+
+
 #pdb.set_trace()
 #env.set_time_strategy(TimeStrategies.FixedSimulationStepExternalTrigger)
 env.configure_stream_manager('socket',time_sync=True,sync_port=5000)

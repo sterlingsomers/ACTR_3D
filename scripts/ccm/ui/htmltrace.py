@@ -234,7 +234,7 @@ class HTMLTrace:
     fixed=self.makeFixedTable(fixed_keys)    
     
     if not filename.endswith('.html'): filename+='.html'    
-    f=file(filename,'w')
+    f=open(filename,'w')
     
     page=html[
            head[

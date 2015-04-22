@@ -32,14 +32,23 @@ class BlenderMotorModule(ccm.Model):
         self.function_map = {'rotate_torso':['set_rotation',{'bone':'ribs'}],
                              'lower_arms':['lower_arms',{}],
                              'extend_shoulder':['set_rotation',{'axis':2}],
-                             'compress_shoulder':['set_rotation',{'axis':2}]}
+                             'compress_shoulder':['set_rotation',{'axis':2}],
+                             'move_forward':['move_forward',{}]}
 
         self._bones = self.get_bones()
                                     #NAME      #min/max by axis: 0, 1, 2
         self._boneProperties = {'part.torso':[[0,0],[-pi/4,pi/4],[0,0]],
                                 'shoulder.L':[[0,0],[0,0],[-pi/6,pi/6]],
-                                'shoulder.R':[[0,0],[0,0],[pi/6,-pi/6]]}
+                                'shoulder.R':[[0,0],[0,0],[-pi/6,pi/6]]}
         #Tick
+        self._internalChunks.append(ccm.Model(type='posture',
+                                              standing='true',
+                                              prone='no',
+                                              minimal_width='false',
+                                              walkable='true',
+                                              runnable='true',
+
+                                              ))
         self._internalChunks.append(ccm.Model(type='proprioception',
                                               feature='shoulders_quality',
                                               quality='none'))
@@ -101,6 +110,81 @@ class BlenderMotorModule(ccm.Model):
                                               height=repr(0.0)))
         #self.blender_camera = Morse().robot.GeometricCamerav1
 
+    def update_posture(self):
+        pattern1='type:proprioception bone:upper_arm.R'# overall_quality:lowered'
+        pattern2='type:proprioception bone:upper_arm.L'# overall_quality:lowered'
+        pattern3='type:proprioception bone:shoulder.R'# rotation0_quality:max'
+        pattern4='type:proprioception bone:shoulder.L'# rotation0_quality:min' #probably should find those, instead of supplying them
+        pattern5='type:proprioception bone:torso'# rotation_direction:right'
+
+        matcher1=Pattern(pattern1)
+        matcher2=Pattern(pattern2)
+        matcher3=Pattern(pattern3)
+        matcher4=Pattern(pattern4)
+        matcher5=Pattern(pattern5)
+
+        pattern = 'type:posture'
+        matcher = Pattern(pattern)
+        for obj in self._internalChunks:
+            #if axis='0.0'
+            if matcher.match(obj)!=None:
+                obj.minimal_width = 'false'
+
+
+
+        matches = [matcher1,matcher2,matcher3,matcher4,matcher5]
+        objs = []
+        for m in matches:
+            for obj in self._internalChunks:
+                if m.match(obj) != None:
+                    objs.append(obj)
+
+        try:#For posture, minimal width, yes
+            if objs[0].overall_quality=='lowered' and \
+                objs[1].overall_quality=='lowered' and\
+                objs[2].rotation0_quality=='max' and\
+                objs[3].rotation0_quality=='min' and\
+                objs[4].rotation_direction == 'right':
+
+                pattern = 'type:posture'
+                matcher = Pattern(pattern)
+
+
+                for obj in self._internalChunks:
+                    #if axis='0.0'
+                    if matcher.match(obj)!=None:
+                        obj.minimal_width = 'true'
+                        return
+        except Exception:
+            pass
+
+        try:#For posture, minimal width, yes
+            if objs[0].overall_quality=='lowered' and \
+                objs[1].overall_quality=='lowered' and\
+                objs[2].rotation0_quality=='min' and\
+                objs[3].rotation0_quality=='max' and\
+                objs[4].rotation_direction == 'left':
+
+                pattern = 'type:posture'
+                matcher = Pattern(pattern)
+
+
+                for obj in self._internalChunks:
+                    #if axis='0.0'
+                    if matcher.match(obj)!=None:
+                        obj.minimal_width = 'true'
+                        return
+        except Exception:
+            pass
+
+
+    def print_state(self):
+        for x in self._internalChunks:
+            print("MODEL")
+            for y in x.__dict__:
+                if not '_' in y[0:2]:
+                    print(y,x.__dict__[y])
+
 
     def lower_arms(self,function_name,**kwargs):
         '''
@@ -139,7 +223,7 @@ class BlenderMotorModule(ccm.Model):
                     obj.rotation0='0'
                     obj.overall_quality='lowered'
             self.busy=False
-
+        self.update_posture()
 
         middleware.send(self.function_map[function_name][0],**kwargs)
 
@@ -208,6 +292,7 @@ class BlenderMotorModule(ccm.Model):
                 if minReached:
                     obj.rotation0_quality='min'
         self.busy=False
+        self.update_posture()
 
     def extend_shoulder(self,function_name,**kwargs):
         '''
@@ -228,8 +313,8 @@ class BlenderMotorModule(ccm.Model):
 
 
         kwargs.update(self.function_map[function_name][1])
-        #if kwargs['bone'] == 'shoulder.R':
-        #    kwargs['radians'] = kwargs['radians'] * -1
+        if kwargs['bone'] == 'shoulder.R':
+            kwargs['radians'] = kwargs['radians'] * -1
         #elif kwargs['bone'] == 'shoulder.L':
         #    kwargs['radians'] = kwargs['radians'] * 1
 
@@ -237,15 +322,15 @@ class BlenderMotorModule(ccm.Model):
         minR,maxR = self._boneProperties[kwargs['bone']][kwargs['axis']]
         #print("MINR", minR)
         if Decimal(kwargs['radians']).quantize(Decimal('0.000'),rounding=ROUND_HALF_UP) >= Decimal(maxR).quantize(Decimal('0.000'),rounding=ROUND_HALF_UP):
-            #print("SET TO MAX")
+            print("SET TO MAX")
             maxReached=True
             kwargs['radians'] = maxR
         elif Decimal(kwargs['radians']).quantize(Decimal('0.000'),rounding=ROUND_HALF_UP) <= Decimal(minR).quantize(Decimal('0.000'),rounding=ROUND_HALF_UP):
-            #print("SET TO MIN")
+            print("SET TO MIN")
             minReached = True
             kwargs['radians'] = minR
 
-        #print("RADIANS",radians)
+        print("RADIANS",kwargs['radians'])
         middleware.send(self.function_map[function_name][0],**kwargs)
         #middleware.send('rotate_torso',axis=axis, radians=radians)
         pattern='type:proprioception ' + 'bone:' + kwargs['bone']
@@ -263,6 +348,7 @@ class BlenderMotorModule(ccm.Model):
                 if minReached:
                     obj.rotation0_quality='min'
         self.busy=False
+        self.update_posture()
 
 
     def compress_shoulder(self,function_name,**kwargs):
@@ -293,16 +379,16 @@ class BlenderMotorModule(ccm.Model):
         minR,maxR = self._boneProperties[kwargs['bone']][kwargs['axis']]
         #print("MINR", minR)
         if Decimal(kwargs['radians']).quantize(Decimal('0.000'),rounding=ROUND_HALF_UP) >= Decimal(maxR).quantize(Decimal('0.000'),rounding=ROUND_HALF_UP):
-            #print("SET TO MAX")
+            print("SET TO MAX")
             maxReached=True
             kwargs['radians'] = maxR
         if Decimal(kwargs['radians']).quantize(Decimal('0.000'),rounding=ROUND_HALF_UP) <= Decimal(minR).quantize(Decimal('0.000'),rounding=ROUND_HALF_UP):
-            #print("SET TO MIN")
+            print("SET TO MIN")
 
             minReached = True
             kwargs['radians'] = minR
 
-        #print("RADIANS",radians)
+        print("RADIANS",kwargs['radians'])
         middleware.send(self.function_map[function_name][0],**kwargs)
         #middleware.send('rotate_torso',axis=axis, radians=radians)
         pattern='type:proprioception ' + 'bone:' + kwargs['bone']
@@ -320,6 +406,7 @@ class BlenderMotorModule(ccm.Model):
                 if minReached:
                     obj.rotation0_quality='min'
         self.busy=False
+        self.update_posture()
 
 
     def rotate_shoulders_to(self,radians):
@@ -335,7 +422,8 @@ class BlenderMotorModule(ccm.Model):
             return
 
         self.busy = True
-        self._boundingBox = middleware.request('getBoundingBox', [])
+        self._boundingBox = [x * 1.00 for x in middleware.request('getBoundingBox', [])]
+
         pattern='type:proprioception feature:bounding_box'
         matcher=Pattern(pattern)
         objs = 0
@@ -349,6 +437,7 @@ class BlenderMotorModule(ccm.Model):
                 raise Exception("There shouldn't be more than one match...")
         print("get_bounding_box done.")
         self.busy = False
+        self.update_posture()
 
         # self._internalChunks.append(ccm.Model(type='proprioception',
         #                                       width=repr(self._boundingBox[0]),
@@ -363,10 +452,10 @@ class BlenderMotorModule(ccm.Model):
         print("REQUEST")
         if self.busy: return
 
-        for obj in self._internalChunks:
-            print("OBJ............")
-            for attr, value in obj.__dict__.items():
-                print(attr,value)
+        #for obj in self._internalChunks:
+        #    print("OBJ............")
+        #    for attr, value in obj.__dict__.items():
+        #        print(attr,value)
 
         matcher = Pattern(pattern)
         print("Matcher",matcher)
@@ -450,9 +539,10 @@ class BlenderMotorModule(ccm.Model):
     def async_test2(self,value):
         middleware.send('async_test2',[value])
 
-    def move_forward(self,distance=0.01):
+    def move_forward(self,function_name,**kwargs):
         '''Move forward by some distance'''
-        middleware.send('move_forward',[distance])
+        #middleware.send('move_forward',[distance])
+        middleware.send(self.function_map[function_name][0],**kwargs)
 
     def set_rotation(self,bone,axis,radians):
         '''Rotate bone on axis by radians'''

@@ -110,10 +110,10 @@ class MannequinTorso(morse.core.actuator.Actuator):
         """
 
         # check if we have an on-going asynchronous tasks...
-        if self._target_count and self.local_data['counter'] > self._target_count:
-            self.completed(status.SUCCESS, self.local_data['counter'])
+        #if self._target_count and self.local_data['counter'] > self._target_count:
+        #    self.completed(status.SUCCESS, self.local_data['counter'])
 
         # implement here the behaviour of your actuator
-        self.local_data['counter'] += 1
+        #self.local_data['counter'] += 1
 
         self.bge_object.update()

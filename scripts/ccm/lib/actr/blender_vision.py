@@ -47,6 +47,8 @@ class BlenderVision(ccm.Model):
         self.error=False
         self.busy=False
         self._objects = {}
+        self._openings = {}
+        self._oldopenings = {}
         self._edges = {}
         self._internalChunks = []
         self._screenLeft = numpy.arange(Decimal(0.60),Decimal(1.0),Decimal(0.002))
@@ -118,19 +120,79 @@ class BlenderVision(ccm.Model):
         #A map of y-values and x,y pairs
 
         if 'feature' in kwargs and kwargs['feature'] == 'opening':
-            if 'depth' in kwargs:
+            openings = self.find_opening(depth=float(kwargs['depth']))
+            if openings == {}:
+                self._openings={}
+                self._b1.clear()
+                self.error = True
+                return
 
-                openings = self.find_opening(depth=float(kwargs['depth']))
-                #print("openings..................")
+            if 'width' in kwargs:
+                # indices = self.indices_of_smallest_angle([self._objects[Decimal('0.500')][self._openings[Decimal('0.500')][0]][4],
+                #                                    self._objects[Decimal('0.500')][self._openings[Decimal('0.500')][0]][5]],
+                #                                 [self._objects[Decimal('0.500')][self._openings[Decimal('0.500')][1]][4],
+                #                                    self._objects[Decimal('0.500')][self._openings[Decimal('0.500')][1]][5]])
 
-                for key in sorted(openings.keys()):
-                    #print(openings[key])
-                    if numpy.intersect1d(self._screenLeft,numpy.arange(openings[key][0],openings[key][1],Decimal(0.002))).any():
-                        chunkValues.add('screenLeft')
-                    if numpy.intersect1d(self._screenCenter,numpy.arange(openings[key][0],openings[key][1],Decimal(0.002))).any():
-                        chunkValues.add('screenCenter')
-                    if numpy.intersect1d(self._screenRight,numpy.arange(openings[key][0],openings[key][1],Decimal(0.002))).any():
-                        chunkValues.add('screenRight')
+
+                openingsKey = Decimal('0.500')
+                if not openingsKey in self._openings:
+                    openingsKey = Decimal('0.495')
+                    if not openingsKey in self._openings:
+                        openingsKey = Decimal('0.510')
+                        if not openingsKey in self._openings:
+                            self._openings = self._oldopenings
+                            #Need to FIX this.
+
+
+                indices = self.indices_of_screen_position(self._objects[Decimal(openingsKey)][self._openings[openingsKey][0]],
+                                                          self._objects[Decimal(openingsKey)][self._openings[openingsKey][1]])
+
+                y1 = self._objects[Decimal(openingsKey)][self._openings[openingsKey][0]][4+indices[0]]
+                y2 = self._objects[Decimal(openingsKey)][self._openings[openingsKey][1]][4+indices[1]]
+                #y1 and y2 are the angle from normal to the first object [0] and the second object, respectively
+                #y is the total angle between the two
+                y = y1+y2
+
+                a = self._objects[Decimal(openingsKey)][self._openings[openingsKey][0]][2+indices[0]]
+                b = self._objects[Decimal(openingsKey)][self._openings[openingsKey][1]][2+indices[1]]
+                c = math.sqrt(float(a)**2 - 2*float(a)*float(b)*math.cos(float(math.radians(y)))+float(b)**2)
+                print("indices",indices)
+                print("C",c,y1,y2,openingsKey)
+                if not float(kwargs['width']) < c:
+                    self._b1.clear()
+                    self.error=True
+                    return
+
+                #FDOprint(indices,' ', c)
+                #FDOprint("y",y,"a",a,"b",b,"c",c)
+
+            #Section is commented out, no longer think it is useful
+            #depth is handled line 121
+            #if 'depth' in kwargs:
+            #
+            #
+            #     #print("openings..................")
+            #
+            for key in sorted(openings.keys()):
+                #FDOprint("PC",key,openings[key])
+                #indices = self.indices_of_smallest_angle(self._objects[key][openings[key][0]][4:6],
+                #                                         self._objects[key][openings[key][1]][4:6])
+                indices = self.indices_of_screen_position(self._objects[key][openings[key][0]],
+                                                          self._objects[key][openings[key][1]])
+                #FDOprint("DT",indices)
+                #FDOprint("DT",self._objects[key][openings[key][0]][indices[0]],self._objects[key][openings[key][1]][indices[1]])
+                x1 = self._objects[key][openings[key][0]][indices[0]]
+                x2 = self._objects[key][openings[key][1]][indices[1]]
+                xs = [x1,x2]
+                xs.sort()
+                #FDOprint("DT",xs)
+
+                if numpy.intersect1d(self._screenLeft,numpy.arange(xs[0],xs[1])).any():               #if openings[key]
+                    chunkValues.add('screenLeft')
+                if numpy.intersect1d(self._screenCenter,numpy.arange(xs[0],xs[1])).any():
+                    chunkValues.add('screenCenter')
+                if numpy.intersect1d(self._screenRight,numpy.arange(xs[0],xs[1])).any():
+                    chunkValues.add('screenRight')
 
         #Result Error if not 'feature' (for now)
         else:
@@ -143,6 +205,7 @@ class BlenderVision(ccm.Model):
         #     d=max(0,self.random.gauss(d,self.delay_sd))
         # yield d
         # self.busy=False
+        print("chunkvalues",chunkValues)
         self._b1.set(kwargs['feature']+':'+'_'.join(chunkValues))
         #print("OPENINGS", openings)
         # self._internalChunks.append(ccm.Model(feature='opening',
@@ -155,19 +218,111 @@ class BlenderVision(ccm.Model):
         #print("similar_depth")
         #print("Depth/5",depth/5)
         #print(list1,list2)
-        dividend = 5
-        return abs(list1[2] - list2[2]) < depth/dividend or \
-               abs(list1[2] - list2[3]) < depth/dividend or \
-               abs(list1[3] - list2[2]) < depth/dividend or \
-               abs(list1[3] - list2[3]) < depth/dividend
+        #this function should suffer from the same issue, not specific (see within_depth)
+        #dividend = 5
+        #return abs(list1[2] - list2[2]) < depth/dividend or \
+        #       abs(list1[2] - list2[3]) < depth/dividend or \
+        #       abs(list1[3] - list2[2]) < depth/dividend or \
+        #       abs(list1[3] - list2[3]) < depth/dividend
+
+        allData1 = self._objects[list1[0]][list1[1]]
+        allData2 = self._objects[list2[0]][list2[1]]
+
+        #indices = self.indices_of_smallest_angle(allData1[4:6],allData2[4:6])
+        indices = self.indices_of_screen_position(allData1,allData2)
+        minDepth = depth/5.0
+
+        linearDepth1 = float(self._objects[list1[0]][list1[1]][2+indices[0]]) * math.cos(math.radians(self._objects[list1[0]][list1[1]][4+indices[0]]))
+        linearDepth2 = float(self._objects[list2[0]][list2[1]][2+indices[1]]) * math.cos(math.radians(self._objects[list2[0]][list2[1]][4+indices[1]]))
+        #print("linearDepth",linearDepth1,linearDepth2)
+        #FDOprint("EX",list1,self._objects[list1[0]][list1[1]][2+indices[0]])
+        #FDOprint("EX",list2,self._objects[list2[0]][list2[1]][2+indices[1]])
+        #FDOprint("EX",abs(self._objects[list1[0]][list1[1]][2+indices[0]] - self._objects[list2[0]][list2[1]][2+indices[1]]))
+        #FDOprint("EX",abs(self._objects[list1[0]][list1[1]][2+indices[0]] - self._objects[list2[0]][list2[1]][2+indices[1]]) < depth/5.0)
+
+        return abs(linearDepth1-linearDepth2) < 0.50
+        #return abs(self._objects[list1[0]][list1[1]][2+indices[0]] - self._objects[list2[0]][list2[1]][2+indices[1]]) < depth/4.5
 
 
     def within_depth(self,list1,list2,depth=0.0):
         '''Returns True if list1[2:] and list2[2:] have a minimum difference of depth'''
-        return abs(list1[2] - list2[2]) < depth or \
-               abs(list1[2] - list2[3]) < depth or \
-               abs(list1[3] - list2[2]) < depth or \
-               abs(list1[3] - list2[3]) < depth
+        #print("withinDepth", list1,list2)
+        #This is not specific enough.  Because the wall could be (at the farthest) close to the depth of the
+        #target.
+        #You need the actual indices
+
+        allData1 = self._objects[list1[0]][list1[1]]
+        allData2 = self._objects[list2[0]][list2[1]]
+
+
+        #indices = self.indices_of_smallest_angle(allData1[4:6],allData2[4:6])
+        #Replacement
+        indices = self.indices_of_screen_position(allData1,allData2)
+
+        #This should give two values e.g. [0,1]
+        #add these indexes to the indexes of interest, in this case [2]
+        #You will get either [2] or [3] (in example [2,3]
+        #compare the depths using those indices
+        linearDepth1 = float(self._objects[list1[0]][list1[1]][2+indices[0]]) * math.cos(math.radians(self._objects[list1[0]][list1[1]][4+indices[0]]))
+        linearDepth2 = float(self._objects[list2[0]][list2[1]][2+indices[1]]) * math.cos(math.radians(self._objects[list2[0]][list2[1]][4+indices[1]]))
+        #FDOprint("DX",list1,self._objects[list1[0]][list1[1]][2+indices[0]])
+        #FDOprint("DX",list2,self._objects[list2[0]][list2[1]][2+indices[1]])
+        #FDOprint("DX",abs(self._objects[list1[0]][list1[1]][2+indices[0]] - self._objects[list2[0]][list2[1]][2+indices[1]]) < depth)
+
+        return abs(linearDepth1-linearDepth2) < depth
+
+        #return abs(self._objects[list1[0]][list1[1]][2+indices[0]] - self._objects[list2[0]][list2[1]][2+indices[1]]) < depth
+
+
+        #return abs(list1[2] - list2[2]) < depth or \
+        #       abs(list1[2] - list2[3]) < depth or \
+        #       abs(list1[3] - list2[2]) < depth or \
+        #       abs(list1[3] - list2[3]) < depth
+
+
+    def indices_of_screen_position(self,list1,list2):
+        '''Takes the entire list of data and determines the correct indices'''
+
+        l1Index = 0
+        l2Index = 0
+        value = 999
+        for i in range(2):
+            for z in range(2):
+                if abs(list1[i]-list2[z]) < value:
+                    value = abs(list1[i]-list2[z])
+
+                    l1Index = i
+                    l2Index = z
+        return [l1Index,l2Index]
+
+    def indices_of_smallest_angle(self,list1,list2):
+
+        l1Index = 0
+        l2Index = 0
+        value=999
+        for i in range(2):
+            for z in range(2):
+                #print("i,z",i,' ',z)
+                #FDOprint("prevalue", list1[i]+list2[z])
+                if abs(list1[i]-list2[z]) < value:
+                    value = abs(list1[i]-list2[z])
+                    #FDOprint("value", value)
+
+                    l1Index = i
+                    l2Index = z
+        return [l1Index,l2Index]
+
+
+    def smallest_angle(self,list1,list2):
+        '''Returns the minimum combined angle between list1[0,1] and list2[0,1]'''
+        return min([list1[0]+list2[0],list1[0]+list2[1],list1[1]+list2[0],list1[1]+list2[1]])
+
+    def vectors_of_smallest_angles(self,listOfVectors1,listOfVectors2):
+        '''Returns the vectors which compose the smallest angle between 2 sets of vectors'''
+
+        #Get the combination of all the vectors
+        combs = [(x,y) for x in listOfVectors1 for y in listOfVectors2]
+
 
 
 
@@ -175,6 +330,7 @@ class BlenderVision(ccm.Model):
     def find_opening(self,depth=0.0):
         '''Uses numpy for now.'''
         #Forces a scan first
+        self._oldopenings = self._openings
         self.scan()
         openings = {}
 
@@ -182,15 +338,20 @@ class BlenderVision(ccm.Model):
         similar_key_major = []
         #print( "DEPTH", depth)
         for y in sorted(self._objects.keys()):
+            # if y == Decimal('0.500'):
+            #     print('0.500')
+
             fullX = numpy.arange(Decimal('0.000'),Decimal('1.0'),Decimal('0.002'))
             if len(self._objects[y].keys()) > 1:
                 similar_keys_minor = []
-                for ky,ty in rolling_window(numpy.array(sorted(self._objects[y],key=lambda lst: min(self._objects[y][lst][2:]))),2):#self._objects[y]:
+                for ky,ty in rolling_window(numpy.array(sorted(self._objects[y],key=lambda lst: min(self._objects[y][lst][2:4]))),2):#self._objects[y]:
                     #print("DDDDDD",y,ky,ty,similar_keys_minor)
                     if ky in self._ignoreLabels or ty in self._ignoreLabels:
                         continue
-
-                    if self.similar_depth(self._objects[y][ky],self._objects[y][ty],depth):
+                    # if ky == 'target' or ty == 'target':
+                    #     print("ASDF")
+                    #if self.similar_depth(self._objects[y][ky],self._objects[y][ty],depth):
+                    if self.similar_depth([y,ky],[y,ty],depth):
                         similar_keys_minor.append(ky)
                         similar_keys_minor.append(ty)
 
@@ -198,22 +359,27 @@ class BlenderVision(ccm.Model):
                     continue
                 #print(similar_keys_minor)
                 for key in similar_keys_minor:
-                    #print(key)
+                    #FDOprint("KEY",key)
                     #print(self._objects[y][key],"ASDFASDFA")
                     #print("FULLX",fullX)
                     t = numpy.arange(Decimal(self._objects[y][key][0]),Decimal(self._objects[y][key][1]),Decimal(0.002))
 
                     fullX = numpy.setdiff1d(fullX,t)
-                    #print("FullX AFTER",len(fullX))
+                    #FDOprint("FullX AFTER",len(fullX))
                 for key in self._objects[y].keys():
+                #Check against ALL the keys
                     if key in similar_keys_minor:
                         continue
                     else:
                         #Are they beyond the distance?
-                        if self.within_depth(self._objects[y][key],self._objects[y][similar_keys_minor[0]],depth):
-                            pass #not sure
+                        #If they within, they're too close
+                        #Only need 1 item below
+                        #if self.within_depth(self._objects[y][key],self._objects[y][similar_keys_minor[0]],depth):
+                        if self.within_depth([y,key],[y,similar_keys_minor[0]]):
+                            #FDOprint("key",key,"This happened")
+                            openings[y] = []
                         else:
-                            openings[y] = [min(fullX),max(fullX)]
+                            openings[y] = similar_keys_minor
                 #At this point I should have a collection of objects with similar depths
 
                     #print(self._objects[y][ky])
@@ -221,6 +387,9 @@ class BlenderVision(ccm.Model):
             else:
                 pass #not sure what to do if there's only 1 object.
             #print("FR",len(fullRange)).
+        print("OBJECTS",self._objects)
+        print("OPENINGS", openings)
+        self._openings = openings
         return openings
 
 
@@ -242,7 +411,7 @@ class BlenderVision(ccm.Model):
         ###!!!Note the keys here are strings, not floats
         ###!!Converti them to float below
         #self._objects = dict((float(k), v) for k,v in self._objects.items())
-        self._objects = dict((float(k), dict((kk,[Decimal(x).quantize(Decimal('.001'),rounding=ROUND_HALF_UP) for x in kv]) for kk,kv in v.items())) for k,v in self._objects.items())
+        self._objects = dict((Decimal(k).quantize(Decimal('.001'),rounding=ROUND_HALF_UP), dict((kk,[Decimal(x).quantize(Decimal('.001'),rounding=ROUND_HALF_UP) for x in kv]) for kk,kv in v.items())) for k,v in self._objects.items())
         self._ignoreLabels = ['None','Ground']
         #self.find_edges()
         ##print(self._edges)
@@ -417,8 +586,10 @@ class BlenderVision(ccm.Model):
    
     def check_match(self, **kwargs):
         if 'opening' in kwargs:
-            if hasattr(self,'_'+kwargs['opening']):
-                pass#here add code
+            if hasattr(self,'_'+kwargs['opening']):#Is this _screenCentre
+                #In the space of the screen centre,
+                #Is there a patch that is wide enough?
+                print("PASS")
             else:
                 self.error=True
                 self.busy=False

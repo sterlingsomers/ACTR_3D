@@ -145,19 +145,41 @@ class GeometricCamera(morse.sensors.camera.Camera):
         #import pdb
         #pdb.set_trace()
         #pdb.set_trace()
-        grainSize = Decimal(grainSize).quantize(Decimal('.01'),rounding=ROUND_HALF_DOWN)
+        #grainSize = Decimal(grainSize).quantize(Decimal('.01'),rounding=ROUND_HALF_UP)
         bigGrain = grainSize * 100
-        minD = Decimal(minD)
-        maxD = Decimal(maxD)
+        #grainSize = grainSize/10.0
+        #print("MINDMAXD",minD,maxD)
+        #minD = Decimal(minD).quantize(Decimal('0.01'),rounding=ROUND_HALF_UP)
+        #maxD = Decimal(maxD).quantize(Decimal('0.01'),rounding=ROUND_HALF_UP)
+        #amt = -0.0001
+        #for z in range(1000):
+        #    hit = self.blender_cam.getScreenRay(x,y,amt)
+        #    if not hit == None:
+        #        return float(amt)
+        #    else:
+        #        amt = amt + grainSize/10.0
+        #if y == 0.500:
+        #   pdb.set_trace()
+        if y == 0.500:
+            print("Start.", x,y,minD,bigGrain)
+
         while minD <= maxD:
-            hit = self.blender_cam.getScreenRay(x,y,minD)
+            hit = self.blender_cam.getScreenRay(x,y,minD,"object")
             if not hit == None:
                 if bigGrain == grainSize:
+                    if y == 0.500:
+                        print("Here1",x,y,minD,bigGrain)
                     return float(minD)
                 else:
+                    if y == 0.500:
+                        print("here2", x, y, minD,bigGrain)
                     minD -= bigGrain
-                    bigGrain = bigGrain/10
-            minD+=bigGrain
+                    bigGrain = bigGrain/10.0
+                    if y == 0.500:
+                        print("Here3", x,y,minD,bigGrain)
+            minD+=float(bigGrain)
+            if y == 0.500:
+                print("Here4",x,y,minD,bigGrain)
         return float(maxD)
     # @service
     # def distance_to_xy(self,x,y,minD,maxD,grainSize=0.01):
@@ -280,8 +302,9 @@ class GeometricCamera(morse.sensors.camera.Camera):
                     
                     
 
-    @service
+
     def getScreenVector(self,x,y):
+
         normal = numpy.array(self.blender_cam.getScreenVect(0.5,0.5))
         dif = numpy.array(self.blender_cam.getScreenVect(x,y))
         dot = numpy.dot(normal,dif)
@@ -289,7 +312,10 @@ class GeometricCamera(morse.sensors.camera.Camera):
         y_modulus = numpy.sqrt((dif*dif).sum())
         cos_angle = dot / x_modulus / y_modulus
         angle = numpy.arccos(cos_angle)
-        return math.degrees(angle)        
+        return math.degrees(angle)
+
+        #return dif
+
         #cosang = numpy.dot(normal,dif)
         #sinang = numpy.linalg.norm(numpy.cross(normal,dif))
         #return numpy.arctan2(sinang,cosang)
@@ -429,19 +455,21 @@ class GeometricCamera(morse.sensors.camera.Camera):
         return objects
                                
     @service
-    def scan_image_multi(self,xyGrain=0.01,xyPrecision=0.002,depthGrain=0.01,minDepth=0.05,maxDepth=50,processes=8):
+    def scan_image_multi(self,ystart=0.0,ystop=1.0,xstart=0.0,xstop=1.0,xyGrain=0.01,xyPrecision=0.002,depthGrain=0.01,minDepth=0.01,maxDepth=50,processes=8):
         def worker(minY,maxY, out_q):
+
+            getcontext().prec = 4
             #beginning = time.time()
             #objects = {} #{objlable:[inside_angle,outside_angle,highest,lowest]}
             YS = {} #{y-index: {label: [[x1,x2,d1,d2],[..],.],lable2:...}
             normal = self.blender_cam.getScreenVect(0.5,0.5)
             before = time.time()
-            BigGrain = 0.01#1% of the picture
-            SmallGrain = xyPrecision
+            BigGrain = Decimal(0.01).quantize(Decimal('.001'),rounding=ROUND_HALF_UP)#1% of the picture
+            SmallGrain = Decimal(xyPrecision).quantize(Decimal('.001'),rounding=ROUND_HALF_UP)
             grain = BigGrain
             stepBack = BigGrain
-            x = 0.0 #left-> right
-            y = minY #top-> bottom
+            x = Decimal(0.0).quantize(Decimal('.001'),rounding=ROUND_HALF_UP) #left-> right
+            y = Decimal(minY).quantize(Decimal('.001'),rounding=ROUND_HALF_UP) #top-> bottom
             lastHit = -1
             rowY = 0
             lastY = 0
@@ -450,7 +478,7 @@ class GeometricCamera(morse.sensors.camera.Camera):
             while y < maxY:
                 #if lastHit != -1:
                     #print(lastHit,objects[lastHit])
-                x = 0.0
+                x = Decimal(0.0).quantize(Decimal('.001'),rounding=ROUND_HALF_UP)
                 lastHit = -1
                 while x < 0.9999:
 
@@ -465,11 +493,11 @@ class GeometricCamera(morse.sensors.camera.Camera):
                     #    continue
                     #FDOprint("Hit is", hit)
                     if lastHit == -1:
-                        stepBack=0.0
+                        stepBack=Decimal(0.0).quantize(Decimal('.001'),rounding=ROUND_HALF_UP)
 
-                    if not y in YS:#change to repr(y) if needed
+                    if not float(y) in YS:#change to repr(y) if needed
                         #this is y has just started
-                        YS[y] = {}
+                        YS[float(y)] = {}
 
                     newState = not(hit == lastHit)
 
@@ -477,7 +505,7 @@ class GeometricCamera(morse.sensors.camera.Camera):
                         #FDOprint(hit, "is a new state")
                         if lastHit == -1:#a new line
                             #FDOprint('lastHit is -1')
-                            YS[y][repr(hit)] = [x,None,self.distance_to_xy(x,y,minDepth,maxDepth,grainSize=depthGrain),None]
+                            YS[float(y)][repr(hit)] = [float(x),None,self.distance_to_xy(x+grain,y,minDepth,maxDepth,grainSize=depthGrain),None,self.getScreenVector(x,y),None]
 
                             #FDOprint(YS, "AFTER -1")
                             #objects[repr(hit)][repr(y)] = [x,None]
@@ -497,26 +525,28 @@ class GeometricCamera(morse.sensors.camera.Camera):
                             #record (x,y)
                             #print("n-", lastHit, objects[lastHit])
                             #FDOprint("X-", lastHit, y,x-grain, hit, y,x)
-                            if repr(lastHit) in YS[y]:#if there is already an entry for this line with that object
+                            if repr(lastHit) in YS[float(y)]:#if there is already an entry for this line with that object
                                 #FDOprint(y, "in", objects[repr(lastHit)])
                                 #FDOprint("so....")
-                                YS[y][repr(lastHit)][1]=x-grain
-                                YS[y][repr(lastHit)][3]=self.distance_to_xy(x-grain,y,minDepth,maxDepth,grainSize=depthGrain)
+                                YS[float(y)][repr(lastHit)][1]=float(x-grain)
+                                YS[float(y)][repr(lastHit)][3]=self.distance_to_xy(x-grain,y,minDepth,maxDepth,grainSize=depthGrain)
+                                YS[float(y)][repr(lastHit)][5]=self.getScreenVector(x-grain,y)
                                 #FDOprint(objects[repr(lastHit)][repr(y)])
                             else:#if this object hasn't been detected on this line
                                 #FDOprint(y, "NOT in", objects[repr(lastHit)])
                                 #FDOprint("so...")
-                                YS[y][repr(lastHit)]=[x-grain,None,None,None]#because it's the most leftest
+                                YS[float(y)][repr(lastHit)]=[float(x-grain),None,None,None,None,None]#because it's the most leftest
                                 #FDOprint(objects[repr(lastHit)][repr(y)])
                             #objects[hit][y] = [x,None] #roughly... it may already have that entry
-                            if repr(hit)  in YS[y]:
+                            if repr(hit)  in YS[float(y)]:
                                 #FDOprint(y, "in2", objects[repr(hit)])
-                                YS[y][repr(hit)][1]=x #this MIGHT be the end of that object, but it's NOT the beggining, thus [1] in [x,None]
-                                YS[y][repr(hit)][3]=self.distance_to_xy(x,y,minDepth,maxDepth,grainSize=depthGrain)
+                                YS[float(y)][repr(hit)][1]=float(x) #this MIGHT be the end of that object, but it's NOT the beggining, thus [1] in [x,None]
+                                YS[float(y)][repr(hit)][3]=self.distance_to_xy(x-grain,y,minDepth,maxDepth,grainSize=depthGrain)
+                                YS[float(y)][repr(hit)][5]=self.getScreenVector(x,y)
                                 #FDOprint("so: ", objects[repr(hit)][repr(y)])
                             else:
                                 #FDOprint(y, "NOT in2", objects[repr(hit)])
-                                YS[y][repr(hit)]=[x,None,self.distance_to_xy(x,y,minDepth,maxDepth,grainSize=depthGrain),None] #if this line is not in there, add it
+                                YS[float(y)][repr(hit)]=[float(x),None,self.distance_to_xy(x+grain,y,minDepth,maxDepth,grainSize=depthGrain),None,self.getScreenVector(x,y),None] #if this line is not in there, add it
                                 #FDOprint("so: ", objects[repr(hit)][repr(y)])
 
                             grain = BigGrain
@@ -554,8 +584,9 @@ class GeometricCamera(morse.sensors.camera.Camera):
                     #if not newState:
                     #    lastHit = hit
                 #FDOprint (YS, "YS...")
-                YS[y][repr(hit)][1]=x#The end (most right) of that line
-                YS[y][repr(hit)][3]=self.distance_to_xy(x,y,minDepth,maxDepth,grainSize=depthGrain)
+                YS[float(y)][repr(hit)][1]=float(x)#The end (most right) of that line
+                YS[float(y)][repr(hit)][3]=self.distance_to_xy(x-grain,y,minDepth,maxDepth,grainSize=depthGrain)
+                YS[float(y)][repr(hit)][5]=self.getScreenVector(x,y)
                 #FDOprint("End of the line", objects[repr(hit)][repr(y)], "for", hit, "and", y)
                 #FDOlastY = y
 
@@ -565,7 +596,7 @@ class GeometricCamera(morse.sensors.camera.Camera):
             #print(type(list(YS.keys())[0]))
             #self.completed(status.SUCCESS,"data sent")
             out_q.put(YS)
-
+        morse.sensors.camera.Camera.default_action(self)
         start = time.time()
         out_q = mp.Queue()
         procs = []
@@ -1140,7 +1171,7 @@ class GeometricCamera(morse.sensors.camera.Camera):
 
         Implements the component behaviour
         """
-        morse.sensors.camera.Camera.default_action(self)
+        #morse.sensors.camera.Camera.default_action(self)
                
         #x = numpy.array(morse.core.blenderapi.cameras()[self.name()].source.image)
         #pyplot.imsave('abc.png',x)

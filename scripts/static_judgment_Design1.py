@@ -121,22 +121,27 @@ class MyModel(ACTR):
 
 
     def setup_three(goal='setup:three', b_motor='width:?w depth:?d'):
-        vision_module.find_feature(feature='opening',depth=d)
+        vision_module.find_feature(feature='opening',depth=d,width=w)
         goal.set('setup:four')
 
 
     def setup_four(goal='setup:four',b_vision1='opening:?opening',b_motor='width:?w depth:?d'):
         #b_motor should be put into another buffer or refreshed
-        vision_module.check_match(opening=opening,width=w)
+        #print("opening", opening)
+        #vision_module.check_match(opening=opening,width=w)
+        #print('setup four', opening, w)
+        print("Agent Response: Yes")
+        goal.set('printState')
+
+    def setup_four_fail(goal='setup:four', vision_module='error:True'):
+        print("Agent Response: No")
         goal.set('stop')
 
     def setup_five(goal='setup:five',b_motor='feature:rotation bone:torso rotation0:?rZero rotation1:?rOne rotation2:?rTwo'):
-        b_cue.chunk['rotation0'] = rZero
-        b_cue.chunk['bone'] = 'torso'
-        b_cue.chunk['feature'] = 'rotation'
-        #b_cue.set(b_cue.chunk + 'rotation0:' + rZero)
-        print(b_cue.chunk)
-        DM.add(b_cue.chunk)
+        pass
+
+    def print_motor_state(goal='printState'):
+        motor_module.print_state()
         goal.set('stop')
 
 # '''Notes:
