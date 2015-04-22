@@ -136,13 +136,15 @@ class morse_middleware():
         self.mustTick = self.active
         #print("setting mustTrick", self.mustTick)
         #print("Sending...", self.action_dict[datastr][1], argslist)
-        rStr = self.action_dict[datastr][0] + self.action_dict[datastr][1] + '(' + ','.join(argslist) + ').result()'
+        rStr = self.action_dict[datastr][0] + self.action_dict[datastr][1] + '(' + ','.join(argslist) + ')'
         try:
             with time_limit(2):
                 result = eval(rStr)
+                result = result.result()
         except TimeoutException:
-            for x in range(10000):
-                robot_simulation.tick()
+            robot_simulation.sleep(1)
+            robot_simulation.tick()
+            robot_simulation.sleep(1)
 
             return self.request(datastr,argslist)
 

@@ -596,6 +596,8 @@ class GeometricCamera(morse.sensors.camera.Camera):
             #print(type(list(YS.keys())[0]))
             #self.completed(status.SUCCESS,"data sent")
             out_q.put(YS)
+        #time.sleep(1.0)
+        #return {'0.455': {'LeftWall': [0.516, 1.006, 6.919999999999996, 10.409999999999997, 6.230040976114821, 49.26413018073574]}}
         morse.sensors.camera.Camera.default_action(self)
         start = time.time()
         out_q = mp.Queue()

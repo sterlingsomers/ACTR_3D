@@ -45,11 +45,11 @@ class MotorMonitor(ccm.ProductionSystem):
         print("MONITORING", bb)
 
 class VisionMethods(ccm.ProductionSystem):
-    production_time = 0.10
+    production_time = 0.02
     fake_buffer = Buffer()
     
     def init():
-        fake_buffer.set('nonono')#should be 'fake'
+        fake_buffer.set('fake')#should be 'fake'
 
     def repeat(fake_buffer='fake'):
         #This could be used during movement, actively doing the task
@@ -109,7 +109,7 @@ class MyModel(ACTR):
         #DM.add('planning_unit:prepare_for_Take_off unit_task:starter cue:break_on')
         #mm.fake_buffer.set('walk:true speed:slow')
         b_count.set('value:0')
-        goal.set('setup:zero')
+        #goal.set('setup:zero')
 
 
 
