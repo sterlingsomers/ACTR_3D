@@ -49,7 +49,7 @@ class VisionMethods(ccm.ProductionSystem):
     fake_buffer = Buffer()
     
     def init():
-        fake_buffer.set('nonono')#should be 'fake'
+        fake_buffer.set('fake')#should be 'fake'
 
     def repeat(fake_buffer='fake'):
         #This could be used during movement, actively doing the task
@@ -107,14 +107,14 @@ class MyModel(ACTR):
         DM.add('planning_unit:assess_width unit_task:assess_width')
               
         #DM.add('planning_unit:prepare_for_Take_off unit_task:starter cue:break_on')
-        #mm.fake_buffer.set('walk:true speed:slow')
+        mm.fake_buffer.set('walk:true speed:slow')
         b_count.set('value:0')
         goal.set('setup:zero')
 
 
 
     ######Calibration########
-    def setup_zero_stop(goal='setup:zero',b_count='value:10'):
+    def setup_zero_stop(goal='setup:zero',b_count='value:15'):
         #goal.set('stop')
 
         b_plan_unit.set('planning_unit:find_target')
@@ -122,7 +122,7 @@ class MyModel(ACTR):
         b_operator.set('operator:none')
         goal.clear()
 
-    def setup_zero(goal='setup:zero',b_count='value:!10'):
+    def setup_zero(goal='setup:zero',b_count='value:!15'):
         b_unit_task.set('type:posture standing:true walkable:true minimal_width:true')
         motor_module.send('lower_arms')
         goal.set('setup:one')

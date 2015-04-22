@@ -30,6 +30,24 @@ from mathutils import Vector
 
 from morse.core.services import service, async_service
 from morse.core import status
+
+
+import signal
+from contextlib import contextmanager
+
+class TimeoutException(Exception): pass
+
+@contextmanager
+def time_limit(seconds):
+    def signal_handler(signum, frame):
+        print("Time out!")
+        raise TimeoutException
+    signal.signal(signal.SIGALRM, signal_handler)
+    signal.alarm(seconds)
+    try:
+        yield
+    finally:
+        signal.alarm(0)
 #from morse.helpers.components import add_data, add_property
 
 class GeometricCamera(morse.sensors.camera.Camera):
@@ -160,26 +178,26 @@ class GeometricCamera(morse.sensors.camera.Camera):
         #        amt = amt + grainSize/10.0
         #if y == 0.500:
         #   pdb.set_trace()
-        if y == 0.500:
-            print("Start.", x,y,minD,bigGrain)
+        #if y == 0.500:
+            #print("Start.", x,y,minD,bigGrain)
 
         while minD <= maxD:
             hit = self.blender_cam.getScreenRay(x,y,minD,"object")
             if not hit == None:
                 if bigGrain == grainSize:
-                    if y == 0.500:
-                        print("Here1",x,y,minD,bigGrain)
+                    #if y == 0.500:
+                        #print("Here1",x,y,minD,bigGrain)
                     return float(minD)
                 else:
-                    if y == 0.500:
-                        print("here2", x, y, minD,bigGrain)
+                    #if y == 0.500:
+                        #print("here2", x, y, minD,bigGrain)
                     minD -= bigGrain
                     bigGrain = bigGrain/10.0
-                    if y == 0.500:
-                        print("Here3", x,y,minD,bigGrain)
+                    #if y == 0.500:
+                        #print("Here3", x,y,minD,bigGrain)
             minD+=float(bigGrain)
-            if y == 0.500:
-                print("Here4",x,y,minD,bigGrain)
+            #if y == 0.500:
+               # print("Here4",x,y,minD,bigGrain)
         return float(maxD)
     # @service
     # def distance_to_xy(self,x,y,minD,maxD,grainSize=0.01):
@@ -587,6 +605,7 @@ class GeometricCamera(morse.sensors.camera.Camera):
                 YS[float(y)][repr(hit)][1]=float(x)#The end (most right) of that line
                 YS[float(y)][repr(hit)][3]=self.distance_to_xy(x-grain,y,minDepth,maxDepth,grainSize=depthGrain)
                 YS[float(y)][repr(hit)][5]=self.getScreenVector(x,y)
+                #print("ADFASDFASFASDF")
                 #FDOprint("End of the line", objects[repr(hit)][repr(y)], "for", hit, "and", y)
                 #FDOlastY = y
 
@@ -596,24 +615,33 @@ class GeometricCamera(morse.sensors.camera.Camera):
             #print(type(list(YS.keys())[0]))
             #self.completed(status.SUCCESS,"data sent")
             out_q.put(YS)
-        morse.sensors.camera.Camera.default_action(self)
-        start = time.time()
-        out_q = mp.Queue()
-        procs = []
+        #time.sleep(1.0)
+        #return {'0.455': {'LeftWall': [0.516, 1.006, 6.919999999999996, 10.409999999999997, 6.230040976114821, 49.26413018073574]}}
 
-        for i in range(processes):
-            p = mp.Process(target=worker,args=(i/processes,i/processes+(1/processes),out_q))
-            procs.append(p)
-            p.start()
+        try:
+            with time_limit(1):
 
-        resultdict = {}
-        for i in range(processes):
-                resultdict.update(out_q.get())
+                morse.sensors.camera.Camera.default_action(self)
+                start = time.time()
+                out_q = mp.Queue()
+                procs = []
 
-        for p in procs:
-            p.join()
-        print(time.time() - start, ": TIME")
-        return resultdict
+                for i in range(processes):
+                    p = mp.Process(target=worker,args=(i/processes,i/processes+(1/processes),out_q))
+                    procs.append(p)
+                    p.start()
+
+                resultdict = {}
+                for i in range(processes):
+                        resultdict.update(out_q.get())
+
+                for p in procs:
+                    p.join()
+                print(time.time() - start, ": TIME")
+                return resultdict
+        except TimeoutException:
+            return self.scan_image_multi(ystart=0.0,ystop=1.0,xstart=0.0,xstop=1.0,xyGrain=0.01,xyPrecision=0.002,depthGrain=0.01,minDepth=0.01,maxDepth=50,processes=8)
+
 
 
 

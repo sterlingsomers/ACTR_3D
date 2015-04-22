@@ -123,6 +123,7 @@ class morse_middleware():
     def request(self, datastr, argslist):
        
         print("Trying to request", datastr)
+        self.robot_simulation.tick()
         #print("mustTick", self.mustTick)
         result = None
         if not type(argslist) == list:
@@ -133,17 +134,27 @@ class morse_middleware():
             raise Exception(datastr + " is not in request_dict. Command does not exist or must be added.")
         if self.mustTick:
             raise Exception("Blocking request already made.")#make something more informative        
-        self.mustTick = self.active
+        self.mustTick = True
         #print("setting mustTrick", self.mustTick)
         #print("Sending...", self.action_dict[datastr][1], argslist)
         rStr = self.action_dict[datastr][0] + self.action_dict[datastr][1] + '(' + ','.join(argslist) + ').result()'
         try:
-            with time_limit(2):
+            with time_limit(1):
                 result = eval(rStr)
-        except TimeoutException:
-            for x in range(10000):
-                robot_simulation.tick()
+                print("Here")
+                #result = result()
+                self.robot_simulation.tick()
+                self.mustTick=False
+                print("Result:",result)
+                return result
 
+                print("Here")
+
+                result = result.result()
+                print("Here2")
+        except TimeoutException:
+            self.mustTick=False
+            self.robot_simulation.tick()
             return self.request(datastr,argslist)
 
         print("Recieved", result)

@@ -9,6 +9,24 @@ from morse.core import blenderapi
 import bpy
 import bge
 
+import signal
+from contextlib import contextmanager
+
+class TimeoutException(Exception): pass
+
+@contextmanager
+def time_limit(seconds):
+    def signal_handler(signum, frame):
+        print("Time out!")
+        raise TimeoutException
+    signal.signal(signal.SIGALRM, signal_handler)
+    signal.alarm(seconds)
+    try:
+        yield
+    finally:
+        signal.alarm(0)
+
+
 class Manny(morse.core.robot.Robot):
     """ 
     Class definition for the Manny robot.
@@ -40,6 +58,8 @@ class Manny(morse.core.robot.Robot):
         #         self.module_map['robot.torso'] = child
         self.func_map = {}
         self.func_map['move_forward'] = self
+        self.func_map['getBbones'] = self
+        self.func_map['getBoundingBox'] = self
 
 
 
@@ -66,9 +86,16 @@ class Manny(morse.core.robot.Robot):
 
     @service
     def accept_data_request(self,queue):
+        response = {}
         for item in queue:
             meth = getattr(self.func_map[item[0]],item[0])
-            meth(**item[1])
+            try:
+                with time_limit(2):
+                    print("FUNC MAP",self.func_map[item[0]])
+                    meth(**item[1])
+            except TimeoutException:
+                meth(**item[1])
+
 
 
     @service
@@ -83,32 +110,36 @@ class Manny(morse.core.robot.Robot):
 
     @service
     def getBoundingBox(self):
+        try:
+            with time_limit(1):
 
-        children = self.bge_object.childrenRecursive
-        children.append(self.bge_object)
-        #print("self", self.bge_object)
-        vxlist = []
-        vylist = []
-        vzlist = []
-        for child in children:#self.bge_object.childrenRecursive:
-            #print(child)
-            if "part" in child.name or child.name == 'robot':
-                #print(child)
-                for mesh in child.meshes:
+                children = self.bge_object.childrenRecursive
+                children.append(self.bge_object)
+                #print("self", self.bge_object)
+                vxlist = []
+                vylist = []
+                vzlist = []
+                for child in children:#self.bge_object.childrenRecursive:
+                    #print(child)
+                    if "part" in child.name or child.name == 'robot':
+                        #print(child)
+                        for mesh in child.meshes:
 
-                    for m_index in range(len(mesh.materials)):
-                        for v_index in range(mesh.getVertexArrayLength(m_index)):
-                            vertex = mesh.getVertex(m_index,v_index)
-                            vertex = child.worldTransform * vertex.getXYZ()
+                            for m_index in range(len(mesh.materials)):
+                                for v_index in range(mesh.getVertexArrayLength(m_index)):
+                                    vertex = mesh.getVertex(m_index,v_index)
+                                    vertex = child.worldTransform * vertex.getXYZ()
 
-                            vx,vy,vz = vertex[0],vertex[1],vertex[2]
-                            vxlist.append(vx)
-                            vylist.append(vy)
-                            vzlist.append(vz)
+                                    vx,vy,vz = vertex[0],vertex[1],vertex[2]
+                                    vxlist.append(vx)
+                                    vylist.append(vy)
+                                    vzlist.append(vz)
 
-        #print(max(vxlist),min(vxlist),max(vylist),min(vylist),max(vzlist),min(vzlist))
-        #return self.bge_object.worldOrientation
-        return [max(vxlist)-min(vxlist),max(vylist)-min(vylist),max(vzlist)-min(vzlist)]
+                #print(max(vxlist),min(vxlist),max(vylist),min(vylist),max(vzlist),min(vzlist))
+                #return self.bge_object.worldOrientation
+                return [max(vxlist)-min(vxlist),max(vylist)-min(vylist),max(vzlist)-min(vzlist)]
+        except TimeoutException:
+            return self.getBoundingBox()
 
 
         ####vxlist = []
