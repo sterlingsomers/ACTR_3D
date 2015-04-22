@@ -139,7 +139,7 @@ class morse_middleware():
         #print("Sending...", self.action_dict[datastr][1], argslist)
         rStr = self.action_dict[datastr][0] + self.action_dict[datastr][1] + '(' + ','.join(argslist) + ').result()'
         try:
-            with time_limit(2):
+            with time_limit(1):
                 result = eval(rStr)
                 print("Here")
                 #result = result()
