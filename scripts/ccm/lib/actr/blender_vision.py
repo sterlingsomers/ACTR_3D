@@ -16,6 +16,10 @@ import math
 
 from decimal import *
 
+
+import threading
+import inspect
+
 #vision_cam = ccm.middle.robot.GeometricCamerav1
 #from test2 import simu
 
@@ -55,6 +59,8 @@ class BlenderVision(ccm.Model):
         self._screenCenter = numpy.arange(Decimal(0.30),Decimal(0.60),Decimal(0.002))
         self._screenRight = numpy.arange(Decimal(0.0),Decimal(0.30),Decimal(0.002))
         self._internalChunks.append(ccm.Model(isa='dial'))
+
+        self.function_map = {'scan':['scan_image_multi',{}]}
 
         #self._internalEnvironment = InternalEnvironment(self._b1)
         #self._internalEnvironment.doConvert(parent=self)
@@ -331,7 +337,7 @@ class BlenderVision(ccm.Model):
         '''Uses numpy for now.'''
         #Forces a scan first
         self._oldopenings = self._openings
-        self.scan()
+        #self.scan()
         openings = {}
 
         fullRange = numpy.array([])
@@ -406,7 +412,14 @@ class BlenderVision(ccm.Model):
 
         #'scan_image' will now use scan_image_multi
         #a new multiprocessing version of scan_image
-        self._objects = middleware.request('scan_image',[])
+        #print("STACK:",inspect.stack()[0][3])
+        thread = threading.Thread(target=self.threaded_scan,args=['scan',delay])
+        middleware.threads.append(thread)
+        thread.start()
+
+    def threaded_scan(self,function_name,delay=0.00):
+
+        self._objects = middleware.request(self.function_map[function_name][0])[self.function_map[function_name][0]]
 
         ###!!!Note the keys here are strings, not floats
         ###!!Converti them to float below

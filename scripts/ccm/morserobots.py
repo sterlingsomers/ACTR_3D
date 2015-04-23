@@ -2,6 +2,7 @@ from .morseconnection import *
 #import morseconnection
 import time
 
+import threading
 
 import signal
 from contextlib import contextmanager
@@ -30,6 +31,9 @@ class morse_middleware():
             raise Exception("pymorse was not detected, or connection was not successful.")
 
         self.robot_simulation = robot_simulation
+        self.return_data = {}
+        self.threads = []
+        self.completed = False
         self.mustTick = False
         self.active=False
         self.modes = ['best_effort']
@@ -112,57 +116,91 @@ class morse_middleware():
     #                 #print(rStr)
     #                 eval(rStr)
                                 
-            
+    def wait_for_data(self):
+        #print("return data...", self.return_data)
+        #print("threads...", self.threads)
+
+        try:
+            while not len(self.return_data) == len(self.threads):
+                time.sleep(0.01)
+                print("Waiting...", self.return_data, self.threads)
+        except TypeError:
+            self.return_data = self.return_data.result()
+            if not len(self.return_data) == len(self.threads):
+                self.wait_for_data()
+
+
+        print("return data...", self.return_data)
+        if len(self.return_data) == len(self.threads):
+            self.completed = True
+
+
     def send(self,function_name,**kwargs):
 
 
         self.send_queue.append([function_name,kwargs])
 
 
-        
-    def request(self, datastr, argslist):
-       
-        print("Trying to request", datastr)
-        self.robot_simulation.tick()
-        #print("mustTick", self.mustTick)
-        result = None
-        if not type(argslist) == list:
-            raise Exception("argslist parameter must be a list")
-        if not all(isinstance(x,str) for x in argslist):
-            raise Exception("All arguments have to be strings")
-        if not datastr in self.request_dict:
-            raise Exception(datastr + " is not in request_dict. Command does not exist or must be added.")
-        if self.mustTick:
-            raise Exception("Blocking request already made.")#make something more informative        
-        self.mustTick = True
-        #print("setting mustTrick", self.mustTick)
-        #print("Sending...", self.action_dict[datastr][1], argslist)
-        rStr = self.action_dict[datastr][0] + self.action_dict[datastr][1] + '(' + ','.join(argslist) + ').result()'
-        try:
-            with time_limit(1):
-                result = eval(rStr)
-                print("Here")
-                #result = result()
-                self.robot_simulation.tick()
-                self.mustTick=False
-                print("Result:",result)
-                return result
+    def request(self,function_name,**kwargs):
+        print("requesting...")
+        self.completed = False
+        self.return_data = {}
+        self.request_queue.append([function_name,kwargs])
+        thread = threading.Thread(target=self.wait_for_data)
+        thread.start()
+        thread.join()
+        while not self.completed:
 
-                print("Here")
+            pass
 
-                result = result.result()
-                print("Here2")
-        except TimeoutException:
-            self.mustTick=False
-            self.robot_simulation.tick()
-            return self.request(datastr,argslist)
+        print("RETURN DATA",self.return_data)
+        if
+        return self.return_data
 
-        print("Recieved", result)
-        #if 'return' in dir(result):
-        #    result = result.result()
-        #while result == None:
-        #   time.sleep(0.0001)
-        return result
+
+    # def request(self, datastr, argslist):
+    #
+    #     print("Trying to request", datastr)
+    #     self.robot_simulation.tick()
+    #     #print("mustTick", self.mustTick)
+    #     result = None
+    #     if not type(argslist) == list:
+    #         raise Exception("argslist parameter must be a list")
+    #     if not all(isinstance(x,str) for x in argslist):
+    #         raise Exception("All arguments have to be strings")
+    #     if not datastr in self.request_dict:
+    #         raise Exception(datastr + " is not in request_dict. Command does not exist or must be added.")
+    #     if self.mustTick:
+    #         raise Exception("Blocking request already made.")#make something more informative
+    #     self.mustTick = True
+    #     #print("setting mustTrick", self.mustTick)
+    #     #print("Sending...", self.action_dict[datastr][1], argslist)
+    #     rStr = self.action_dict[datastr][0] + self.action_dict[datastr][1] + '(' + ','.join(argslist) + ').result()'
+    #     try:
+    #         with time_limit(1):
+    #             result = eval(rStr)
+    #             print("Here")
+    #             #result = result()
+    #             self.robot_simulation.tick()
+    #             self.mustTick=False
+    #             print("Result:",result)
+    #             return result
+    #
+    #             print("Here")
+    #
+    #             result = result.result()
+    #             print("Here2")
+    #     except TimeoutException:
+    #         self.mustTick=False
+    #         self.robot_simulation.tick()
+    #         return self.request(datastr,argslist)
+    #
+    #     print("Recieved", result)
+    #     #if 'return' in dir(result):
+    #     #    result = result.result()
+    #     #while result == None:
+    #     #   time.sleep(0.0001)
+    #     return result
 
 
 
@@ -177,7 +215,64 @@ class morse_middleware():
     def reset(self):
         self.robot_simulation.reset()
 
+    def handle_request(self):
+        self.return_data = self.robot_simulation.robot.accept_data_request(self.request_queue)
+        time.sleep(0.001)
+
+
     def tick(self,sync=False):
+        #eimport time
+        if self.mode == 'best_effort':
+            #print("mustTick - in tick", self.mustTick)
+            self.mustTick = False
+            #print("mustTick - in tick 2", self.mustTick)
+            self.modules_in_use = {}
+            self.completed = False
+            #self.return_data = {}
+            for rate in range(self.rate):
+                print("Middleware tick!")
+                print("Request Queue:", self.request_queue)
+                print("Send Queue:",self.send_queue)
+                #send a tick to the simulator
+                self.robot_simulation.tick()
+
+                if self.send_queue:
+                    try:
+                        with time_limit(1):
+                            self.robot_simulation.robot.accept_send_request(self.send_queue)
+                    except TimeoutException:
+                        pass#self.robot_simulation.tick()
+                    self.send_queue = []
+
+
+                if self.request_queue:
+                    try:
+                        with time_limit(1):
+                            print("calling accept_data_request", self.request_queue)
+                            thread = threading.Thread(target=self.handle_request)
+                            thread.start()
+                            thread.join()
+                            while not self.completed:
+                                time.sleep(0.01)
+
+                            #self.return_data = self.robot_simulation.robot.accept_data_request(self.request_queue)
+
+                    except TimeoutException:
+                        print("timeout in tick()")
+
+                    self.request_queue = []
+                    self.threads = []
+                    self.completed = False
+
+
+
+                #print("TIME:",self.robot_simulation.time())
+                #time.sleep(0.01)
+
+            if self.send_queue:
+                raise Exception("Send queue not clear. Too many commands per cycle.")
+
+    def tick2(self,sync=False):
         #eimport time
         if self.mode == 'best_effort':
             #print("mustTick - in tick", self.mustTick)

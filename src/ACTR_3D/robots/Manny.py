@@ -58,7 +58,7 @@ class Manny(morse.core.robot.Robot):
         #         self.module_map['robot.torso'] = child
         self.func_map = {}
         self.func_map['move_forward'] = self
-        self.func_map['getBbones'] = self
+        self.func_map['getBones'] = self
         self.func_map['getBoundingBox'] = self
 
 
@@ -86,19 +86,26 @@ class Manny(morse.core.robot.Robot):
 
     @service
     def accept_data_request(self,queue):
+
+        print("ACCEPT DATA REQUEST", queue)
         response = {}
+
         for item in queue:
+            print(item[0])
             meth = getattr(self.func_map[item[0]],item[0])
             try:
                 with time_limit(2):
                     print("FUNC MAP",self.func_map[item[0]])
-                    meth(**item[1])
+
+                    response[item[0]] = meth(**item[1])
+                    print("RESPONSE...",response)
             except TimeoutException:
-                meth(**item[1])
+                pass
+        return response
 
 
 
-    @service
+
     def getBones(self):
         children = self.bge_object.childrenRecursive
         children.append(self.bge_object)
@@ -108,7 +115,7 @@ class Manny(morse.core.robot.Robot):
                 returnList.append(child.name)
         return returnList
 
-    @service
+
     def getBoundingBox(self):
         try:
             with time_limit(1):
