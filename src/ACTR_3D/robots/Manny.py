@@ -66,9 +66,11 @@ class Manny(morse.core.robot.Robot):
     @service
     def accept_send_request(self,queue):
         print("QUEUE...", queue)
+        x = None
         for item in queue:
             meth = getattr(self.func_map[item[0]],item[0])
-            meth(**item[1])
+            x = meth(**item[1])
+        return x
         #import math
         # self.robot_children[0].lower_arms()
         # self.robot_children[0].set_rotation('ribs',1,math.radians(90))

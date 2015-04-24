@@ -8,15 +8,21 @@ from subprocess import call
 import os
 import time
 import subprocess
+from subprocess import *
+from sys import executable
 import shlex
 
 
 
-# os.chdir('/home/sterling/morse/projects')
-# subprocess.Popen(shlex.split('morse run ACTR_3D'), stdout=subprocess.PIPE)
-# #call(['morse','run','ACTR_3D'])
-# time.sleep(3)
-# os.chdir('/home/sterling/morse/projects/ACTR_3D/scripts')
+os.chdir('/home/sterling/morse/projects')
+#subprocess.Popen('morse run ACTR_3D', shell=True, creationflags=subprocess.CREATE_NEW_CONSOLE)
+#p = subprocess.Popen('ls', shell=True, stdout=subprocess.STDOUT, stderr=subprocess.STDOUT)
+#p.communicate()[0]
+#subprocess.Popen(shlex.split('morse run ACTR_3D'), stdout=subprocess.PIPE,shell=True)
+#call(['morse','run','ACTR_3D'])
+Popen(['gnome-terminal', '--command=morse run ACTR_3D'], stdin=PIPE)
+time.sleep(3)
+os.chdir('/home/sterling/morse/projects/ACTR_3D/scripts')
 
 
 
@@ -52,7 +58,7 @@ class MotorMonitor(ccm.ProductionSystem):
         print("MONITORING", bb)
 
 class VisionMethods(ccm.ProductionSystem):
-    production_time = 0.10
+    production_time = 0.01
     fake_buffer = Buffer()
     
     def init():
@@ -94,11 +100,11 @@ class MyModel(ACTR):
     b_vision1 = Buffer()
     b_vision2 = Buffer()
     #vm = SOSVision(b_vision)    
-    vision_module = BlenderVision(b_vision1,b_vision2)
+    vision_module = BlenderVision(b_vision1,b_vision2,sync=False)
     #p_vision=VisionModule(b_vision1)
 
 
-    motor_module = BlenderMotorModule(b_motor)
+    motor_module = BlenderMotorModule(b_motor,sync=False)
     
     vm = VisionMethods()
     mm = MotorMethods()
@@ -110,7 +116,10 @@ class MyModel(ACTR):
 
     b_count=Buffer()
 
+
+
     def init():
+
         DM.add('planning_unit:find_target unit_task:find_target')
         DM.add('planning_unit:assess_width unit_task:assess_width')
               
@@ -122,15 +131,15 @@ class MyModel(ACTR):
 
 
     ######Calibration########
-    def setup_zero_stop(goal='setup:zero',b_count='value:15'):
-        #goal.set('stop')
+    def setup_zero_stop(goal='setup:zero',b_count='value:16'):
+        goal.set('stop')
 
-        b_plan_unit.set('planning_unit:find_target')
-        b_unit_task.set('unit_task:none')
-        b_operator.set('operator:none')
-        goal.clear()
+        #b_plan_unit.set('planning_unit:find_target')
+        #b_unit_task.set('unit_task:none')
+        #b_operator.set('operator:none')
+        #goal.clear()
 
-    def setup_zero(goal='setup:zero',b_count='value:!15'):
+    def setup_zero(goal='setup:zero',b_count='value:!16'):
         b_unit_task.set('type:posture standing:true walkable:true minimal_width:true')
         motor_module.send('lower_arms')
         goal.set('setup:one')
@@ -310,6 +319,7 @@ class MyModel(ACTR):
 log=ccm.log(html=True)
 model=MyModel()
 model.middleware = middleware
+
 #vInternal = VisualEnvironment()
 env = MyEnvironment()
 env.agent = model
@@ -322,7 +332,7 @@ model.run(0)
 model.keepAlive = True
 print("Pre-run")
 
-middleware.set_mode('best_effort',2)
+middleware.set_mode('best_effort',2,sync=False)
 
 #best effort will try to clear the stack
 #will tick n times for every tick. the defaul py must be set right.
@@ -337,7 +347,7 @@ while model.keepAlive:
     model.run(0.01)
     print("TICK...................")
 
-    middleware.tick(sync=True)
+    middleware.tick()
 
 
 print("post run")
@@ -353,7 +363,7 @@ del ccm
 #print("here2")
 #middleware.robot_simulation.close()
 #middleware.robot_simulation.close()
-middleware.tick(sync=True)
+middleware.tick()
 middleware.robot_simulation.quit()
 
 

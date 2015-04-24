@@ -17,13 +17,14 @@ from ccm.morserobots import middleware
 
 
 class BlenderMotorModule(ccm.Model):
-    def __init__(self,buffer1,delay=0.0,log=None,delay_sd=None):
+    def __init__(self,buffer1,sync=False,delay=0.0,log=None,delay_sd=None):
         self._b1=buffer1
         #self._b2=buffer2
         self.delay=delay
         self.delay_sd=delay_sd
         self.error=False
         self.busy=False
+        self.sync = sync
         self._internalChunks = []
         self._boundingBox = []
 
@@ -260,11 +261,14 @@ class BlenderMotorModule(ccm.Model):
     def get_bones(self):
         '''This will retrieve all the bones' names'''
         #return middleware.request('get_bones',[])
-        print("before request")
-        thread = threading.Thread(target=self.threaded_get_bones,args=['get_bones'])
-        middleware.threads.append(thread)
-        thread.start()
-        print("after request")
+        if self.sync:
+            print("before request")
+            thread = threading.Thread(target=self.threaded_get_bones,args=['get_bones'])
+            middleware.threads.append(thread)
+            thread.start()
+            print("after request")
+        else:
+            self._bones = middleware.request(self.function_map[inspect.stack()[0][3]][0])[self.function_map[inspect.stack()[0][3]][0]]
 
 
 
@@ -443,10 +447,15 @@ class BlenderMotorModule(ccm.Model):
     def get_bounding_box(self):
 
         #self._boundingBox = [x * 1.00 for x in middleware.request('getBoundingBox', [])]
-        print("STACK:",inspect.stack()[0][3])
-        thread = threading.Thread(target=self.threaded_get_bounding_box,args=['get_bounding_box'])
-        middleware.threads.append(thread)
-        thread.start()
+        if self.sync:
+
+            print(self.parent, "PARENT")
+            print("STACK:",inspect.stack()[0][3])
+            thread = threading.Thread(target=self.threaded_get_bounding_box,args=['get_bounding_box'])
+            middleware.threads.append(thread)
+            thread.start()
+        else:
+            self._boundingBox = middleware.request(self.function_map[inspect.stack()[0][3]][0])[self.function_map[inspect.stack()[0][3]][0]]
 
     def request_bounding_box(self):
         if self.busy:

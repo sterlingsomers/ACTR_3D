@@ -41,11 +41,12 @@ class InternalEnvironment(ccm.Model):
 
 
 class BlenderVision(ccm.Model):
-    def __init__(self,buffer1,buffer2,delay=0.0,log=None,delay_sd=None):
+    def __init__(self,buffer1,buffer2,sync=False,delay=0.0,log=None,delay_sd=None):
         #from ccm.morserobots import middleware
         #self._vision_cam = Morse().robot.GeometricCamerav1
         self._b1=buffer1
         self._b2=buffer2
+        self.sync = sync
         self.delay=delay
         self.delay_sd=delay_sd
         self.error=False
@@ -413,9 +414,13 @@ class BlenderVision(ccm.Model):
         #'scan_image' will now use scan_image_multi
         #a new multiprocessing version of scan_image
         #print("STACK:",inspect.stack()[0][3])
-        thread = threading.Thread(target=self.threaded_scan,args=['scan',delay])
-        middleware.threads.append(thread)
-        thread.start()
+        if self.sync:
+
+            thread = threading.Thread(target=self.threaded_scan,args=['scan',delay])
+            middleware.threads.append(thread)
+            thread.start()
+        else:
+            self._objects = middleware.request(self.function_map[inspect.stack()[0][3]][0])[self.function_map[inspect.stack()[0][3]][0]]
 
     def threaded_scan(self,function_name,delay=0.00):
 
