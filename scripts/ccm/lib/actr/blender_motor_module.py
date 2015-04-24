@@ -7,7 +7,8 @@ from ccm.lib.actr import Buffer
 from ccm.pattern import Pattern
 from decimal import *
 
-import re
+import threading
+import inspect
 
 from ccm.morserobots import middleware
 
@@ -25,7 +26,7 @@ class BlenderMotorModule(ccm.Model):
         self.busy=False
         self._internalChunks = []
         self._boundingBox = []
-        self.get_bounding_box()
+
 
         # self._monitor = MotorMonitor()
                              #internal name  #external       #addition arguments for external
@@ -33,9 +34,11 @@ class BlenderMotorModule(ccm.Model):
                              'lower_arms':['lower_arms',{}],
                              'extend_shoulder':['set_rotation',{'axis':2}],
                              'compress_shoulder':['set_rotation',{'axis':2}],
-                             'move_forward':['move_forward',{}]}
-
-        self._bones = self.get_bones()
+                             'move_forward':['move_forward',{}],
+                             'get_bones':['getBones'],
+                             'get_bounding_box':['getBoundingBox']}
+        self.get_bounding_box()
+        self.get_bones()
                                     #NAME      #min/max by axis: 0, 1, 2
         self._boneProperties = {'part.torso':[[0,0],[-pi/4,pi/4],[0,0]],
                                 'shoulder.L':[[0,0],[0,0],[-pi/6,pi/6]],
@@ -227,6 +230,11 @@ class BlenderMotorModule(ccm.Model):
 
         middleware.send(self.function_map[function_name][0],**kwargs)
 
+    def retrieve(self,function_name,**kwargs):
+
+        func = getattr(self,function_name)
+        func(function_name,**kwargs)
+
 
     def send(self,function_name,**kwargs):
         '''Checks for function_name in motor module. Calls function_name with kwargs on ACTR side.
@@ -244,9 +252,20 @@ class BlenderMotorModule(ccm.Model):
 
         #middleware.send(self.function_map[function_name][0],**kwargs)
 
+    def threaded_get_bones(self,function_name):
+        print("BBONES request", self.function_map[function_name][0])
+        self._bones = middleware.request(self.function_map[function_name][0])[self.function_map[function_name][0]]
+        #print("BBB",self._bones)
+
     def get_bones(self):
         '''This will retrieve all the bones' names'''
-        return middleware.request('get_bones',[])
+        #return middleware.request('get_bones',[])
+        print("before request")
+        thread = threading.Thread(target=self.threaded_get_bones,args=['get_bones'])
+        middleware.threads.append(thread)
+        thread.start()
+        print("after request")
+
 
 
     def rotate_torso(self,function_name,**kwargs):
@@ -416,14 +435,24 @@ class BlenderMotorModule(ccm.Model):
         x = torso.set_rotation('ribs',1,radians).result()
 
             
+    def threaded_get_bounding_box(self,function_name):
+        print("BBOX")
+        self._boundingBox = middleware.request(self.function_map[function_name][0])[self.function_map[function_name][0]]
+        #print("BBOX",self._boundingBox)
+
     def get_bounding_box(self):
-        print("get_bounding_box")
+
+        #self._boundingBox = [x * 1.00 for x in middleware.request('getBoundingBox', [])]
+        print("STACK:",inspect.stack()[0][3])
+        thread = threading.Thread(target=self.threaded_get_bounding_box,args=['get_bounding_box'])
+        middleware.threads.append(thread)
+        thread.start()
+
+    def request_bounding_box(self):
         if self.busy:
             return
 
         self.busy = True
-        self._boundingBox = [x * 1.00 for x in middleware.request('getBoundingBox', [])]
-
         pattern='type:proprioception feature:bounding_box'
         matcher=Pattern(pattern)
         objs = 0

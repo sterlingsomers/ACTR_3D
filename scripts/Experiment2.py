@@ -9,18 +9,11 @@ import os
 import time
 import subprocess
 import shlex
-
-
-
-# os.chdir('/home/sterling/morse/projects')
-# subprocess.Popen(shlex.split('morse run ACTR_3D'), stdout=subprocess.PIPE)
-# #call(['morse','run','ACTR_3D'])
-# time.sleep(3)
-# os.chdir('/home/sterling/morse/projects/ACTR_3D/scripts')
-
-
-
-
+os.chdir('/home/sterling/morse/projects')
+subprocess.Popen(shlex.split('morse run ACTR_3D'), stdout=subprocess.PIPE)
+#call(['morse','run','ACTR_3D'])
+time.sleep(3)
+os.chdir('/home/sterling/morse/projects/ACTR_3D/scripts')
 #import ACT-R Stuff
 import ccm
 
@@ -40,7 +33,7 @@ class MyEnvironment(ccm.Model):
 
 class MotorMonitor(ccm.ProductionSystem):
 
-    production_time = 0.05
+    production_time = 0.01
     fake_buffer = Buffer()
 
     def init():
@@ -60,7 +53,7 @@ class VisionMethods(ccm.ProductionSystem):
 
     def repeat(fake_buffer='fake'):
         #This could be used during movement, actively doing the task
-        print("Producting vision_module.scan()")
+
         self.parent.vision_module.scan()
         #self.parent.vision_module.getScreenVector('0.4999','0.5')    
         #self.parent.vision_module.cScan('0.5')#50cm minimum depth for an opening.
@@ -72,7 +65,6 @@ class MotorMethods(ccm.ProductionSystem):
     fake_buffer = Buffer()
 
     def slow_step(fake_buffer='walk:true speed:slow'):
-        print("producting move_forward")
         motor_module.send('move_forward',amount=0.0645)
 
 
@@ -165,7 +157,6 @@ class MyModel(ACTR):
         #goal.set('stop')
 
     def setup_three(goal='setup:three'):
-        print("Producting get_bounding_box")
         motor_module.get_bounding_box()
         goal.set('setup:four')
 
@@ -218,7 +209,6 @@ class MyModel(ACTR):
                                             b_operator='operator:none'):
 
         #Make sure bounding box is most up to date
-        print("producting get_bounding_box (find opening)")
         motor_module.get_bounding_box()
         b_operator.set('operator:get_body_size')
 
