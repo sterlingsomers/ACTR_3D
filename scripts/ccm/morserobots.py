@@ -33,6 +33,7 @@ class morse_middleware():
         self.robot_simulation = robot_simulation
         self.return_data = {}
         self.threads = []
+        self.can_complete = False
         self.completed = False
         self.mustTick = False
         self.active=False
@@ -120,19 +121,41 @@ class morse_middleware():
         #print("return data...", self.return_data)
         #print("threads...", self.threads)
 
-        try:
-            while not len(self.return_data) == len(self.threads):
-                time.sleep(0.01)
-                print("Waiting...", self.return_data, self.threads)
-        except TypeError:
-            self.return_data = self.return_data.result()
-            if not len(self.return_data) == len(self.threads):
-                self.wait_for_data()
+        while not self.can_complete:
+            pass
+
+        cont = True
+        while cont:
+            try:
+                while not len(self.return_data) == len(self.threads):
+                    pass
+                cont = False
+            except TypeError:
+                self.return_data = self.return_data.result()
 
 
-        print("return data...", self.return_data)
         if len(self.return_data) == len(self.threads):
+            print("set  complete TRUE")
             self.completed = True
+        else:
+            self.wait_for_data()
+
+
+
+
+        # try:
+        #     while not len(self.return_data) == len(self.threads):
+        #         time.sleep(0.01)
+        #         print("Waiting...", self.return_data, self.threads)
+        # except TypeError:
+        #     self.return_data = self.return_data.result()
+        #     if not len(self.return_data) == len(self.threads):
+        #         self.wait_for_data()
+        #
+        #
+        # print("return data...", self.return_data)
+        # if len(self.return_data) == len(self.threads):
+        #     self.completed = True
 
 
     def send(self,function_name,**kwargs):
@@ -149,12 +172,14 @@ class morse_middleware():
         thread = threading.Thread(target=self.wait_for_data)
         thread.start()
         thread.join()
-        while not self.completed:
-
+        while not self.can_complete:
             pass
 
+        while not self.completed:
+            pass
+
+
         print("RETURN DATA",self.return_data)
-        if
         return self.return_data
 
 
@@ -217,7 +242,8 @@ class morse_middleware():
 
     def handle_request(self):
         self.return_data = self.robot_simulation.robot.accept_data_request(self.request_queue)
-        time.sleep(0.001)
+        print("return",self.return_data)
+        #time.sleep(0.001)
 
 
     def tick(self,sync=False):
@@ -231,38 +257,45 @@ class morse_middleware():
             #self.return_data = {}
             for rate in range(self.rate):
                 print("Middleware tick!")
-                print("Request Queue:", self.request_queue)
                 print("Send Queue:",self.send_queue)
+                print("Request Queue:", self.request_queue)
+
                 #send a tick to the simulator
-                self.robot_simulation.tick()
+                #self.robot_simulation.tick()
 
                 if self.send_queue:
                     try:
                         with time_limit(1):
                             self.robot_simulation.robot.accept_send_request(self.send_queue)
                     except TimeoutException:
-                        pass#self.robot_simulation.tick()
+                        print("Time out in SEND")
                     self.send_queue = []
 
-
+                self.robot_simulation.tick()
                 if self.request_queue:
+                    self.can_complete = True
                     try:
                         with time_limit(1):
                             print("calling accept_data_request", self.request_queue)
-                            thread = threading.Thread(target=self.handle_request)
-                            thread.start()
-                            thread.join()
+                            self.return_data = self.robot_simulation.robot.accept_data_request(self.request_queue)
+                            #thread = threading.Thread(target=self.handle_request)
+                            #thread.start()
+                            #thread.join()
                             while not self.completed:
-                                time.sleep(0.01)
+                                pass
+
 
                             #self.return_data = self.robot_simulation.robot.accept_data_request(self.request_queue)
 
                     except TimeoutException:
-                        print("timeout in tick()")
+                        print("Time out in REQUEST")
 
-                    self.request_queue = []
-                    self.threads = []
-                    self.completed = False
+
+                self.request_queue = []
+                self.threads = []
+                self.completed = False
+                self.can_complete = False
+
 
 
 

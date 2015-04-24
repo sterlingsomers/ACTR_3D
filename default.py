@@ -181,7 +181,7 @@ env.select_display_camera(GeometricCamerav1)
 
 #pdb.set_trace()
 #env.set_time_strategy(TimeStrategies.FixedSimulationStepExternalTrigger)
-env.configure_stream_manager('socket',time_sync=True,sync_port=5000)
+#env.configure_stream_manager('socket',time_sync=True,sync_port=5000)
 env.show_framerate(True)
 #env.show_physics(True)
 

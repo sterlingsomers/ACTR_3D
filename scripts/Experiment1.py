@@ -52,7 +52,7 @@ class MotorMonitor(ccm.ProductionSystem):
         print("MONITORING", bb)
 
 class VisionMethods(ccm.ProductionSystem):
-    production_time = 0.01
+    production_time = 0.10
     fake_buffer = Buffer()
     
     def init():
@@ -72,6 +72,7 @@ class MotorMethods(ccm.ProductionSystem):
     fake_buffer = Buffer()
 
     def slow_step(fake_buffer='walk:true speed:slow'):
+        print("producting move_forward")
         motor_module.send('move_forward',amount=0.0645)
 
 
@@ -164,7 +165,7 @@ class MyModel(ACTR):
         #goal.set('stop')
 
     def setup_three(goal='setup:three'):
-        print("Producing get_bounding_box")
+        print("Producting get_bounding_box")
         motor_module.get_bounding_box()
         goal.set('setup:four')
 
@@ -217,6 +218,7 @@ class MyModel(ACTR):
                                             b_operator='operator:none'):
 
         #Make sure bounding box is most up to date
+        print("producting get_bounding_box (find opening)")
         motor_module.get_bounding_box()
         b_operator.set('operator:get_body_size')
 

@@ -100,7 +100,7 @@ class Manny(morse.core.robot.Robot):
                     response[item[0]] = meth(**item[1])
                     print("RESPONSE...",response)
             except TimeoutException:
-                pass
+                print("Timeout in accept_data_request()")
         return response
 
 
