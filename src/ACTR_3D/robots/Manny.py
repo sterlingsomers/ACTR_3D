@@ -70,7 +70,7 @@ class Manny(morse.core.robot.Robot):
         for item in queue:
             meth = getattr(self.func_map[item[0]],item[0])
             x = meth(**item[1])
-        return x
+        return 1
         #import math
         # self.robot_children[0].lower_arms()
         # self.robot_children[0].set_rotation('ribs',1,math.radians(90))

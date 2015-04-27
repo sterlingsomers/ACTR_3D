@@ -14,15 +14,19 @@ import shlex
 
 
 
-os.chdir('/home/sterling/morse/projects')
-#subprocess.Popen('morse run ACTR_3D', shell=True, creationflags=subprocess.CREATE_NEW_CONSOLE)
-#p = subprocess.Popen('ls', shell=True, stdout=subprocess.STDOUT, stderr=subprocess.STDOUT)
-#p.communicate()[0]
-#subprocess.Popen(shlex.split('morse run ACTR_3D'), stdout=subprocess.PIPE,shell=True)
-#call(['morse','run','ACTR_3D'])
-Popen(['gnome-terminal', '--command=morse run ACTR_3D'], stdin=PIPE)
-time.sleep(3)
-os.chdir('/home/sterling/morse/projects/ACTR_3D/scripts')
+
+if not os.path.isfile('check.ck'):
+    os.chdir('/home/sterling/morse/projects')
+    #subprocess.Popen('morse run ACTR_3D', shell=True, creationflags=subprocess.CREATE_NEW_CONSOLE)
+    #p = subprocess.Popen('ls', shell=True, stdout=subprocess.STDOUT, stderr=subprocess.STDOUT)
+    #p.communicate()[0]
+    #subprocess.Popen(shlex.split('morse run ACTR_3D'), stdout=subprocess.PIPE,shell=True)
+    #call(['morse','run','ACTR_3D'])
+    Popen(['gnome-terminal', '--command=morse run ACTR_3D'], stdin=PIPE)
+    time.sleep(3)
+    os.chdir('/home/sterling/morse/projects/ACTR_3D/scripts')
+    f = open('check.ck', 'w')
+    f.close()
 
 
 
@@ -35,13 +39,13 @@ from ccm.lib.actr import *
 from ccm.lib.actr.blender_vision import BlenderVision
 from ccm.lib.actr.blender_motor_module import BlenderMotorModule
 
+
 from ccm.morserobots import middleware
 
 class MyEnvironment(ccm.Model):
     v1 = ccm.Model(isa='dial')
 
-#class VisionModule(ccm.Model):
-#    poop=ccm.Model(isa='dial',value=-1000)
+
 
 
 class MotorMonitor(ccm.ProductionSystem):
@@ -62,7 +66,7 @@ class VisionMethods(ccm.ProductionSystem):
     fake_buffer = Buffer()
     
     def init():
-        fake_buffer.set('fake')#should be 'fake'
+        fake_buffer.set('none')#should be 'fake'
 
     def repeat(fake_buffer='fake'):
         #This could be used during movement, actively doing the task
@@ -75,14 +79,26 @@ class VisionMethods(ccm.ProductionSystem):
 
 class MotorMethods(ccm.ProductionSystem):
     production_time = 0.050
-    fake_buffer = Buffer()
+    #fake_buffer = Buffer()
 
-    def slow_step(fake_buffer='walk:true speed:slow'):
+
+
+    def slow_step(b_motor_command='walk:true speed:slow'):
         print("producting move_forward")
         motor_module.send('move_forward',amount=0.0645)
 
 
 
+class timeKeeper(ccm.Model):
+
+
+
+    def record_stop(self,now):
+        log.stop = now
+
+    def record_start(self,now):
+
+        log.start = now
 
 
 
@@ -107,7 +123,9 @@ class MyModel(ACTR):
     motor_module = BlenderMotorModule(b_motor,sync=False)
     
     vm = VisionMethods()
-    mm = MotorMethods()
+
+    b_motor_command = Buffer()
+    mm = MotorMethods(b_motor_command)
 
     
     DMbuffer=Buffer()
@@ -116,12 +134,13 @@ class MyModel(ACTR):
 
     b_count=Buffer()
 
-
+    timeKeep = timeKeeper()
 
     def init():
-
+        import math
         DM.add('planning_unit:find_target unit_task:find_target')
         DM.add('planning_unit:assess_width unit_task:assess_width')
+
               
         #DM.add('planning_unit:prepare_for_Take_off unit_task:starter cue:break_on')
         #mm.fake_buffer.set('walk:true speed:slow')
@@ -131,20 +150,27 @@ class MyModel(ACTR):
 
 
     ######Calibration########
-    def setup_zero_stop(goal='setup:zero',b_count='value:16'):
-        goal.set('stop')
-
+    def setup_zero_stop(goal='setup:zero',b_count='value:10'):
+        b_plan_unit.set('planning_unit:walk_through_apeture')
+        b_unit_task.set('unit_task:walk posture:standing')
+        b_operator.set('operator:start_walking')
+        goal.clear()
+        #goal.set('stop')
         #b_plan_unit.set('planning_unit:find_target')
         #b_unit_task.set('unit_task:none')
         #b_operator.set('operator:none')
         #goal.clear()
 
-    def setup_zero(goal='setup:zero',b_count='value:!16'):
+    def setup_zero(goal='setup:zero',b_count='value:!10'):
         b_unit_task.set('type:posture standing:true walkable:true minimal_width:true')
         motor_module.send('lower_arms')
+        b_motor_command.set('walk:true speed:slow')
         goal.set('setup:one')
 
     def setup_one_A(goal='setup:one', b_unit_task='type:posture standing:true walkable:true minimal_width:true'):
+        motor_module.send('rotate_torso',axis=1,radians=math.radians(0))
+        motor_module.send('compress_shoulder',bone='shoulder.L',radians=math.radians(0.0))
+        motor_module.send('extend_shoulder',bone='shoulder.R',radians=math.radians(0.0))
         goal.set('setup:two')
         b_operator.set('direction:left')
 
@@ -199,7 +225,14 @@ class MyModel(ACTR):
 
 ###########################
 ###########################
-    def start_experiment(self,):
+    def start_experiment(b_plan_unit='planning_unit:walk_through_apeture',
+                         b_unit_task='unit_task:walk posture:standing',
+                         b_operator='operator:start_walking'):
+        b_motor_command.set('walk:true speed:slow')
+        b_plan_unit.clear()
+        timeKeep.record_start(self.now())
+        goal.set('stop')
+
 
     #
     # def estimate_passability_retrieveUT(b_plan_unit='planning_unit:find_target', b_unit_task='unit_task:none',
@@ -309,6 +342,7 @@ class MyModel(ACTR):
 
 
     def stop(goal='stop'):
+        timeKeep.record_stop(self.now())
         self.keepAlive = False
     
         
@@ -318,7 +352,7 @@ class MyModel(ACTR):
 
 
 
-log=ccm.log(html=True)
+log=ccm.log(data=True)
 model=MyModel()
 model.middleware = middleware
 
@@ -326,7 +360,7 @@ model.middleware = middleware
 env = MyEnvironment()
 env.agent = model
 
-ccm.log_everything(env)
+#ccm.log_everything(env)
 model.goal.set('action:greet')
 
 #initialize ACT-R
@@ -355,7 +389,7 @@ while model.keepAlive:
 print("post run")
 ccm.finished()
 print("here0")
-del ccm
+#del ccm
 #middleware.robot_simulation.quit()
 #middleware.robot_simulation.close()
 #middleware.robot_simulation.reset()
@@ -366,7 +400,12 @@ del ccm
 #middleware.robot_simulation.close()
 #middleware.robot_simulation.close()
 middleware.tick()
-middleware.robot_simulation.quit()
+middleware.robot_simulation.reset()
+time.sleep(3)
+#middleware.robot_simulation.quit()
+
+
+#del ccm
 
 
 

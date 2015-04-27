@@ -199,7 +199,9 @@ class MyModel(ACTR):
 
 ###########################
 ###########################
-    def start_experiment(self,):
+    def start_experiment(self,b_plan_unit='planning_unit:walk_through_apeture',
+                         b_unit_task='unit_task:walk posture:standing',
+                         b_operator='operator:start_walking'):
 
     #
     # def estimate_passability_retrieveUT(b_plan_unit='planning_unit:find_target', b_unit_task='unit_task:none',
