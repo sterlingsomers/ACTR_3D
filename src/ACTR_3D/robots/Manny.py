@@ -9,8 +9,15 @@ from morse.core import blenderapi
 import bpy
 import bge
 
+
+import datetime
+import scipy
+
+
 import signal
 from contextlib import contextmanager
+
+
 
 class TimeoutException(Exception): pass
 
@@ -61,6 +68,18 @@ class Manny(morse.core.robot.Robot):
         self.func_map['getBones'] = self
         self.func_map['getBoundingBox'] = self
 
+
+    @service
+    def end_simulation_tasks(self):
+        for o in blenderapi.scene().objects:
+            if 'TopViewCamera' in o.name:
+
+                print('11111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111')
+                print(dir(o))
+                image = o.source.image
+                scipy.misc.imsave('\home\123.png', image)
+
+        return 1
 
 
     @service

@@ -61,20 +61,35 @@ class MotorMonitor(ccm.ProductionSystem):
         #bb = middleware.request('getBoundingBox', [])
         print("MONITORING", bb)
 
-class VisionMethods(ccm.ProductionSystem):
-    production_time = 0.01
+class BottomUpVision(ccm.ProductionSystem):
+    production_time=0.100
     fake_buffer = Buffer()
-    
+
     def init():
-        fake_buffer.set('none')#should be 'fake'
+        fake_buffer.set('fake')
 
     def repeat(fake_buffer='fake'):
-        #This could be used during movement, actively doing the task
-        print("Producting vision_module.scan()")
         self.parent.vision_module.scan()
-        #self.parent.vision_module.getScreenVector('0.4999','0.5')    
-        #self.parent.vision_module.cScan('0.5')#50cm minimum depth for an opening.
-        #self.parent.vision_module.xScan('0.3','0.5')
+
+class VisionMethods(ccm.ProductionSystem):
+    production_time = 0.10
+    #fake_buffer = Buffer()
+    
+    def init():
+        pass
+
+    def start_detect_aperture(b_vision_command='detect:start'):
+        vision_module.find_feature(feature='opening', depth=0, width=0)
+        b_vision_command.set('detect:aperture')
+
+    def detect_aperture(b_vision_command='detect:aperture',
+                        b_vision1='opening:?opening'):
+
+        vision_module.find_feature(feature='opening', depth=0, width=0)
+
+    def aperture_not_detected(b_vision_command='detect:aperture',
+                              vision_module='error:True'):
+        goal.set('stop')
 
 
 class MotorMethods(ccm.ProductionSystem):
@@ -95,6 +110,11 @@ class timeKeeper(ccm.Model):
 
     def record_stop(self,now):
         log.stop = now
+        x = 0
+        x = middleware.robot_simulation.robot.end_simulation_tasks()
+        while not x:
+            pass
+
 
     def record_start(self,now):
 
@@ -115,6 +135,7 @@ class MyModel(ACTR):
     
     b_vision1 = Buffer()
     b_vision2 = Buffer()
+    b_vision_command = Buffer()
     #vm = SOSVision(b_vision)    
     vision_module = BlenderVision(b_vision1,b_vision2,sync=False)
     #p_vision=VisionModule(b_vision1)
@@ -122,7 +143,10 @@ class MyModel(ACTR):
 
     motor_module = BlenderMotorModule(b_motor,sync=False)
     
-    vm = VisionMethods()
+    bottom_up_vision = BottomUpVision()
+
+
+    vm = VisionMethods(b_vision_command)
 
     b_motor_command = Buffer()
     mm = MotorMethods(b_motor_command)
@@ -151,7 +175,7 @@ class MyModel(ACTR):
 
     ######Calibration########
     def setup_zero_stop(goal='setup:zero',b_count='value:10'):
-        b_plan_unit.set('planning_unit:walk_through_apeture')
+        b_plan_unit.set('planning_unit:walk_through_aperture')
         b_unit_task.set('unit_task:walk posture:standing')
         b_operator.set('operator:start_walking')
         goal.clear()
@@ -164,7 +188,7 @@ class MyModel(ACTR):
     def setup_zero(goal='setup:zero',b_count='value:!10'):
         b_unit_task.set('type:posture standing:true walkable:true minimal_width:true')
         motor_module.send('lower_arms')
-        b_motor_command.set('walk:true speed:slow')
+        #b_motor_command.set('walk:true speed:slow')
         goal.set('setup:one')
 
     def setup_one_A(goal='setup:one', b_unit_task='type:posture standing:true walkable:true minimal_width:true'):
@@ -225,13 +249,24 @@ class MyModel(ACTR):
 
 ###########################
 ###########################
-    def start_experiment(b_plan_unit='planning_unit:walk_through_apeture',
+    def start_experiment(b_plan_unit='planning_unit:walk_through_aperture',
                          b_unit_task='unit_task:walk posture:standing',
                          b_operator='operator:start_walking'):
         b_motor_command.set('walk:true speed:slow')
-        b_plan_unit.clear()
+        vision_module.find_feature(feature='opening', depth=0, width=0)
+
+        b_operator.set('operator:visual_monitor_walking')
+
+    def visual_monitor_walking(b_plan_unit='planning_unit:walk_through_aperture',
+                               b_unit_task='unit_task:walk posture:standing',
+                               b_operator='operator:visual_monitor_walking'):
+        b_vision_command.set('detect:start')
+
+
+        b_operator.clear()
         timeKeep.record_start(self.now())
-        goal.set('stop')
+        #goal.set('stop')
+
 
 
     #
@@ -360,7 +395,7 @@ model.middleware = middleware
 env = MyEnvironment()
 env.agent = model
 
-#ccm.log_everything(env)
+ccm.log_everything(env)
 model.goal.set('action:greet')
 
 #initialize ACT-R

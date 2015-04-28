@@ -120,6 +120,11 @@ torso.add_service('socket')
 # actuator.
 
 
+TopViewCamera = Camera('TopViewCamera')
+TopViewCamera.location = [0, 4, 8]
+TopViewCamera.rotate(math.radians(0), math.radians(180), math.radians(180))
+
+
 #Geometric camera
 GeometricCamerav1 = GeometricCamera()
 

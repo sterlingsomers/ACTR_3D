@@ -421,6 +421,8 @@ class BlenderVision(ccm.Model):
             thread.start()
         else:
             self._objects = middleware.request(self.function_map[inspect.stack()[0][3]][0])[self.function_map[inspect.stack()[0][3]][0]]
+            self._objects = dict((Decimal(k).quantize(Decimal('.001'),rounding=ROUND_HALF_UP), dict((kk,[Decimal(x).quantize(Decimal('.001'),rounding=ROUND_HALF_UP) for x in kv]) for kk,kv in v.items())) for k,v in self._objects.items())
+            self._ignoreLabels = ['None','Ground']
 
     def threaded_scan(self,function_name,delay=0.00):
 
