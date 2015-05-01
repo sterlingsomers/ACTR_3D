@@ -486,7 +486,7 @@ class BlenderMotorModule(ccm.Model):
     def move(self):
         pass
 
-    def request(self,pattern=''):
+    def request(self,pattern='',delay=0.0,delay_sd=0.0):
         print("REQUEST")
         if self.busy: return
 
@@ -506,11 +506,12 @@ class BlenderMotorModule(ccm.Model):
                 r.append(obj)
 
         self.busy = True
-        d = self.delay
+        d = delay
         if self.delay_sd is not None:
             d=max(0,self.random.gauss(d,self.delay_sd))
         yield d
         print("YEILDED", d)
+
         self.busy=False
         if len(r) == 0:
             self._b1.clear()

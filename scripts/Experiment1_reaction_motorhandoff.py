@@ -54,15 +54,19 @@ class MotorMonitor(ccm.ProductionSystem):
     fake_buffer = Buffer()
 
     def init():
-        fake_buffer.set('asdf')#should be 'fake'
+        fake_buffer.set('fake')#should be 'fake'
 
     def repeat(fake_buffer='fake'):
         #This could be used during movement, actively doing the task
         #bb = middleware.request('getBoundingBox', [])
-        print("MONITORING", bb)
+        motor_module.get_bounding_box()
+        motor_module.request_bounding_box()
+        motor_module.request('type:proprioception feature:bounding_box width:? depth:?')
+
+        #print("MONITORING", bb)
 
 class BottomUpVision(ccm.ProductionSystem):
-    production_time=0.100
+    production_time=0.050
     fake_buffer = Buffer()
 
     def init():
@@ -70,6 +74,10 @@ class BottomUpVision(ccm.ProductionSystem):
 
     def repeat(fake_buffer='fake'):
         self.parent.vision_module.scan()
+
+    def obstacle_scan(fake_buffer='fake',
+                      b_motor='type:proprioception feature:bounding_box width:?w depth:?d'):
+        vision_module.find_feature(feature='obstacle', depth=d, width=w)
 
 class VisionMethods(ccm.ProductionSystem):
     production_time = 0.10
@@ -79,13 +87,13 @@ class VisionMethods(ccm.ProductionSystem):
         pass
 
     def start_detect_aperture(b_vision_command='detect:start'):
-        vision_module.find_feature(feature='opening', depth=0, width=0)
+        vision_module.find_feature(feature='opening', depth=0, width=0, delay=0.05)
         b_vision_command.set('detect:aperture')
 
     def detect_aperture(b_vision_command='detect:aperture',
                         b_vision1='opening:?opening'):
 
-        vision_module.find_feature(feature='opening', depth=0, width=0)
+        vision_module.find_feature(feature='opening', depth=0, width=0, delay=0.05)
 
     def aperture_not_detected(b_vision_command='detect:aperture',
                               vision_module='error:True'):
@@ -144,7 +152,7 @@ class MyModel(ACTR):
     motor_module = BlenderMotorModule(b_motor,sync=False)
     
     bottom_up_vision = BottomUpVision()
-
+    bottom_up_motor = MotorMonitor()
 
     vm = VisionMethods(b_vision_command)
 
@@ -175,11 +183,14 @@ class MyModel(ACTR):
 
     ######Calibration########
     def setup_zero_stop(goal='setup:zero',b_count='value:10'):
-        b_plan_unit.set('planning_unit:walk_through_aperture')
-        b_unit_task.set('unit_task:walk posture:standing')
-        b_operator.set('operator:start_walking')
-        goal.clear()
-        #goal.set('stop')
+        #b_plan_unit.set('planning_unit:walk_through_aperture')
+        #b_unit_task.set('unit_task:walk posture:standing')
+        #b_operator.set('operator:start_walking')
+        motor_module.send('rotate_torso',axis=1,radians=math.radians(0))
+        motor_module.send('compress_shoulder',bone='shoulder.L',radians=math.radians(0.0))
+        motor_module.send('extend_shoulder',bone='shoulder.R',radians=math.radians(0.0))
+        #goal.clear()
+        goal.set('stop')
         #b_plan_unit.set('planning_unit:find_target')
         #b_unit_task.set('unit_task:none')
         #b_operator.set('operator:none')
@@ -234,6 +245,7 @@ class MyModel(ACTR):
         goal.set('setup:five')
 
     def setup_five(goal='setup:five',b_motor='width:?w depth:?d'):
+        print("setup_five")
         b_cue.set('width:'+w+ ' depth:'+d)
         motor_module.request('type:posture minimal_width:?')
         goal.set('setup:six')
@@ -252,8 +264,9 @@ class MyModel(ACTR):
     def start_experiment(b_plan_unit='planning_unit:walk_through_aperture',
                          b_unit_task='unit_task:walk posture:standing',
                          b_operator='operator:start_walking'):
+
         b_motor_command.set('walk:true speed:slow')
-        vision_module.find_feature(feature='opening', depth=0, width=0)
+        vision_module.find_feature(feature='opening', depth=0, width=0, delay=0.05)
 
         b_operator.set('operator:visual_monitor_walking')
 
@@ -267,7 +280,9 @@ class MyModel(ACTR):
         timeKeep.record_start(self.now())
         #goal.set('stop')
 
-
+    def react_to_obstacle(b_operator='operator:react_to_obstacle'):
+        print("obstacle")
+        goal.set('stop')
 
     #
     # def estimate_passability_retrieveUT(b_plan_unit='planning_unit:find_target', b_unit_task='unit_task:none',
@@ -387,7 +402,7 @@ class MyModel(ACTR):
 
 
 
-log=ccm.log(data=True)
+log=ccm.log(html=True)
 model=MyModel()
 model.middleware = middleware
 

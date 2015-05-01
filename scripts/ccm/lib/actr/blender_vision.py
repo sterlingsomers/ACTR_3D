@@ -56,6 +56,7 @@ class BlenderVision(ccm.Model):
         self._oldopenings = {}
         self._edges = {}
         self._internalChunks = []
+        self._attending = None
         self._screenLeft = numpy.arange(Decimal(0.60),Decimal(1.0),Decimal(0.002))
         self._screenCenter = numpy.arange(Decimal(0.30),Decimal(0.60),Decimal(0.002))
         self._screenRight = numpy.arange(Decimal(0.0),Decimal(0.30),Decimal(0.002))
@@ -125,6 +126,13 @@ class BlenderVision(ccm.Model):
         self.error = False
         openings = {}
         #A map of y-values and x,y pairs
+
+        if 'feature' in kwargs and kwargs['feature'] == 'obstacle':
+            openingsKey = Decimal('0.500')
+
+            print('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
+            print(self._objects[openingsKey])
+
 
         if 'feature' in kwargs and kwargs['feature'] == 'opening':
             openings = self.find_opening(depth=float(kwargs['depth']))
@@ -204,16 +212,21 @@ class BlenderVision(ccm.Model):
         #Result Error if not 'feature' (for now)
         else:
             self._b1.clear()
+            self.busy = False
             self.error=True
 
         # self.busy=True
         # d=self.delay
-        # if self.delay_sd is not None:
-        #     d=max(0,self.random.gauss(d,self.delay_sd))
-        # yield d
-        # self.busy=False
+        if 'delay' in kwargs:
+            if 'delay_sd' in kwargs:
+                d = max(0,self.random.gauss(kwargs['delay'],kwargs['delay_sd']))
+            else:
+                d=kwargs['delay']
+            yield d
+        self.busy=False
         print("chunkvalues",chunkValues)
-        self._b1.set(kwargs['feature']+':'+'_'.join(chunkValues))
+        if chunkValues:
+            self._b1.set(kwargs['feature']+':'+'_'.join(chunkValues))
         #print("OPENINGS", openings)
         # self._internalChunks.append(ccm.Model(feature='opening',
         #                                       screenRight=))
