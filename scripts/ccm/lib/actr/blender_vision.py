@@ -132,6 +132,7 @@ class BlenderVision(ccm.Model):
 
             print('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
             print(self._objects[openingsKey])
+            chunkValues.add('obstacle')
 
 
         if 'feature' in kwargs and kwargs['feature'] == 'opening':

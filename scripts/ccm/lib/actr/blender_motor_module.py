@@ -43,7 +43,7 @@ class BlenderMotorModule(ccm.Model):
                                     #NAME      #min/max by axis: 0, 1, 2
         self._boneProperties = {'part.torso':[[0,0],[-pi/4,pi/4],[0,0]],
                                 'shoulder.L':[[0,0],[0,0],[-pi/6,pi/6]],
-                                'shoulder.R':[[0,0],[0,0],[-pi/6,pi/6]]}
+                                'shoulder.R':[[0,0],[0,0],[pi/6,-pi/6]]}
         #Tick
         self._internalChunks.append(ccm.Model(type='posture',
                                               standing='true',
@@ -115,6 +115,8 @@ class BlenderMotorModule(ccm.Model):
         #self.blender_camera = Morse().robot.GeometricCamerav1
 
     def update_posture(self):
+        print("UPDATE CALLED")
+        self.print_state()
         pattern1='type:proprioception bone:upper_arm.R'# overall_quality:lowered'
         pattern2='type:proprioception bone:upper_arm.L'# overall_quality:lowered'
         pattern3='type:proprioception bone:shoulder.R'# rotation0_quality:max'
@@ -326,7 +328,7 @@ class BlenderMotorModule(ccm.Model):
          :return:applies the shoulder extension with set_rotation on Morse side
          '''
         #Check the max rotation
-        print("Extend Shoulder")
+        print("Extend Shoulder",kwargs['bone'],kwargs['radians'])
         if self.busy:
             return
         self.busy = True
@@ -340,18 +342,30 @@ class BlenderMotorModule(ccm.Model):
             kwargs['radians'] = kwargs['radians'] * -1
         #elif kwargs['bone'] == 'shoulder.L':
         #    kwargs['radians'] = kwargs['radians'] * 1
-
+        print("radians now",kwargs['radians'])
 
         minR,maxR = self._boneProperties[kwargs['bone']][kwargs['axis']]
         #print("MINR", minR)
-        if Decimal(kwargs['radians']).quantize(Decimal('0.000'),rounding=ROUND_HALF_UP) >= Decimal(maxR).quantize(Decimal('0.000'),rounding=ROUND_HALF_UP):
-            print("SET TO MAX")
-            maxReached=True
-            kwargs['radians'] = maxR
-        elif Decimal(kwargs['radians']).quantize(Decimal('0.000'),rounding=ROUND_HALF_UP) <= Decimal(minR).quantize(Decimal('0.000'),rounding=ROUND_HALF_UP):
-            print("SET TO MIN")
-            minReached = True
-            kwargs['radians'] = minR
+        if kwargs['bone'] == 'shoulder.L':
+            if Decimal(kwargs['radians']).quantize(Decimal('0.000'),rounding=ROUND_HALF_UP) >= Decimal(maxR).quantize(Decimal('0.000'),rounding=ROUND_HALF_UP):
+                print("SET TO MAX")
+                maxReached=True
+                kwargs['radians'] = maxR
+            elif Decimal(kwargs['radians']).quantize(Decimal('0.000'),rounding=ROUND_HALF_UP) <= Decimal(minR).quantize(Decimal('0.000'),rounding=ROUND_HALF_UP):
+                print("SET TO MIN")
+                minReached = True
+                kwargs['radians'] = minR
+
+        if kwargs['bone'] == 'shoulder.R':
+            if Decimal(kwargs['radians']).quantize(Decimal('0.000'),rounding=ROUND_HALF_UP) <= Decimal(maxR).quantize(Decimal('0.000'),rounding=ROUND_HALF_UP):
+                print("SET TO MAX")
+                maxReached=True
+                kwargs['radians'] = maxR
+
+            elif Decimal(kwargs['radians']).quantize(Decimal('0.000'),rounding=ROUND_HALF_UP) >= Decimal(minR).quantize(Decimal('0.000'),rounding=ROUND_HALF_UP):
+                print("SET TO MIN")
+                minReached = True
+                kwargs['radians'] = minR
 
         print("RADIANS",kwargs['radians'])
         middleware.send(self.function_map[function_name][0],**kwargs)
@@ -383,7 +397,7 @@ class BlenderMotorModule(ccm.Model):
          :return:applies the shoulder compression with set_rotation on Morse side
          '''
         #Check the max rotation
-        print("Compress Shoulder")
+        print("Compress Shoulder",kwargs['radians'])
         if self.busy:
             return
         self.busy = True
@@ -393,12 +407,12 @@ class BlenderMotorModule(ccm.Model):
 
 
         kwargs.update(self.function_map[function_name][1])
-        #if kwargs['bone'] == 'shoulder.R':
-        #    kwargs['radians'] = kwargs['radians'] * 1
+        if kwargs['bone'] == 'shoulder.R':
+            kwargs['radians'] = kwargs['radians'] * -1
         if kwargs['bone'] == 'shoulder.L':
             kwargs['radians'] = kwargs['radians'] * -1
 
-
+        print("radians now",kwargs['radians'])
         minR,maxR = self._boneProperties[kwargs['bone']][kwargs['axis']]
         #print("MINR", minR)
         if Decimal(kwargs['radians']).quantize(Decimal('0.000'),rounding=ROUND_HALF_UP) >= Decimal(maxR).quantize(Decimal('0.000'),rounding=ROUND_HALF_UP):
@@ -488,7 +502,9 @@ class BlenderMotorModule(ccm.Model):
 
     def request(self,pattern='',delay=0.0,delay_sd=0.0):
         print("REQUEST")
-        if self.busy: return
+        if self.busy:
+            print("Motor request busy")
+            return
 
         #for obj in self._internalChunks:
         #    print("OBJ............")

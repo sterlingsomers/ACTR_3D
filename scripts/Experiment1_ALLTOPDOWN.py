@@ -54,7 +54,7 @@ class MotorMonitor(ccm.ProductionSystem):
     fake_buffer = Buffer()
 
     def init():
-        fake_buffer.set('fake')#should be 'fake'
+        fake_buffer.set('off')#should be 'fake'
 
     def repeat(fake_buffer='not'):
         #This could be used during movement, actively doing the task
@@ -66,7 +66,7 @@ class MotorMonitor(ccm.ProductionSystem):
         #print("MONITORING", bb)
 
 class BottomUpVision(ccm.ProductionSystem):
-    production_time=0.050
+    production_time=0.100
     fake_buffer = Buffer()
 
     def init():
@@ -75,15 +75,7 @@ class BottomUpVision(ccm.ProductionSystem):
     def repeat(fake_buffer='fake'):
         self.parent.vision_module.scan()
 
-    def obstacle_scan_one(fake_buffer='fake'):
-        motor_module.request('type:proprioception feature:bounding_box width:? depth:?',delay=0.02)
 
-    def obstacle_scan_two(fake_buffer='obscan',b_motor='type:proprioception feature:bounding_box width:?w depth:?d'):
-        vision_module.find_feature(feature='obstacle', depth=d, width=w,delay=0.05)
-
-    def obstacle_scan_three(fake_buffer='obscan',b_vision1='obstacle:obstacle'):
-        b_operator.set('operator:react_to_obstacle')
-        fake_buffer.set('fake')
 
 
 class VisionMethods(ccm.ProductionSystem):
@@ -93,18 +85,7 @@ class VisionMethods(ccm.ProductionSystem):
     def init():
         pass
 
-    def start_detect_aperture(b_vision_command='detect:start'):
-        vision_module.find_feature(feature='opening', depth=0, width=0, delay=0.05)
-        b_vision_command.set('detect:aperture')
 
-    def detect_aperture(b_vision_command='detect:aperture',
-                        b_vision1='opening:?opening'):
-
-        vision_module.find_feature(feature='opening', depth=0, width=0, delay=0.05)
-
-    def aperture_not_detected(b_vision_command='detect:aperture',
-                              vision_module='error:True'):
-        goal.set('stop')
 
 
 class MotorMethods(ccm.ProductionSystem):
@@ -198,10 +179,7 @@ class MyModel(ACTR):
         motor_module.send('extend_shoulder',bone='shoulder.R',radians=math.radians(0.0))
         goal.clear()
         #goal.set('stop')
-        #b_plan_unit.set('planning_unit:find_target')
-        #b_unit_task.set('unit_task:none')
-        #b_operator.set('operator:none')
-        #goal.clear()
+
 
     def setup_zero(goal='setup:zero',b_count='value:!10'):
         b_unit_task.set('type:posture standing:true walkable:true minimal_width:true')
@@ -227,6 +205,7 @@ class MyModel(ACTR):
         motor_module.send('extend_shoulder',bone='shoulder.L',radians=math.radians(50.0))
         motor_module.send('compress_shoulder',bone='shoulder.R',radians=math.radians(50.0))
         #motor_module.send('move_forward',amount=0.01)
+
         goal.set('setup:three')
         #goal.set('stop')
 
@@ -257,15 +236,21 @@ class MyModel(ACTR):
         motor_module.request('type:posture minimal_width:?',delay=0.02)
         goal.set('setup:six')
 
-    def setup_five_half(goal='setup:six',b_cue='width:?w depth:?d',motor_module='busy:True'):
-        motor_module.request('type:posture minimal_width:?',delay=0.02)
 
-    def setup_six(goal='setup:six',b_cue='width:?w depth:?d',b_motor='type:posture minimal_width:?m standing:?s',
+
+    def setup_six(goal='setup:six',b_cue='width:?w depth:?d',b_motor='type:posture minimal_width:true standing:?s',
                   b_count='value:?v'):
-        print('ADDING:','width:'+w + ' depth:' + d + ' type:posture minimal_width:' + m + ' standing:'+s)
-        DM.add('width:'+w + ' depth:' + d + ' type:posture minimal_width:' + m + ' standing:'+s)
+        print('ADDING:','width:'+w + ' depth:' + d + ' type:posture minimal_width:true' + ' standing:'+s)
+        DM.add('width:'+w + ' depth:' + d + ' type:posture minimal_width:true' + ' standing:'+s)
         b_count.modify(value=repr(int(v)+1))
         goal.set('setup:zero')
+
+    def setup_six_failure(goal='setup:six',b_cue='width:?w depth:?d',b_motor='type:posture minimal_width:false standing:?s',
+                  b_count='value:?v'):
+        print('ADDING:','width:'+w + ' depth:' + d + ' type:posture minimal_width:true' + ' standing:'+s)
+        DM.add('width:'+w + ' depth:' + d + ' type:posture minimal_width:true' + ' standing:'+s)
+        b_count.modify(value=repr(int(v)+1))
+        goal.set('stop')
 
 
 
@@ -278,22 +263,17 @@ class MyModel(ACTR):
         b_motor_command.set('walk:true speed:slow')
         vision_module.find_feature(feature='opening', depth=0, width=0, delay=0.05)
 
-        b_operator.set('operator:visual_monitor_walking')
-
-    def visual_monitor_walking(b_plan_unit='planning_unit:walk_through_aperture',
-                               b_unit_task='unit_task:walk posture:standing',
-                               b_operator='operator:visual_monitor_walking'):
-        b_vision_command.set('detect:start')
-
-
-        b_operator.clear()
-        timeKeep.record_start(self.now())
+        b_operator.set('operator:check_for_obstacle')
+        #b_plan_unit.clear()
         #goal.set('stop')
+        #b_operator.set('operator:visual_monitor_walking')
 
-    def react_to_obstacle(b_operator='operator:react_to_obstacle'):
-        print("obstacle")
+
+    def check_for_obstacle(b_plan_unit='planning_unit:walk_through_aperture',
+                           b_unit_task='unit_task:walk posture:standing',
+                           b_operator='operator:check_for_obstacle'):
+        b_plan_unit.clear()
         goal.set('stop')
-
     #
     # def estimate_passability_retrieveUT(b_plan_unit='planning_unit:find_target', b_unit_task='unit_task:none',
     #                                     b_operator='operator:none'):
