@@ -76,6 +76,16 @@ class BottomUpVision(ccm.ProductionSystem):
         self.parent.vision_module.scan()
 
 
+    def detect_obstacles_one(b_vision_command='scan:obstacles get:body_dimensions',motor_module='busy:False'):
+        motor_module.request('type:proprioception feature:bounding_box width:? depth:?',delay=0.02)
+        b_vision_command.set('scan:obstacles get:visual_obstacles')
+
+    def detect_obstacles_two(b_vision_command='scan:obstacles get:visual_obstacles',
+                             b_motor='type:proprioception feature:bounding_box width:?w depth:?d',
+                             vision_module='busy:False'):
+        vision_module.find_feature(feature='obstacle', depth=d, width=w, delay=0.05)
+
+        goal.set('stop')
 
 
 class VisionMethods(ccm.ProductionSystem):
@@ -262,18 +272,49 @@ class MyModel(ACTR):
 
         b_motor_command.set('walk:true speed:slow')
         vision_module.find_feature(feature='opening', depth=0, width=0, delay=0.05)
-
-        b_operator.set('operator:check_for_obstacle')
-        #b_plan_unit.clear()
-        #goal.set('stop')
-        #b_operator.set('operator:visual_monitor_walking')
+        b_operator.set('operator:vision_result')
 
 
-    def check_for_obstacle(b_plan_unit='planning_unit:walk_through_aperture',
-                           b_unit_task='unit_task:walk posture:standing',
-                           b_operator='operator:check_for_obstacle'):
-        b_plan_unit.clear()
+    def start_experiment_vision_result(b_plan_unit='planning_unit:walk_through_aperture',
+                                       b_unit_task='unit_task:walk posture:standing',
+                                       b_operator='operator:vision_result',
+                                       b_vision1='opening:screenCenter'):
+
+        b_vision_command.set('scan:obstacles get:body_dimensions')
+        b_operator.clear()
+
+
+    def start_experiment_vision_no_result(b_plan_unit='planning_unit:walk_through_aperture',
+                                          b_unit_task='unit_task:walk posture:standing',
+                                          b_operator='operator:vision_result',
+                                          vision_module='error:True'):
+
+        b_operator.clear()
         goal.set('stop')
+
+    def start_experiment_vision_not_centre(b_plan_unit='planning_unit:walk_through_aperture',
+                                          b_unit_task='unit_task:walk posture:standing',
+                                          b_operator='operator:vision_result',
+                                          b_vision1='opening:!screenCenter'):
+
+        b_operator.clear()
+        goal.set('stop')
+
+
+
+    #
+    #
+    #     b_operator.set('operator:check_for_obstacle')
+    #     #b_plan_unit.clear()
+    #     #goal.set('stop')
+    #     #b_operator.set('operator:visual_monitor_walking')
+    #
+    #
+    # def check_for_obstacle(b_plan_unit='planning_unit:walk_through_aperture',
+    #                        b_unit_task='unit_task:walk posture:standing',
+    #                        b_operator='operator:check_for_obstacle'):
+    #     b_plan_unit.clear()
+    #     goal.set('stop')
     #
     # def estimate_passability_retrieveUT(b_plan_unit='planning_unit:find_target', b_unit_task='unit_task:none',
     #                                     b_operator='operator:none'):

@@ -60,7 +60,7 @@ class BlenderVision(ccm.Model):
         self._screenLeft = numpy.arange(Decimal(0.60),Decimal(1.0),Decimal(0.002))
         self._screenCenter = numpy.arange(Decimal(0.30),Decimal(0.60),Decimal(0.002))
         self._screenRight = numpy.arange(Decimal(0.0),Decimal(0.30),Decimal(0.002))
-        self._internalChunks.append(ccm.Model(isa='dial'))
+        #self._internalChunks.append(ccm.Model(isa='dial'))
 
         self.function_map = {'scan':['scan_image_multi',{}]}
 
@@ -120,22 +120,62 @@ class BlenderVision(ccm.Model):
                 #break
 
     def find_feature(self,**kwargs):
-        chunkValues = set()
+        chunkValues = []
         if self.busy: return
 
         self.error = False
         openings = {}
+
+        openingChunks = set()
+        obstacleChunks = set()
+
+
+        #Add all chunk lists to a master list of chunks
+        allChunks = {'obstacles':obstacleChunks,'openings':openingChunks}
         #A map of y-values and x,y pairs
 
         if 'feature' in kwargs and kwargs['feature'] == 'obstacle':
             openingsKey = Decimal('0.500')
 
+            if not 'depth' in kwargs and not 'width' in kwargs:
+                self.error=True
+                self.busy=False
+                print("Error...")
+                return
+
+
             print('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
+            depth = float(kwargs['depth'])
+            width = float(kwargs['width'])
+            keySize = max([depth,width])
+            obstacles = []
+            #objCount = 0
+
+            print("keySize",keySize,depth,width)
             print(self._objects[openingsKey])
-            chunkValues.add('obstacle')
+            for obj in self._objects[openingsKey]:
+                d1 = float(self._objects[openingsKey][obj][2])
+                d2 = float(self._objects[openingsKey][obj][3])
+                closer = 3
+                side = 'left'
+                if d1 <= d2:
+                    closer = 2
+                if float(self._objects[openingsKey][obj][closer]) <= keySize * 3:
+                    if float(self._objects[openingsKey][obj][closer -2]) < 0.50:
+                        side = 'right'
+                    obstacles.append([side,self._objects[openingsKey][obj][closer],self._objects[openingsKey][obj][closer + 2]])
+                # if float(self._objects[openingsKey][obj][2]) <= keySize * 3:
+                #     obstacles.append([self._objects[openingsKey][obj][2],self._objects[openingsKey][obj][4]])
+                # if float(self._objects[openingsKey][obj][3]) <= keySize * 3:
+                #     obstacles.append([self._objects[openingsKey][obj][3],self._objects[openingsKey][obj][5]])
+
+            print("obstacles",obstacles)
+            if obstacles:
+                chunkValues.add('true')
 
 
-        if 'feature' in kwargs and kwargs['feature'] == 'opening':
+
+        elif 'feature' in kwargs and kwargs['feature'] == 'opening':
             openings = self.find_opening(depth=float(kwargs['depth']))
             if openings == {}:
                 self._openings={}
@@ -204,11 +244,15 @@ class BlenderVision(ccm.Model):
                 #FDOprint("DT",xs)
 
                 if numpy.intersect1d(self._screenLeft,numpy.arange(xs[0],xs[1])).any():               #if openings[key]
-                    chunkValues.add('screenLeft')
+                    openingChunks.add('screenLeft')
                 if numpy.intersect1d(self._screenCenter,numpy.arange(xs[0],xs[1])).any():
-                    chunkValues.add('screenCenter')
+                    openingChunks.add('screenCenter')
                 if numpy.intersect1d(self._screenRight,numpy.arange(xs[0],xs[1])).any():
-                    chunkValues.add('screenRight')
+                    openingChunks.add('screenRight')
+
+                if openingChunks:
+                    chunkValues.add('true')
+                    #Should get openings:true
 
         #Result Error if not 'feature' (for now)
         else:
@@ -225,9 +269,22 @@ class BlenderVision(ccm.Model):
                 d=kwargs['delay']
             yield d
         self.busy=False
+
+
+        allChunks = {'obstacles':list(obstacleChunks),'openings':list(openingChunks)}
         print("chunkvalues",chunkValues)
         if chunkValues:
             self._b1.set(kwargs['feature']+':'+'_'.join(chunkValues))
+            #self._b1.set(repr(self._b1.chunk) + ' moo:cow')
+        chunks = []
+        for key in allChunks:
+            for i in range(len(allChunks[key])):
+            #for i range(len(allChunks[key])):
+                chunks.append(kwargs['feature'] + repr(i) + ':' + allChunks[key][i])
+        print("Chunks",chunks)
+        self._b1.set(repr(self._b1,chunk) + ' '.join(chunks))
+
+
         #print("OPENINGS", openings)
         # self._internalChunks.append(ccm.Model(feature='opening',
         #                                       screenRight=))
