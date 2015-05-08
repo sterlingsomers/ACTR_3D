@@ -65,8 +65,8 @@ class MotorMonitor(ccm.ProductionSystem):
 
         #print("MONITORING", bb)
 
-class BottomUpVision(ccm.ProductionSystem):
-    production_time=0.100
+class VisionScanner(ccm.ProductionSystem):
+    production_time=0.050
     fake_buffer = Buffer()
 
     def init():
@@ -74,6 +74,10 @@ class BottomUpVision(ccm.ProductionSystem):
 
     def repeat(fake_buffer='fake'):
         self.parent.vision_module.scan()
+
+class BottomUpVision(ccm.ProductionSystem):
+    production_time=0.050
+
 
 
     def detect_obstacles_one(b_vision_command='scan:obstacles get:body_dimensions',motor_module='busy:False'):
@@ -84,9 +88,21 @@ class BottomUpVision(ccm.ProductionSystem):
                              b_motor='type:proprioception feature:bounding_box width:?w depth:?d',
                              vision_module='busy:False'):
         vision_module.find_feature(feature='obstacle', depth=d, width=w, delay=0.05)
+        vision_module.request('isa:obstacle location:? distance:? radians:?')
+        b_vision_command.set('scan:obstacles get:obstacle_found')
 
-        goal.set('stop')
+    def detect_obstacles_three_fail(b_vision_command='scan:obstacles get:obstacle_found',
+                             b_motor='type:proprioception feature:bounding_box width:?w depth:?d',
+                             vision_module='error:True'):
+        b_vision_command.set('scan:obstacles get:body_dimensions')
 
+    def detect_obstacles_three(b_vision_command='scan:obstacles get:obstacle_found',
+                             b_motor='type:proprioception feature:bounding_box width:?w depth:?d',
+                             b_vision1='isa:obstacle location:?l distance:? radians:?'):
+        #self.parent.b_plan_unit.clear()
+        self.parent.b_operator.set('operator:react isa:obstacle location:' + l)
+        b_vision_command.clear()
+        #goal.set('stop')
 
 class VisionMethods(ccm.ProductionSystem):
     production_time = 0.10
@@ -99,16 +115,25 @@ class VisionMethods(ccm.ProductionSystem):
 
 
 class MotorMethods(ccm.ProductionSystem):
-    production_time = 0.050
+    production_time = 0.010
     #fake_buffer = Buffer()
 
 
 
-    def slow_step(b_motor_command='walk:true speed:slow'):
+    def slow_step(b_motor_command_legs='walk:true speed:slow'):
         print("producting move_forward")
-        motor_module.send('move_forward',amount=0.0645)
+        motor_module.send('move_forward',amount=0.00645)
 
+    def increase_rotation_abdomen_left(b_motor_command_abdomen='rotate:true direction:left'):
+        motor_module.increase_shoulder_rotation('left',0.387)
+        goal.set('stop')
 
+    def increase_rotation_abdomen_right(b_motor_command_abdomen='rotate:true direction:right'):
+        motor_module.increase_shoulder_rotation('right',-0.387)
+        goal.set('stop')
+
+    def increase_rotation_shoulders(b_motor_command_shoulders='rotate:true direction:?d'):
+        goal.set('stop')
 
 class timeKeeper(ccm.Model):
 
@@ -150,12 +175,16 @@ class MyModel(ACTR):
     motor_module = BlenderMotorModule(b_motor,sync=False)
     
     bottom_up_vision = BottomUpVision()
+    vision_scanner = VisionScanner()
     bottom_up_motor = MotorMonitor()
 
     vm = VisionMethods(b_vision_command)
 
-    b_motor_command = Buffer()
-    mm = MotorMethods(b_motor_command)
+    b_motor_command_legs = Buffer()
+    b_motor_command_abdomen = Buffer()
+    b_motor_command_shoulders = Buffer()
+
+    mm = MotorMethods(b_motor_command_legs)
 
     
     DMbuffer=Buffer()
@@ -270,15 +299,16 @@ class MyModel(ACTR):
                          b_unit_task='unit_task:walk posture:standing',
                          b_operator='operator:start_walking'):
 
-        b_motor_command.set('walk:true speed:slow')
+        b_motor_command_legs.set('walk:true speed:slow')
         vision_module.find_feature(feature='opening', depth=0, width=0, delay=0.05)
+        vision_module.request('isa:opening centre:? left:? right:?')
         b_operator.set('operator:vision_result')
 
 
     def start_experiment_vision_result(b_plan_unit='planning_unit:walk_through_aperture',
                                        b_unit_task='unit_task:walk posture:standing',
                                        b_operator='operator:vision_result',
-                                       b_vision1='opening:screenCenter'):
+                                       b_vision1='centre:true'):
 
         b_vision_command.set('scan:obstacles get:body_dimensions')
         b_operator.clear()
@@ -300,7 +330,31 @@ class MyModel(ACTR):
         b_operator.clear()
         goal.set('stop')
 
+    def vision_scan_obstacle_left(b_plan_unit='planning_unit:walk_through_aperture',
+                                  b_unit_task='unit_task:walk posture:standing',
+                                  b_operator='operator:react isa:obstacle location:left'):
+        #Left Shoulder Rotation Start
+        b_operator.set('number:' + repr(3.12))
+        b_motor_command_shoulders.set('rotate:true direction:left')
+        b_motor_command_abdomen.set('rotate:true direction:left')
+        #b_plan_unit.clear()
+        #goal.set('stop')
 
+    def vision_scan_obstacle_right(b_plan_unit='planning_unit:walk_through_aperture',
+                                    b_unit_task='unit_task:walk posture:standing',
+                                    b_operator='operator:react isa:obstacle location:right'):
+        #Right Shoulder Rotation Start
+        b_operator.set('number:' + repr(3.12))
+        b_motor_command_shoulders.set('rotate:true direction:right')
+        b_motor_command_abdomen.set('rotate:true direction:right')
+        #b_plan_unit.clear()
+        #goal.set('stop')
+
+    def number_test(b_plan_unit='planning_unit:walk_through_aperture',
+                                  b_unit_task='unit_task:walk posture:standing',
+                                  b_operator='number:3.12'):
+        goal.set('stop')
+        b_plan_unit.clear()
 
     #
     #

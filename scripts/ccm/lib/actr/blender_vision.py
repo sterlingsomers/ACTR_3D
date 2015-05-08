@@ -20,6 +20,8 @@ from decimal import *
 import threading
 import inspect
 
+import random
+
 #vision_cam = ccm.middle.robot.GeometricCamerav1
 #from test2 import simu
 
@@ -149,6 +151,9 @@ class BlenderVision(ccm.Model):
             width = float(kwargs['width'])
             keySize = max([depth,width])
             obstacles = []
+
+            #need to delete the old obstacles and re-find them
+
             #objCount = 0
 
             print("keySize",keySize,depth,width)
@@ -160,18 +165,22 @@ class BlenderVision(ccm.Model):
                 side = 'left'
                 if d1 <= d2:
                     closer = 2
-                if float(self._objects[openingsKey][obj][closer]) <= keySize * 3:
+                if float(self._objects[openingsKey][obj][closer]) <= keySize * 6:
                     if float(self._objects[openingsKey][obj][closer -2]) < 0.50:
                         side = 'right'
-                    obstacles.append([side,self._objects[openingsKey][obj][closer],self._objects[openingsKey][obj][closer + 2]])
+                    self._internalChunks.append(ccm.Model(isa='obstacle',
+                                                          location=side,
+                                                          distance=repr(float(self._objects[openingsKey][obj][closer])),
+                                                          radians=repr(float(self._objects[openingsKey][obj][closer+2]))))
+                    #obstacles.append([side,self._objects[openingsKey][obj][closer],self._objects[openingsKey][obj][closer + 2]])
                 # if float(self._objects[openingsKey][obj][2]) <= keySize * 3:
                 #     obstacles.append([self._objects[openingsKey][obj][2],self._objects[openingsKey][obj][4]])
                 # if float(self._objects[openingsKey][obj][3]) <= keySize * 3:
                 #     obstacles.append([self._objects[openingsKey][obj][3],self._objects[openingsKey][obj][5]])
 
-            print("obstacles",obstacles)
-            if obstacles:
-                chunkValues.add('true')
+            #print("obstacles",obstacles)
+            #if obstacles:
+             #   chunkValues.add('true')
 
 
 
@@ -230,7 +239,7 @@ class BlenderVision(ccm.Model):
             #     #print("openings..................")
             #
             for key in sorted(openings.keys()):
-                #FDOprint("PC",key,openings[key])
+                print("PC",key,openings[key])
                 #indices = self.indices_of_smallest_angle(self._objects[key][openings[key][0]][4:6],
                 #                                         self._objects[key][openings[key][1]][4:6])
                 indices = self.indices_of_screen_position(self._objects[key][openings[key][0]],
@@ -243,15 +252,33 @@ class BlenderVision(ccm.Model):
                 xs.sort()
                 #FDOprint("DT",xs)
 
-                if numpy.intersect1d(self._screenLeft,numpy.arange(xs[0],xs[1])).any():               #if openings[key]
-                    openingChunks.add('screenLeft')
-                if numpy.intersect1d(self._screenCenter,numpy.arange(xs[0],xs[1])).any():
-                    openingChunks.add('screenCenter')
-                if numpy.intersect1d(self._screenRight,numpy.arange(xs[0],xs[1])).any():
-                    openingChunks.add('screenRight')
 
-                if openingChunks:
-                    chunkValues.add('true')
+                if numpy.intersect1d(self._screenCenter,numpy.arange(xs[0],xs[1])).any():
+                    openingChunks.add('centre:true')
+                else:
+                    openingChunks.add('centre:false')
+                if numpy.intersect1d(self._screenLeft,numpy.arange(xs[0],xs[1])).any():               #if openings[key]
+                    openingChunks.add('left:true')
+                else:
+                    openingChunks.add('left:false')
+
+                if numpy.intersect1d(self._screenRight,numpy.arange(xs[0],xs[1])).any():
+                    openingChunks.add('right:true')
+                else:
+                    openingChunks.add('right:false')
+
+            if openingChunks:
+                a = ccm.Model(isa='opening')
+                count = 0
+                for val in openingChunks:
+                    s,v = val.split(':')
+                    setattr(a,s,v)
+                    count += 1
+                print("openingChunks", dir(a))
+                self._internalChunks.append(a)
+
+                #if openingChunks:
+                #    chunkValues.add('true')
                     #Should get openings:true
 
         #Result Error if not 'feature' (for now)
@@ -262,28 +289,34 @@ class BlenderVision(ccm.Model):
 
         # self.busy=True
         # d=self.delay
-        if 'delay' in kwargs:
-            if 'delay_sd' in kwargs:
-                d = max(0,self.random.gauss(kwargs['delay'],kwargs['delay_sd']))
-            else:
-                d=kwargs['delay']
-            yield d
-        self.busy=False
 
 
-        allChunks = {'obstacles':list(obstacleChunks),'openings':list(openingChunks)}
-        print("chunkvalues",chunkValues)
-        if chunkValues:
-            self._b1.set(kwargs['feature']+':'+'_'.join(chunkValues))
-            #self._b1.set(repr(self._b1.chunk) + ' moo:cow')
-        chunks = []
-        for key in allChunks:
-            for i in range(len(allChunks[key])):
-            #for i range(len(allChunks[key])):
-                chunks.append(kwargs['feature'] + repr(i) + ':' + allChunks[key][i])
-        print("Chunks",chunks)
-        self._b1.set(repr(self._b1,chunk) + ' '.join(chunks))
+        #May 4 replacement
 
+
+        #May 4th
+        # if 'delay' in kwargs:
+        #     if 'delay_sd' in kwargs:
+        #         d = max(0,self.random.gauss(kwargs['delay'],kwargs['delay_sd']))
+        #     else:
+        #         d=kwargs['delay']
+        #     yield d
+        # self.busy=False
+        #
+        #
+        # allChunks = {'obstacles':list(obstacleChunks),'openings':list(openingChunks)}
+        # print("chunkvalues",chunkValues)
+        # if chunkValues:
+        #     self._b1.set(kwargs['feature']+':'+'_'.join(chunkValues))
+        #     #self._b1.set(repr(self._b1.chunk) + ' moo:cow')
+        # chunks = []
+        # for key in allChunks:
+        #     for i in range(len(allChunks[key])):
+        #     #for i range(len(allChunks[key])):
+        #         chunks.append(kwargs['feature'] + repr(i) + ':' + allChunks[key][i])
+        # print("Chunks",chunks)
+        # self._b1.set(repr(self._b1,chunk) + ' '.join(chunks))
+        #May 4th
 
         #print("OPENINGS", openings)
         # self._internalChunks.append(ccm.Model(feature='opening',
@@ -688,18 +721,43 @@ class BlenderVision(ccm.Model):
             self.error=True
             self.busy=False
 
-    def request(self,pattern=''):
+    def request(self,pattern='',delay=0.0,delay_sd=0.0):
         print("REQUEST")
-        if self.busy: return
+        if self.busy:
+            print("Motor request busy")
+            return
+
+        #for obj in self._internalChunks:
+        #    print("OBJ............")
+        #    for attr, value in obj.__dict__.items():
+        #        print(attr,value)
 
         matcher = Pattern(pattern)
+        print("Matcher",matcher)
 
         self.error=False
         r=[]
         for obj in self._internalChunks:
-            print("one")
-            if matcher.match(obj)!=None:
-                print("Not None", obj)
+            #print("one",obj)
+            if matcher.match(obj)!= None:
+                r.append(obj)
+
+        self.busy = True
+        d = delay
+        if self.delay_sd is not None:
+            d=max(0,self.random.gauss(d,self.delay_sd))
+        yield d
+        print("YEILDED", d)
+
+        self.busy=False
+        if len(r) == 0:
+            self._b1.clear()
+            self.error = True
+        else:
+            #print("RRR",r)
+            #random.shuffle(r)
+            obj=self.random.choice(r)
+            self._b1.set(obj)
         #self._internalEnvironment.__convert()
         #print(dir(self._internalEnvironment), "InternalEnvironment")
         #print(self._internalEnvironment.poop.isa,"poooooooop")

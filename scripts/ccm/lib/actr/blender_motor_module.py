@@ -192,6 +192,23 @@ class BlenderMotorModule(ccm.Model):
                     print(y,x.__dict__[y])
 
 
+    def increase_shoulder_rotation(self,direction,radians):
+        pattern='type:proprioception bone:torso'
+        matcher=Pattern(pattern)
+        for obj in self._internalChunks:
+            #if axis='0.0'
+            if matcher.match(obj)!=None:
+                current_rotation = obj.rotation0
+
+                return self.send('rotate_torso',axis=1,radians=current_rotation+radians)
+                #print(obj.rotation2, "Torso")
+        #'rotate_torso',axis=1,radians=math.radians(0)
+
+
+
+
+
+
     def lower_arms(self,function_name,**kwargs):
         '''
         This function lowers the arms completly.
