@@ -361,8 +361,9 @@ class MyModel(ACTR):
         #b_operator.set('number:' + repr(3.12))
         b_motor_command_shoulders.set('rotate:true direction:left')
         b_motor_command_abdomen.set('rotate:true direction:left')
+        b_vision_command.set('scan:obstacles get:body_dimensions alert_status:alert')
         #b_plan_unit.clear()
-        goal.set('stop')
+        #goal.set('stop')
 
     def vision_scan_obstacle_right(b_plan_unit='planning_unit:walk_through_aperture',
                                     b_unit_task='unit_task:walk posture:standing',
@@ -371,8 +372,9 @@ class MyModel(ACTR):
         #b_operator.set('number:' + repr(3.12))
         b_motor_command_shoulders.set('rotate:true direction:right')
         b_motor_command_abdomen.set('rotate:true direction:right')
+        b_vision_command.set('scan:obstacles get:body_dimensions alert_status:alert')
         #b_plan_unit.clear()
-        goal.set('stop')
+        #goal.set('stop')
 
     def number_test(b_plan_unit='planning_unit:walk_through_aperture',
                                   b_unit_task='unit_task:walk posture:standing',
