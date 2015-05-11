@@ -78,32 +78,49 @@ class VisionScanner(ccm.ProductionSystem):
 class BottomUpVision(ccm.ProductionSystem):
     production_time=0.050
 
-
-
-    def detect_obstacles_one(b_vision_command='scan:obstacles get:body_dimensions',motor_module='busy:False'):
+    def detect_obstacles_one_alert(b_vision_command='scan:obstacles get:body_dimensions alert_status:alert',motor_module='busy:False'):
         motor_module.request('type:proprioception feature:bounding_box width:? depth:?',delay=0.02)
-        b_vision_command.set('scan:obstacles get:visual_obstacles')
+        b_vision_command.set('scan:obstacles get:visual_obstacles alert_status:alert')
 
-    def detect_obstacles_two(b_vision_command='scan:obstacles get:visual_obstacles',
+    def detect_obstacles_one(b_vision_command='scan:obstacles get:body_dimensions alert_status:none',motor_module='busy:False'):
+        motor_module.request('type:proprioception feature:bounding_box width:? depth:?',delay=0.02)
+        b_vision_command.set('scan:obstacles get:visual_obstacles alert_status:none')
+
+    def detect_obstacles_two_alert(b_vision_command='scan:obstacles get:visual_obstacles alert_status:alert',
                              b_motor='type:proprioception feature:bounding_box width:?w depth:?d',
                              vision_module='busy:False'):
         vision_module.find_feature(feature='obstacle', depth=d, width=w, delay=0.05)
         vision_module.request('isa:obstacle location:? distance:? radians:?')
-        b_vision_command.set('scan:obstacles get:obstacle_found alert:none')
+        b_vision_command.set('scan:obstacles get:obstacle_found alert_status:alert')
 
-    def detect_obstacles_three_fail(b_vision_command='scan:obstacles get:obstacle_found alert_status:!alert',
+    def detect_obstacles_two(b_vision_command='scan:obstacles get:visual_obstacles alert_status:none',
+                             b_motor='type:proprioception feature:bounding_box width:?w depth:?d',
+                             vision_module='busy:False'):
+        vision_module.find_feature(feature='obstacle', depth=d, width=w, delay=0.05)
+        vision_module.request('isa:obstacle location:? distance:? radians:?')
+        b_vision_command.set('scan:obstacles get:obstacle_found alert_status:none')
+
+    def detect_obstacles_three_fail_alert(b_vision_command='scan:obstacles get:obstacle_found alert_status:alert',
                              b_motor='type:proprioception feature:bounding_box width:?w depth:?d',
                              vision_module='error:True'):
-        b_vision_command.set('scan:obstacles get:body_dimensions')
+        b_vision_command.set('scan:obstacles get:body_dimensions alert_status:alert')
 
-    def detect_obstacles_three_fail(b_vision_command='scan:obstacles get:obstacle_found alert_status:alert',
+    def detect_obstacles_three_fail(b_vision_command='scan:obstacles get:obstacle_found alert_status:none',
                              b_motor='type:proprioception feature:bounding_box width:?w depth:?d',
                              vision_module='error:True'):
-        #b_vision_command.set('scan:obstacles get:body_dimensions')
-        self.parent.b_operator.set('operator:react isa:obstacle present:false')
+        b_vision_command.set('scan:obstacles get:body_dimensions alert_status:none')
+
+    def detect_obstacles_three_alert(b_vision_command='scan:obstacles get:obstacle_found alert_status:alert',
+                             b_motor='type:proprioception feature:bounding_box width:?w depth:?d',
+                             b_vision1='isa:obstacle location:?l distance:? radians:?'):
+        print("THREE ALERT")
+        #sel.parent.b_plan_unit.clear()
+        #self.parent.b_operator.set('operator:react isa:obstacle location:' + l)
+        #b_vision_command.clear()
+        #goal.set('stop')
 
 
-    def detect_obstacles_three(b_vision_command='scan:obstacles get:obstacle_found',
+    def detect_obstacles_three(b_vision_command='scan:obstacles get:obstacle_found alert_status:none',
                              b_motor='type:proprioception feature:bounding_box width:?w depth:?d',
                              b_vision1='isa:obstacle location:?l distance:? radians:?'):
         #self.parent.b_plan_unit.clear()
