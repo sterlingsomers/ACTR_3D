@@ -89,12 +89,19 @@ class BottomUpVision(ccm.ProductionSystem):
                              vision_module='busy:False'):
         vision_module.find_feature(feature='obstacle', depth=d, width=w, delay=0.05)
         vision_module.request('isa:obstacle location:? distance:? radians:?')
-        b_vision_command.set('scan:obstacles get:obstacle_found')
+        b_vision_command.set('scan:obstacles get:obstacle_found alert:none')
 
-    def detect_obstacles_three_fail(b_vision_command='scan:obstacles get:obstacle_found',
+    def detect_obstacles_three_fail(b_vision_command='scan:obstacles get:obstacle_found alert_status:!alert',
                              b_motor='type:proprioception feature:bounding_box width:?w depth:?d',
                              vision_module='error:True'):
         b_vision_command.set('scan:obstacles get:body_dimensions')
+
+    def detect_obstacles_three_fail(b_vision_command='scan:obstacles get:obstacle_found alert_status:alert',
+                             b_motor='type:proprioception feature:bounding_box width:?w depth:?d',
+                             vision_module='error:True'):
+        #b_vision_command.set('scan:obstacles get:body_dimensions')
+        self.parent.b_operator.set('operator:react isa:obstacle present:false')
+
 
     def detect_obstacles_three(b_vision_command='scan:obstacles get:obstacle_found',
                              b_motor='type:proprioception feature:bounding_box width:?w depth:?d',
@@ -310,7 +317,7 @@ class MyModel(ACTR):
                                        b_operator='operator:vision_result',
                                        b_vision1='centre:true'):
 
-        b_vision_command.set('scan:obstacles get:body_dimensions')
+        b_vision_command.set('scan:obstacles get:body_dimensions alert_status:none')
         b_operator.clear()
 
 
@@ -334,21 +341,21 @@ class MyModel(ACTR):
                                   b_unit_task='unit_task:walk posture:standing',
                                   b_operator='operator:react isa:obstacle location:left'):
         #Left Shoulder Rotation Start
-        b_operator.set('number:' + repr(3.12))
+        #b_operator.set('number:' + repr(3.12))
         b_motor_command_shoulders.set('rotate:true direction:left')
         b_motor_command_abdomen.set('rotate:true direction:left')
         #b_plan_unit.clear()
-        #goal.set('stop')
+        goal.set('stop')
 
     def vision_scan_obstacle_right(b_plan_unit='planning_unit:walk_through_aperture',
                                     b_unit_task='unit_task:walk posture:standing',
                                     b_operator='operator:react isa:obstacle location:right'):
         #Right Shoulder Rotation Start
-        b_operator.set('number:' + repr(3.12))
+        #b_operator.set('number:' + repr(3.12))
         b_motor_command_shoulders.set('rotate:true direction:right')
         b_motor_command_abdomen.set('rotate:true direction:right')
         #b_plan_unit.clear()
-        #goal.set('stop')
+        goal.set('stop')
 
     def number_test(b_plan_unit='planning_unit:walk_through_aperture',
                                   b_unit_task='unit_task:walk posture:standing',

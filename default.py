@@ -9,6 +9,7 @@ Feel free to edit this template as you like!
 #import bpy
 import math
 from morse.builder import *
+import morse.sensors.camera
 #from ACTR_3D.builer.robots import Mannequin
 from ACTR_3D.builder.robots import Manny
 from ACTR_3D.builder.robots import Car
@@ -120,9 +121,9 @@ torso.add_service('socket')
 # actuator.
 
 
-TopViewCamera = Camera('TopViewCamera')
-TopViewCamera.location = [0, 4, 8]
-TopViewCamera.rotate(math.radians(0), math.radians(180), math.radians(180))
+#TopViewCamera = Camera('TopViewCamera')
+#TopViewCamera.location = [0, 4, 8]
+#TopViewCamera.rotate(math.radians(0), math.radians(180), math.radians(180))
 
 
 #Geometric camera
