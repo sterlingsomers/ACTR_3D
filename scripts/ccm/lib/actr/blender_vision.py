@@ -127,6 +127,8 @@ class BlenderVision(ccm.Model):
 
         self.error = False
         openings = {}
+        self._internalChunks = []
+
 
         openingChunks = set()
         obstacleChunks = set()
@@ -152,6 +154,9 @@ class BlenderVision(ccm.Model):
             keySize = max([depth,width])
             obstacles = []
 
+            if 'radius_multiplier' in kwargs:
+                radius_multiplier = float(kwargs['radius_multiplier'])
+
             #need to delete the old obstacles and re-find them
 
             #objCount = 0
@@ -165,7 +170,7 @@ class BlenderVision(ccm.Model):
                 side = 'left'
                 if d1 <= d2:
                     closer = 2
-                if float(self._objects[openingsKey][obj][closer]) <= keySize * 6:
+                if float(self._objects[openingsKey][obj][closer]) <= keySize * radius_multiplier:
                     if float(self._objects[openingsKey][obj][closer -2]) < 0.50:
                         side = 'right'
                     self._internalChunks.append(ccm.Model(isa='obstacle',
@@ -222,7 +227,7 @@ class BlenderVision(ccm.Model):
                 b = self._objects[Decimal(openingsKey)][self._openings[openingsKey][1]][2+indices[1]]
                 c = math.sqrt(float(a)**2 - 2*float(a)*float(b)*math.cos(float(math.radians(y)))+float(b)**2)
                 print("indices",indices)
-                print("C",c,y1,y2,openingsKey)
+                print("C",c,y1,y2,openingsKey,float(kwargs['width']))
                 if not float(kwargs['width']) < c:
                     self._b1.clear()
                     self.error=True
