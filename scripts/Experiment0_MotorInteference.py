@@ -136,18 +136,17 @@ class VisionMethods(ccm.ProductionSystem):
         pass
 
 
-class MotorMethods_legs(ccm.ProductionSystem):
-    production_time = 0.010
 
-    def slow_step(b_motor_command_legs='walk:true speed:slow', motor_module='busy:False'):
-        print("producting move_forward")
-        motor_module.send('move_forward',amount=0.00645)
+
+
 
 class MotorMethods(ccm.ProductionSystem):
     production_time = 0.010
     #fake_buffer = Buffer()
 
-
+    def slow_step(b_motor_command_legs='walk:true speed:slow', motor_module='busy:False'):
+        print("producting move_forward")
+        motor_module.send('move_forward',amount=0.00645)
 
     def increase_rotation_abdomen_left(b_motor_command_abdomen='rotate:true direction:left', motor_module='busy:False'):
         motor_module.increase_shoulder_rotation('left',0.01745)
@@ -210,8 +209,8 @@ class MyModel(ACTR):
     b_motor_command_abdomen = Buffer()
     b_motor_command_shoulders = Buffer()
 
-    mm = MotorMethods()
-    mm_legs = MotorMethods(b_motor_command_legs)
+    mm = MotorMethods(b_motor_command_legs)
+
 
     
     DMbuffer=Buffer()
