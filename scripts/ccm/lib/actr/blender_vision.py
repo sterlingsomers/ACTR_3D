@@ -54,6 +54,7 @@ class BlenderVision(ccm.Model):
         self.error=False
         self.busy=False
         self._objects = {}
+        self._oldobjects = {}
         self._openings = {}
         self._oldopenings = {}
         self._edges = {}
@@ -213,9 +214,17 @@ class BlenderVision(ccm.Model):
                             self._openings = self._oldopenings
                             #Need to FIX this.
 
+                try:
 
-                indices = self.indices_of_screen_position(self._objects[Decimal(openingsKey)][self._openings[openingsKey][0]],
+                    indices = self.indices_of_screen_position(self._objects[Decimal(openingsKey)][self._openings[openingsKey][0]],
                                                           self._objects[Decimal(openingsKey)][self._openings[openingsKey][1]])
+                except KeyError:
+                    try:
+                        indices = self.indices_of_screen_position(self._oldobjects[Decimal(openingsKey)][self._openings[openingsKey][0]],
+                                                          self._oldobjects[Decimal(openingsKey)][self._openings[openingsKey][1]])
+                    except KeyError:
+                        return #need a better solution. This seems to occur during threshold passage
+
 
                 y1 = self._objects[Decimal(openingsKey)][self._openings[openingsKey][0]][4+indices[0]]
                 y2 = self._objects[Decimal(openingsKey)][self._openings[openingsKey][1]][4+indices[1]]
@@ -529,6 +538,7 @@ class BlenderVision(ccm.Model):
             middleware.threads.append(thread)
             thread.start()
         else:
+            self._oldobjects = self._objects
             self._objects = middleware.request(self.function_map[inspect.stack()[0][3]][0])[self.function_map[inspect.stack()[0][3]][0]]
             self._objects = dict((Decimal(k).quantize(Decimal('.001'),rounding=ROUND_HALF_UP), dict((kk,[Decimal(x).quantize(Decimal('.001'),rounding=ROUND_HALF_UP) for x in kv]) for kk,kv in v.items())) for k,v in self._objects.items())
             self._ignoreLabels = ['None','Ground']

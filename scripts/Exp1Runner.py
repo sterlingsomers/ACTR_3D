@@ -2,6 +2,6 @@ import ccm
 import os
 
 
-ccm.run('Experiment1_ALLTOPDOWN',10)
+ccm.run('Experiment0_NoMotorInteference',10)
 os.remove('check.ck')
 

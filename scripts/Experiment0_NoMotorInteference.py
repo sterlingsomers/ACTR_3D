@@ -46,7 +46,17 @@ class MyEnvironment(ccm.Model):
     v1 = ccm.Model(isa='dial')
 
 
+class CollisionScanner(ccm.ProductionSystem):
+    production_time = 0.007
+    fake_buffer = Buffer()
 
+    def init():
+        fake_buffer.set('fake')
+
+    def repeat(fake_buffer='fake'):
+
+        collision = middleware.robot_simulation.robot.torso.collision.get(timeout=0.01)
+        print("Collision", collision)
 
 class MotorMonitor(ccm.ProductionSystem):
 
@@ -66,7 +76,7 @@ class MotorMonitor(ccm.ProductionSystem):
         #print("MONITORING", bb)
 
 class VisionScanner(ccm.ProductionSystem):
-    production_time=0.050
+    production_time=0.080
     fake_buffer = Buffer()
 
     def init():
@@ -196,7 +206,7 @@ class MyModel(ACTR):
     #vm = SOSVision(b_vision)    
     vision_module = BlenderVision(b_vision1,b_vision2,sync=False)
     #p_vision=VisionModule(b_vision1)
-
+    collision = CollisionScanner()
 
     motor_module = BlenderMotorModule(b_motor,sync=False)
     
@@ -406,7 +416,7 @@ class MyModel(ACTR):
                                     b_operator='operator:check_gap',
                                     b_motor='width:?w depth:?d'):
         vision_module.find_feature(feature='opening', width=float(w)*1.2, depth=d)
-        vision_module.request('isa:opening',delay=0.08)
+        vision_module.request('isa:opening',delay=0.05)
         b_operator.set('operator:check_opening')
         #goal.set('stop')
         #b_plan_unit.clear()
@@ -417,6 +427,9 @@ class MyModel(ACTR):
                                     b_vision1='isa:opening'):
         b_motor_command_shoulders.clear()
         b_motor_command_abdomen.clear()
+        b_unit_task.set('unit_task:passing_aperture')
+        b_operator.set('operator:check_for_aperture')
+
         #goal.set('stop')
         #b_plan_unit.clear()
 
@@ -425,7 +438,45 @@ class MyModel(ACTR):
                                     b_unit_task='unit_task:manage_rotation',
                                     b_operator='operator:check_opening',
                                     vision_module='error:True'):
+        #b_operator.set('operator:retrieve_width')
+        #Have I passed the aperture?
+        b_operator.set('operator:check_passed_aperture')
+        vision_module.find_feature(feature='opening', width=0, depth=0)
+        vision_module.request('isa:opening',delay=0.05)
+
+    def manage_rotation_opening_not_found_still_aperture(b_plan_unit='planning_unit:walk_through_aperture',
+                                    b_unit_task='unit_task:manage_rotation',
+                                    b_operator='operator:check_passed_aperture',
+                                    b_vision1='isa:opening'):
         b_operator.set('operator:retrieve_width')
+
+    def manage_rotation_opening_not_found_no_aperture(b_plan_unit='planning_unit:walk_through_aperture',
+                                    b_unit_task='unit_task:manage_rotation',
+                                    b_operator='operator:check_passed_aperture',
+                                    vision_module='error:True'):
+        b_plan_unit.clear()
+        goal.set('stop')
+
+    def passing_aperture_check_for_aperture(b_plan_unit='planning_unit:walk_through_aperture',
+                                            b_unit_task='unit_task:passing_aperture',
+                                            b_operator='operator:check_for_aperture'):
+        vision_module.find_feature(feature='opening',width=0,depth=0)
+        vision_module.request('isa:opening',delay=0.05)
+        b_operator.set('operator:visual_results')
+
+    def passing_aperture_visual_results(b_plan_unit='planning_unit:walk_through_aperture',
+                                        b_unit_task='unit_task:passing_aperture',
+                                        b_operator='operator:visual_results',
+                                        b_vision1='isa:opening'):
+        b_operator.set('operator:check_for_aperture')
+
+    def passing_aperture_visual_results_no_aperture(b_plan_unit='planning_unit:walk_through_aperture',
+                                        b_unit_task='unit_task:passing_aperture',
+                                        b_operator='operator:visual_results',
+                                        vision_module='error:True'):
+        b_operator.clear()
+        goal.set('stop')
+
 
     #
     #

@@ -69,9 +69,10 @@ torso.rotate(z=math.radians(90))
 #armature.place_IK_targets('ik_target.robot.armature.shoulder.L', [0.04,0.04,0.53],None,False)
 
 
-#collision = Collision()
-#collision.properites(collision_property="obstacle")
-#armature.append(collision)
+collision = Collision()
+collision.properties(collision_property="obstacle")
+torso.append(collision)
+collision.add_stream('socket')
 
 #armproximity = Proximity()
 #armproximity.properties(Track = 'obstacle')
