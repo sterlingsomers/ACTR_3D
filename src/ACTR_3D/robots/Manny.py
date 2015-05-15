@@ -68,6 +68,31 @@ class Manny(morse.core.robot.Robot):
         self.func_map['getBones'] = self
         self.func_map['getBoundingBox'] = self
 
+    @service
+    def check_collision(self):
+
+        children = self.bge_object.childrenRecursive
+        for child in children:
+
+            if 'part' in child.name:
+                try:
+                    if child['collision']:
+                        return 1
+                except KeyError:
+                    pass
+        return 0
+
+    @service
+    def reset_collision(self):
+        children = self.bge_object.childrenRecursive
+        for child in children:
+            if 'part' in child.name:
+                if hasattr(child, 'collision'):
+                    child.colllision = 0
+
+        return 1
+
+
 
     @service
     def end_simulation_tasks(self):

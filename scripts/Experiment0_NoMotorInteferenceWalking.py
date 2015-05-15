@@ -54,7 +54,12 @@ class CollisionScanner(ccm.ProductionSystem):
         fake_buffer.set('fake')
 
     def repeat(fake_buffer='fake'):
-        pass
+        collision = 27
+        collision = middleware.robot_simulation.robot.check_collision().result()
+        while collision == 27:
+            pass
+
+        print("COLLISION", collision)
         #collision = middleware.robot_simulation.robot.collision.get(timeout=0.01)
         #print("Collision", collision)
 
@@ -160,11 +165,11 @@ class MotorMethods(ccm.ProductionSystem):
 
 
     def increase_rotation_abdomen_left(b_motor_command_abdomen='rotate:true direction:left', motor_module='busy:False'):
-        motor_module.increase_shoulder_rotation('left',0.01745)
+        motor_module.increase_shoulder_rotation('left',0.0)#0.01745)
         #goal.set('stop')
 
     def increase_rotation_abdomen_right(b_motor_command_abdomen='rotate:true direction:right', motor_module='busy:False'):
-        motor_module.increase_shoulder_rotation('right',-0.01745)
+        motor_module.increase_shoulder_rotation('right',0.0)#-0.01745)
         #goal.set('stop')
 
     def increase_rotation_shoulders(b_motor_command_shoulders='rotate:true direction:?d', motor_module='busy:False'):
@@ -233,6 +238,7 @@ class MyModel(ACTR):
     timeKeep = timeKeeper()
 
     def init():
+
         import math
         DM.add('planning_unit:find_target unit_task:find_target')
         DM.add('planning_unit:assess_width unit_task:assess_width')
@@ -247,6 +253,7 @@ class MyModel(ACTR):
 
     ######Calibration########
     def setup_zero_stop(goal='setup:zero',b_count='value:10'):
+        #middleware.robot_simulation.robot.check_collision()
         b_plan_unit.set('planning_unit:walk_through_aperture')
         b_unit_task.set('unit_task:walk posture:standing')
         b_operator.set('operator:start_walking')

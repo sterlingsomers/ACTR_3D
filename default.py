@@ -6,7 +6,7 @@ Feel free to edit this template as you like!
 """
 #import pdb
 
-#import bpy
+import bpy
 import math
 from morse.builder import *
 import morse.sensors.camera
@@ -69,10 +69,13 @@ torso.rotate(z=math.radians(90))
 #armature.place_IK_targets('ik_target.robot.armature.shoulder.L', [0.04,0.04,0.53],None,False)
 
 
-collision = Collision()
-collision.properties(collision_property="obstacle")
-torso.append(collision)
-collision.add_stream('socket')
+#collision = Collision()
+#collision.properties(collision_property="obstacle")
+#torso.append(collision)
+#collision.add_stream('socket')
+
+#for obj in bpy.context.scene.objects:
+#    print("obj",obj)
 
 #armproximity = Proximity()
 #armproximity.properties(Track = 'obstacle')
@@ -125,12 +128,12 @@ torso.add_service('socket')
 #TopViewCamera = Camera('TopViewCamera')
 #TopViewCamera.location = [0, 4, 8]
 #TopViewCamera.rotate(math.radians(0), math.radians(180), math.radians(180))
-
+scale = [1.0,1.0,1.0]
 
 #Geometric camera
 GeometricCamerav1 = GeometricCamera()
 
-GeometricCamerav1.translate(x=0.13,y=-0.0,z=1.22)
+GeometricCamerav1.translate(x=0.13*scale[0],y=-0.0*scale[1],z=1.22*scale[2])
 GeometricCamerav1.properties(Object=False)
 GeometricCamerav1.properties(cam_width=2048,cam_height=2048)
 GeometricCamerav1.properties(cam_focal=14)
@@ -171,7 +174,7 @@ robot.add_service('socket')
 # Check here: http://www.openrobots.org/morse/doc/stable/user/integration.html 
 # the other available interfaces (like ROS, YARP...)
 robot.add_default_interface('socket')
-robot.scale = [1.0,1.0,1.0]
+robot.scale = scale#[1.05,1.0,1.0]
 
 
 # set 'fastmode' to True to switch to wireframe mode
@@ -190,6 +193,6 @@ env.select_display_camera(GeometricCamerav1)
 #env.set_time_strategy(TimeStrategies.FixedSimulationStepExternalTrigger)
 #env.configure_stream_manager('socket',time_sync=True,sync_port=5000)
 env.show_framerate(True)
-env.show_physics(True)
+#env.show_physics(True)
 
 
