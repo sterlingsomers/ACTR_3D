@@ -41,7 +41,7 @@ class BlenderMotorModule(ccm.Model):
         self.get_bounding_box()
         self.get_bones()
                                     #NAME      #min/max by axis: 0, 1, 2
-        self._boneProperties = {'part.torso':[[0,0],[-pi/4,pi/4],[0,0]],
+        self._boneProperties = {'part.torso':[[0,0],[-pi/3,pi/3],[0,0]],
                                 'shoulder.L':[[0,0],[0,0],[-pi/6,pi/6]],
                                 'shoulder.R':[[0,0],[0,0],[pi/6,-pi/6]]}
         #Tick
@@ -516,6 +516,23 @@ class BlenderMotorModule(ccm.Model):
 
     def move(self):
         pass
+
+    def get_shoulder_angle(self):
+        pattern = 'bone:torso'
+        matcher = Pattern(pattern)
+        for obj in self._internalChunks:
+            if matcher.match(obj) != None:
+                return obj.rotation0
+        return "Error"
+
+    def get_shoulder_direction(self):
+        pattern = 'bone:torso'
+        matcher = Pattern(pattern)
+        for obj in self._internalChunks:
+            if matcher.match(obj) != None:
+                return obj.rotation0_direction
+        return "Error"
+
 
     def request(self,pattern='',delay=0.0,delay_sd=0.0):
         print("REQUEST")

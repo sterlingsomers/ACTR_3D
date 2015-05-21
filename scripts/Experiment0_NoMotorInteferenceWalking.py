@@ -51,7 +51,7 @@ class CollisionScanner(ccm.ProductionSystem):
     fake_buffer = Buffer()
 
     def init():
-        fake_buffer.set('fake')
+        fake_buffer.set('none')
 
     def repeat(fake_buffer='fake'):
         collision = 27
@@ -104,14 +104,14 @@ class BottomUpVision(ccm.ProductionSystem):
     def detect_obstacles_two_alert(b_vision_command='scan:obstacles get:visual_obstacles alert_status:alert',
                              b_motor='type:proprioception feature:bounding_box width:?w depth:?d',
                              vision_module='busy:False'):
-        vision_module.find_feature(feature='obstacle', depth=d, width=w, radius_multiplier=1.5, delay=0.05)
+        vision_module.find_feature(feature='obstacle', depth=d, width=w, radius_multiplier=1., delay=0.05)
         vision_module.request('isa:obstacle location:? distance:? radians:?')
         b_vision_command.set('scan:obstacles get:obstacle_found alert_status:alert')
 
     def detect_obstacles_two(b_vision_command='scan:obstacles get:visual_obstacles alert_status:none',
                              b_motor='type:proprioception feature:bounding_box width:?w depth:?d',
                              vision_module='busy:False'):
-        vision_module.find_feature(feature='obstacle', depth=d, width=w, radius_multiplier=1.5, delay=0.05)
+        vision_module.find_feature(feature='obstacle', depth=d, width=w, radius_multiplier=1., delay=0.05)
         vision_module.request('isa:obstacle location:? distance:? radians:?')
         b_vision_command.set('scan:obstacles get:obstacle_found alert_status:none')
 
@@ -165,11 +165,11 @@ class MotorMethods(ccm.ProductionSystem):
 
 
     def increase_rotation_abdomen_left(b_motor_command_abdomen='rotate:true direction:left', motor_module='busy:False'):
-        motor_module.increase_shoulder_rotation('left',0.0)#0.01745)
+        motor_module.increase_shoulder_rotation('left',0.01745)
         #goal.set('stop')
 
     def increase_rotation_abdomen_right(b_motor_command_abdomen='rotate:true direction:right', motor_module='busy:False'):
-        motor_module.increase_shoulder_rotation('right',0.0)#-0.01745)
+        motor_module.increase_shoulder_rotation('right',-0.01745)
         #goal.set('stop')
 
     def increase_rotation_shoulders(b_motor_command_shoulders='rotate:true direction:?d', motor_module='busy:False'):
@@ -177,19 +177,26 @@ class MotorMethods(ccm.ProductionSystem):
         #goal.set('stop')
 
 class timeKeeper(ccm.Model):
-
-
+    def __init__(self):
+        self.start = 0.0
+        self.stop = 0.0
 
     def record_stop(self,now):
+        self.stop = now
         log.stop = now
         x = 0
         x = middleware.robot_simulation.robot.end_simulation_tasks()
         while not x:
             pass
+        log.collision = middleware.robot_simulation.robot.check_collision().result()
+        log.angle = self.parent.motor_module.get_shoulder_angle()
+        log.direction = self.parent.motor_module.get_shoulder_direction()
+        log.delta_time = self.stop - self.start
 
 
     def record_start(self,now):
 
+        self.start = now
         log.start = now
 
 
@@ -346,6 +353,7 @@ class MyModel(ACTR):
         b_motor_command_legs.set('walk:true speed:slow')
         vision_module.find_feature(feature='opening', depth=0, width=0, delay=0.05)
         vision_module.request('isa:opening centre:? left:? right:?')
+        timeKeep.record_start(self.now())
         b_operator.set('operator:vision_result')
 
 
@@ -355,7 +363,10 @@ class MyModel(ACTR):
                                        b_vision1='centre:true'):
 
         b_vision_command.set('scan:obstacles get:body_dimensions alert_status:none')
-        b_operator.clear()
+        b_plan_unit.set('planning_unit:walk_through_aperture')
+        b_unit_task.set('unit_task:manage_rotation')
+        b_operator.set('operator:retrieve_width')
+        #b_operator.clear()
 
 
     def start_experiment_vision_no_result(b_plan_unit='planning_unit:walk_through_aperture',
@@ -422,7 +433,7 @@ class MyModel(ACTR):
                                     b_unit_task='unit_task:manage_rotation',
                                     b_operator='operator:check_gap',
                                     b_motor='width:?w depth:?d'):
-        vision_module.find_feature(feature='opening', width=float(w)*1.2, depth=d)
+        vision_module.find_feature(feature='opening', width=float(w)*1.0, depth=d)
         vision_module.request('isa:opening',delay=0.05)
         b_operator.set('operator:check_opening')
         #goal.set('stop')
@@ -461,8 +472,23 @@ class MyModel(ACTR):
                                     b_unit_task='unit_task:manage_rotation',
                                     b_operator='operator:check_passed_aperture',
                                     vision_module='error:True'):
-        b_plan_unit.clear()
+        b_operator.set('operator:double_check_vision')
+        vision_module.find_feature(feature='opening', width=0, depth=0)
+        vision_module.request('isa:opening',delay=0.05)
+
+    def manage_rotation_opening_not_found_no_aperture_double_check(b_plan_unit='planning_unit:walk_through_aperture',
+                                    b_unit_task='unit_task:manage_rotation',
+                                    b_operator='operator:double_check_vision',
+                                    vision_module='error:True'):
+        b_operator.clear()
         goal.set('stop')
+
+    def manage_rotation_opening_not_found_no_aperture_double_check_aperture_visible(b_plan_unit='planning_unit:walk_through_aperture',
+                                    b_unit_task='unit_task:manage_rotation',
+                                    b_operator='operator:double_check_vision',
+                                    b_vision1='isa:opening'):
+        b_vision1.clear()
+        b_operator.set('operator:check_passed_aperture')
 
     def passing_aperture_check_for_aperture(b_plan_unit='planning_unit:walk_through_aperture',
                                             b_unit_task='unit_task:passing_aperture',
@@ -616,7 +642,7 @@ class MyModel(ACTR):
 
 
 
-log=ccm.log(html=True)
+log=ccm.log(data=True)
 model=MyModel()
 model.middleware = middleware
 
