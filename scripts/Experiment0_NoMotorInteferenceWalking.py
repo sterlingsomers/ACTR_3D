@@ -357,16 +357,24 @@ class MyModel(ACTR):
         b_operator.set('operator:vision_result')
 
 
+    def start_experiment_rescan(b_plan_unit='planning_unit:walk_through_aperture',
+                                       b_unit_task='unit_task:walk posture:standing',
+                                       b_operator='operator:start_rescan'):
+        vision_module.find_feature(feature='opening', depth=0, width=0, delay=0.05)
+        vision_module.request('isa:opening centre:? left:? right:?')
+        b_operator.set('operator:vision_result')
+
+
     def start_experiment_vision_result(b_plan_unit='planning_unit:walk_through_aperture',
                                        b_unit_task='unit_task:walk posture:standing',
                                        b_operator='operator:vision_result',
                                        b_vision1='centre:true'):
 
         b_vision_command.set('scan:obstacles get:body_dimensions alert_status:none')
-        b_plan_unit.set('planning_unit:walk_through_aperture')
-        b_unit_task.set('unit_task:manage_rotation')
-        b_operator.set('operator:retrieve_width')
-        #b_operator.clear()
+        #b_plan_unit.set('planning_unit:walk_through_aperture')
+        #b_unit_task.set('unit_task:manage_rotation')
+        #b_operator.set('operator:retrieve_width')
+        b_operator.clear()
 
 
     def start_experiment_vision_no_result(b_plan_unit='planning_unit:walk_through_aperture',
