@@ -488,6 +488,7 @@ class GeometricCamera(morse.sensors.camera.Camera):
             stepBack = BigGrain
             x = Decimal(0.0).quantize(Decimal('.001'),rounding=ROUND_HALF_UP) #left-> right
             y = Decimal(minY).quantize(Decimal('.001'),rounding=ROUND_HALF_UP) #top-> bottom
+            newState = None
             lastHit = -1
             rowY = 0
             lastY = 0
@@ -519,6 +520,7 @@ class GeometricCamera(morse.sensors.camera.Camera):
 
                     newState = not(hit == lastHit)
 
+
                     if newState:
                         #FDOprint(hit, "is a new state")
                         if lastHit == -1:#a new line
@@ -527,7 +529,7 @@ class GeometricCamera(morse.sensors.camera.Camera):
 
                             #FDOprint(YS, "AFTER -1")
                             #objects[repr(hit)][repr(y)] = [x,None]
-                            #FDOprint("added: ", objects[repr(hit)], "because -1")
+                            #print("added: ", objects[repr(hit)], "because -1")
                             #print("NS", hit, objects[hit])
 
 
@@ -544,28 +546,28 @@ class GeometricCamera(morse.sensors.camera.Camera):
                             #print("n-", lastHit, objects[lastHit])
                             #FDOprint("X-", lastHit, y,x-grain, hit, y,x)
                             if repr(lastHit) in YS[float(y)]:#if there is already an entry for this line with that object
-                                #FDOprint(y, "in", objects[repr(lastHit)])
+                                #FDOprint(y, "in", YS)
                                 #FDOprint("so....")
                                 YS[float(y)][repr(lastHit)][1]=float(x-grain)
                                 YS[float(y)][repr(lastHit)][3]=self.distance_to_xy(x-grain,y,minDepth,maxDepth,grainSize=depthGrain)
                                 YS[float(y)][repr(lastHit)][5]=self.getScreenVector(x-grain,y)
-                                #FDOprint(objects[repr(lastHit)][repr(y)])
+                                #FDOprint(YS[float(y)])
                             else:#if this object hasn't been detected on this line
-                                #FDOprint(y, "NOT in", objects[repr(lastHit)])
+                                #FDOprint(y, "NOT in", YS)
                                 #FDOprint("so...")
                                 YS[float(y)][repr(lastHit)]=[float(x-grain),None,None,None,None,None]#because it's the most leftest
-                                #FDOprint(objects[repr(lastHit)][repr(y)])
+                                #FDOprint(YS[y])
                             #objects[hit][y] = [x,None] #roughly... it may already have that entry
                             if repr(hit)  in YS[float(y)]:
-                                #FDOprint(y, "in2", objects[repr(hit)])
+                                #FDOprint(y, "in2", YS)
                                 YS[float(y)][repr(hit)][1]=float(x) #this MIGHT be the end of that object, but it's NOT the beggining, thus [1] in [x,None]
                                 YS[float(y)][repr(hit)][3]=self.distance_to_xy(x-grain,y,minDepth,maxDepth,grainSize=depthGrain)
                                 YS[float(y)][repr(hit)][5]=self.getScreenVector(x,y)
-                                #FDOprint("so: ", objects[repr(hit)][repr(y)])
+                                #FDOprint("so: ", YS[float(y)])
                             else:
-                                #FDOprint(y, "NOT in2", objects[repr(hit)])
+                                #FDOprint(y, "NOT in2", YS)
                                 YS[float(y)][repr(hit)]=[float(x),None,self.distance_to_xy(x+grain,y,minDepth,maxDepth,grainSize=depthGrain),None,self.getScreenVector(x,y),None] #if this line is not in there, add it
-                                #FDOprint("so: ", objects[repr(hit)][repr(y)])
+                                #FDOprint("so: ", YS[float(y)])
 
                             grain = BigGrain
                             #FDOprint("set to bigGrain")
@@ -595,31 +597,37 @@ class GeometricCamera(morse.sensors.camera.Camera):
                                 #FDOprint("lastHit changed to hit->", hit)
                                 lastHit = hit#if it's a bigGrain, we're moving forward
                     else:
-                        #FDOprint("same object found")
+                        #fDOprint("same object found")
                         x+=grain
                         #input("x to " + repr(x) + "continue?")
                         #return "same state" + repr([x,y])
                     #if not newState:
                     #    lastHit = hit
                 #FDOprint (YS, "YS...")
-                YS[float(y)][repr(hit)][1]=float(x)#The end (most right) of that line
+                try:
+                    YS[float(y)][repr(hit)][1]=float(x)#The end (most right) of that line
+                except KeyError:
+                    #FDOprint(YS,y,hit,x,lastHit,newState,grain,BigGrain,SmallGrain)
+                    return self.resultdict
                 YS[float(y)][repr(hit)][3]=self.distance_to_xy(x-grain,y,minDepth,maxDepth,grainSize=depthGrain)
                 YS[float(y)][repr(hit)][5]=self.getScreenVector(x,y)
-                #print("ADFASDFASFASDF")
-                #FDOprint("End of the line", objects[repr(hit)][repr(y)], "for", hit, "and", y)
-                #FDOlastY = y
+                #FDOprint("ADFASDFASFASDF")
+                #print("End of the line", objects[repr(hit)][repr(y)], "for", hit, "and", y)
+                #lastY = y
 
                 y+=grain
                 rowY+=1#a counter for the objects[hit][rowY]
+                #FDOprint("End of x loop...")
             #print(repr(time.time() - beginning) +  " TIME ASDFADFAD")
             #print(type(list(YS.keys())[0]))
             #self.completed(status.SUCCESS,"data sent")
+            #FDOprint("Before out_q")
             out_q.put(YS)
         #time.sleep(1.0)
         #return {'0.455': {'LeftWall': [0.516, 1.006, 6.919999999999996, 10.409999999999997, 6.230040976114821, 49.26413018073574]}}
 
         try:
-            with time_limit(1):
+            with time_limit(2):
 
                 morse.sensors.camera.Camera.default_action(self)
                 start = time.time()
@@ -638,9 +646,12 @@ class GeometricCamera(morse.sensors.camera.Camera):
                 for p in procs:
                     p.join()
                 print(time.time() - start, ": TIME")
+                self.resultdict = resultdict
                 return resultdict
         except TimeoutException:
-            return self.scan_image_multi(ystart=0.0,ystop=1.0,xstart=0.0,xstop=1.0,xyGrain=0.01,xyPrecision=0.002,depthGrain=0.01,minDepth=0.01,maxDepth=50,processes=8)
+            print ("Time out!")
+            return self.resultdict
+            #raise TimeoutException#return self.scan_image_multi(ystart=0.0,ystop=1.0,xstart=0.0,xstop=1.0,xyGrain=0.01,xyPrecision=0.002,depthGrain=0.01,minDepth=0.01,maxDepth=50,processes=8)
 
 
 

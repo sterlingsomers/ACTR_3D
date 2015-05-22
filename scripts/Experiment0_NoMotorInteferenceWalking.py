@@ -15,7 +15,7 @@ import shlex
 
 
 
-if os.path.isfile('check.ck'):
+if not os.path.isfile('check.ck'):
     os.chdir('/home/sterling/morse/projects')
     #subprocess.Popen('morse run ACTR_3D', shell=True, creationflags=subprocess.CREATE_NEW_CONSOLE)
     #p = subprocess.Popen('ls', shell=True, stdout=subprocess.STDOUT, stderr=subprocess.STDOUT)
@@ -124,6 +124,7 @@ class BottomUpVision(ccm.ProductionSystem):
                              b_motor='type:proprioception feature:bounding_box width:?w depth:?d',
                              vision_module='error:True'):
         b_vision_command.set('scan:obstacles get:body_dimensions alert_status:none')
+        #vision_module.error = False
 
     def detect_obstacles_three_alert(b_vision_command='scan:obstacles get:obstacle_found alert_status:alert',
                              b_motor='type:proprioception feature:bounding_box width:?w depth:?d',
@@ -139,6 +140,8 @@ class BottomUpVision(ccm.ProductionSystem):
                              b_motor='type:proprioception feature:bounding_box width:?w depth:?d',
                              b_vision1='isa:obstacle location:?l distance:? radians:?'):
         #self.parent.b_plan_unit.clear()
+        self.parent.b_plan_unit.set('planning_unit:walk_through_aperture')
+        self.parent.b_unit_task.set('unit_task:walk posture:standing')
         self.parent.b_operator.set('operator:react isa:obstacle location:' + l)
         b_vision_command.clear()
         #goal.set('stop')
@@ -354,6 +357,7 @@ class MyModel(ACTR):
         vision_module.find_feature(feature='opening', depth=0, width=0, delay=0.05)
         vision_module.request('isa:opening centre:? left:? right:?')
         timeKeep.record_start(self.now())
+
         b_operator.set('operator:vision_result')
 
 
@@ -371,10 +375,21 @@ class MyModel(ACTR):
                                        b_vision1='centre:true'):
 
         b_vision_command.set('scan:obstacles get:body_dimensions alert_status:none')
-        #b_plan_unit.set('planning_unit:walk_through_aperture')
-        #b_unit_task.set('unit_task:manage_rotation')
-        #b_operator.set('operator:retrieve_width')
-        b_operator.clear()
+        b_plan_unit.set('planning_unit:walk_through_aperture')
+        b_unit_task.set('unit_task:manage_rotation')
+        b_operator.set('operator:retrieve_width')
+        #b_vision1.clear()
+        #b_operator.set('operator:start_rescan')
+
+    # def start_experiment_vision_no_result2(b_plan_unit='planning_unit:walk_through_aperture',
+    #                                       b_unit_task='unit_task:walk posture:standing',
+    #                                       b_operator='operator:vision_result',
+    #                                       b_vision_command='get:!obstacle_found',
+    #                                       vision_module='error:True'):
+    #
+    #     b_vision_command.clear()
+    #     b_operator.clear()
+    #     goal.set('stop')
 
 
     def start_experiment_vision_no_result(b_plan_unit='planning_unit:walk_through_aperture',
@@ -441,6 +456,7 @@ class MyModel(ACTR):
                                     b_unit_task='unit_task:manage_rotation',
                                     b_operator='operator:check_gap',
                                     b_motor='width:?w depth:?d'):
+        print("BBWIDTH",w)
         vision_module.find_feature(feature='opening', width=float(w)*1.0, depth=d)
         vision_module.request('isa:opening',delay=0.05)
         b_operator.set('operator:check_opening')
@@ -658,7 +674,7 @@ model.middleware = middleware
 env = MyEnvironment()
 env.agent = model
 
-ccm.log_everything(env)
+#ccm.log_everything(env)
 model.goal.set('action:greet')
 
 #initialize ACT-R

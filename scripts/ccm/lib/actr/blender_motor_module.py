@@ -487,6 +487,7 @@ class BlenderMotorModule(ccm.Model):
             thread.start()
         else:
             self._boundingBox = middleware.request(self.function_map[inspect.stack()[0][3]][0])[self.function_map[inspect.stack()[0][3]][0]]
+            #self.update_posture()
 
     def request_bounding_box(self):
         if self.busy:
