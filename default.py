@@ -128,12 +128,12 @@ torso.add_service('socket')
 #TopViewCamera = Camera('TopViewCamera')
 #TopViewCamera.location = [0, 4, 8]
 #TopViewCamera.rotate(math.radians(0), math.radians(180), math.radians(180))
-scale = [1.0,1.0,1.0]
+scale = [40.4/44.5,1.0,1.0]
 
 #Geometric camera
 GeometricCamerav1 = GeometricCamera()
 
-GeometricCamerav1.translate(x=0.13*scale[0],y=-0.0*scale[1],z=1.22*scale[2])
+GeometricCamerav1.translate(x=0.13,y=-0.0,z=1.22*scale[2])
 GeometricCamerav1.properties(Object=False)
 GeometricCamerav1.properties(cam_width=2048,cam_height=2048)
 GeometricCamerav1.properties(cam_focal=14)
