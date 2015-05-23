@@ -1,3 +1,4 @@
+RadiusMultiplier=1.0
 #Run with a morse environment already running.
 
 #import MiddleMorse
@@ -11,6 +12,7 @@ import subprocess
 from subprocess import *
 from sys import executable
 import shlex
+import math
 
 
 
@@ -104,14 +106,16 @@ class BottomUpVision(ccm.ProductionSystem):
     def detect_obstacles_two_alert(b_vision_command='scan:obstacles get:visual_obstacles alert_status:alert',
                              b_motor='type:proprioception feature:bounding_box width:?w depth:?d',
                              vision_module='busy:False'):
-        vision_module.find_feature(feature='obstacle', depth=d, width=w, radius_multiplier=1., delay=0.05)
+
+        vision_module.find_feature(feature='obstacle', depth=d, width=w, radius_multiplier=self.parent.RadiusMultiplier, delay=0.05)
         vision_module.request('isa:obstacle location:? distance:? radians:?')
         b_vision_command.set('scan:obstacles get:obstacle_found alert_status:alert')
 
     def detect_obstacles_two(b_vision_command='scan:obstacles get:visual_obstacles alert_status:none',
                              b_motor='type:proprioception feature:bounding_box width:?w depth:?d',
                              vision_module='busy:False'):
-        vision_module.find_feature(feature='obstacle', depth=d, width=w, radius_multiplier=1., delay=0.05)
+
+        vision_module.find_feature(feature='obstacle', depth=d, width=w, radius_multiplier=self.parent.RadiusMultiplier, delay=0.05)
         vision_module.request('isa:obstacle location:? distance:? radians:?')
         b_vision_command.set('scan:obstacles get:obstacle_found alert_status:none')
 
@@ -160,6 +164,9 @@ class MotorMethods_legs(ccm.ProductionSystem):
     def slow_step(b_motor_command_legs='walk:true speed:slow', motor_module='busy:False'):
         print("producting move_forward")
         motor_module.send('move_forward',amount=0.00645)
+        y_position = middleware.robot_simulation.robot.y_position().result()
+        if y_position >= 3.8:
+            self.parent.timeKeep.record_data(self.parent.now)
 
 class MotorMethods(ccm.ProductionSystem):
     production_time = 0.010
@@ -168,11 +175,11 @@ class MotorMethods(ccm.ProductionSystem):
 
 
     def increase_rotation_abdomen_left(b_motor_command_abdomen='rotate:true direction:left', motor_module='busy:False'):
-        motor_module.increase_shoulder_rotation('left',0.01745)
+        motor_module.increase_shoulder_rotation('left',0.02618)
         #goal.set('stop')
 
     def increase_rotation_abdomen_right(b_motor_command_abdomen='rotate:true direction:right', motor_module='busy:False'):
-        motor_module.increase_shoulder_rotation('right',-0.01745)
+        motor_module.increase_shoulder_rotation('right',-0.02618)
         #goal.set('stop')
 
     def increase_rotation_shoulders(b_motor_command_shoulders='rotate:true direction:?d', motor_module='busy:False'):
@@ -183,6 +190,16 @@ class timeKeeper(ccm.Model):
     def __init__(self):
         self.start = 0.0
         self.stop = 0.0
+        self.recorded = False
+
+    def record_data(self,now):
+
+        if not self.recorded:
+            log.angle = math.degrees(self.parent.motor_module.get_shoulder_angle())
+            log.direction = self.parent.motor_module.get_shoulder_direction()
+        self.recorded = True
+        #pythonpylog.delta_time = now - self.start
+
 
     def record_stop(self,now):
         self.stop = now
@@ -192,9 +209,10 @@ class timeKeeper(ccm.Model):
         while not x:
             pass
         log.collision = middleware.robot_simulation.robot.check_collision().result()
-        log.angle = self.parent.motor_module.get_shoulder_angle()
-        log.direction = self.parent.motor_module.get_shoulder_direction()
-        log.delta_time = self.stop - self.start
+        middleware.robot_simulation.robot.reset_collision()
+        #log.angle = math.degrees(self.parent.motor_module.get_shoulder_angle())
+        #log.direction = self.parent.motor_module.get_shoulder_direction()
+        #log.delta_time = self.stop - self.start
 
 
     def record_start(self,now):
@@ -668,6 +686,8 @@ class MyModel(ACTR):
 
 log=ccm.log(data=True)
 model=MyModel()
+
+model.RadiusMultiplier = RadiusMultiplier
 model.middleware = middleware
 
 #vInternal = VisualEnvironment()

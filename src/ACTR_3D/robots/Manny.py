@@ -79,7 +79,7 @@ class Manny(morse.core.robot.Robot):
                     if child['collision']:
                         return 1
                 except KeyError:
-                    pass
+                    print("Key error on collision")
         return 0
 
     @service
@@ -87,8 +87,11 @@ class Manny(morse.core.robot.Robot):
         children = self.bge_object.childrenRecursive
         for child in children:
             if 'part' in child.name:
-                if hasattr(child, 'collision'):
-                    child.colllision = 0
+                print("part")
+                try:
+                    child['collision'] = 0
+                except KeyError:
+                    print("no collision?")
 
         return 1
 
@@ -274,7 +277,11 @@ class Manny(morse.core.robot.Robot):
     def set_speed(self, xValue):
         self._speed = xValue
         return 
-        
+
+    @service
+    def y_position(self):
+        return self.position_3d.y
+
     @service
     def move_forward(self, amount):
         parent = self.bge_object
@@ -293,6 +300,7 @@ class Manny(morse.core.robot.Robot):
         
         self.apply_speed('Position', [vx,vy,vz], [rx,ry,rz /2.0])
         self.completed(status.SUCCESS, "Moving Forward")
+
 
         #bge.logic.setFrameRate(200)
         #bge.logic.setLogicTicRate(200)
