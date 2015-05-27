@@ -175,11 +175,11 @@ class MotorMethods(ccm.ProductionSystem):
 
 
     def increase_rotation_abdomen_left(b_motor_command_abdomen='rotate:true direction:left', motor_module='busy:False'):
-        motor_module.increase_shoulder_rotation('left',0.02618)
+        motor_module.increase_shoulder_rotation('left',0.03491)
         #goal.set('stop')
 
     def increase_rotation_abdomen_right(b_motor_command_abdomen='rotate:true direction:right', motor_module='busy:False'):
-        motor_module.increase_shoulder_rotation('right',-0.02618)
+        motor_module.increase_shoulder_rotation('right',-0.03491)
         #goal.set('stop')
 
     def increase_rotation_shoulders(b_motor_command_shoulders='rotate:true direction:?d', motor_module='busy:False'):
