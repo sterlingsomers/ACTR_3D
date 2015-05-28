@@ -1,4 +1,5 @@
-RadiusMultiplier=1.9
+RadiusMultiplier=1.0
+VisionMultiplier=1.0
 #Run with a morse environment already running.
 
 #import MiddleMorse
@@ -484,7 +485,7 @@ class MyModel(ACTR):
                                     b_operator='operator:check_gap',
                                     b_motor='width:?w depth:?d'):
         print("BBWIDTH",w)
-        vision_module.find_feature(feature='opening', width=float(w)*1.0, depth=d)
+        vision_module.find_feature(feature='opening', width=float(w)*self.VisionMultiplier, depth=d)
         vision_module.request('isa:opening',delay=0.05)
         b_operator.set('operator:check_opening')
         #goal.set('stop')
@@ -697,6 +698,7 @@ log=ccm.log(data=True)
 model=MyModel()
 
 model.RadiusMultiplier = RadiusMultiplier
+model.VisionMultiplier = VisionMultiplier
 model.middleware = middleware
 
 #vInternal = VisualEnvironment()
