@@ -43,7 +43,7 @@ class BlenderMotorModule(ccm.Model):
                                     #NAME      #min/max by axis: 0, 1, 2
         self._boneProperties = {'part.torso':[[0,0],[-pi/3,pi/3],[0,0]],
                                 'shoulder.L':[[0,0],[0,0],[-pi/6,pi/6]],
-                                'shoulder.R':[[0,0],[0,0],[-pi/6,pi/6]]}
+                                'shoulder.R':[[0,0],[0,0],[pi/6,-pi/6]]}
         #Tick
         self._internalChunks.append(ccm.Model(type='posture',
                                               standing='true',
@@ -442,15 +442,26 @@ class BlenderMotorModule(ccm.Model):
         print("radians now",kwargs['radians'])
         minR,maxR = self._boneProperties[kwargs['bone']][kwargs['axis']]
         #print("MINR", minR)
-        if Decimal(kwargs['radians']).quantize(Decimal('0.000'),rounding=ROUND_HALF_UP) >= Decimal(maxR).quantize(Decimal('0.000'),rounding=ROUND_HALF_UP):
-            print("SET TO MAX")
-            maxReached=True
-            kwargs['radians'] = maxR
-        if Decimal(kwargs['radians']).quantize(Decimal('0.000'),rounding=ROUND_HALF_UP) <= Decimal(minR).quantize(Decimal('0.000'),rounding=ROUND_HALF_UP):
-            print("SET TO MIN")
+        if kwargs['bone'] == 'shoulder.L':
+            if Decimal(kwargs['radians']).quantize(Decimal('0.000'),rounding=ROUND_HALF_UP) >= Decimal(maxR).quantize(Decimal('0.000'),rounding=ROUND_HALF_UP):
+                print("SET TO MAX")
+                maxReached=True
+                kwargs['radians'] = maxR
+            elif Decimal(kwargs['radians']).quantize(Decimal('0.000'),rounding=ROUND_HALF_UP) <= Decimal(minR).quantize(Decimal('0.000'),rounding=ROUND_HALF_UP):
+                print("SET TO MIN")
+                minReached = True
+                kwargs['radians'] = minR
 
-            minReached = True
-            kwargs['radians'] = minR
+        if kwargs['bone'] == 'shoulder.R':
+            if Decimal(kwargs['radians']).quantize(Decimal('0.000'),rounding=ROUND_HALF_UP) <= Decimal(maxR).quantize(Decimal('0.000'),rounding=ROUND_HALF_UP):
+                print("SET TO MAX")
+                maxReached=True
+                kwargs['radians'] = maxR
+
+            elif Decimal(kwargs['radians']).quantize(Decimal('0.000'),rounding=ROUND_HALF_UP) >= Decimal(minR).quantize(Decimal('0.000'),rounding=ROUND_HALF_UP):
+                print("SET TO MIN")
+                minReached = True
+                kwargs['radians'] = minR
 
         print("RADIANS",kwargs['radians'])
         middleware.send(self.function_map[function_name][0],**kwargs)

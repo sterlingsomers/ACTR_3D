@@ -274,17 +274,17 @@ class MyModel(ACTR):
         DM.add('planning_unit:assess_width unit_task:assess_width')
 
               
-        #DM.add('planning_unit:prepare_for_Take_off unit_task:starter cue:break_on')
+
         #mm.fake_buffer.set('walk:true speed:slow')
         b_count.set('value:0')
-        #motor_module.send('rotate_torso',axis=1,radians=math.radians(0))
+        motor_module.send('rotate_torso',axis=1,radians=math.radians(0))
         #motor_module.send('compress_shoulder',bone='shoulder.L',radians=0.0)
-        #motor_module.send('compress_shoulder',bone='shoulder.R',radians=0.1)
-        motor_module.increase_shoulder_compression(bone='shoulder.L',radians=0.1)
-        motor_module.increase_shoulder_compression(bone='shoulder.L',radians=0.1)
-        motor_module.increase_shoulder_compression(bone='shoulder.L',radians=0.1)
-        goal.set('stop')
-        #goal.set('setup:zero')
+        #motor_module.send('compress_shoulder',bone='shoulder.R',radians=0.53)
+        #motor_module.increase_shoulder_compression(bone='shoulder.L',radians=0.1)
+        #motor_module.increase_shoulder_compression(bone='shoulder.L',radians=0.1)
+        #motor_module.increase_shoulder_compression(bone='shoulder.L',radians=0.1)
+        #goal.set('stop')
+        goal.set('setup:zero')
 
 
 
@@ -743,7 +743,7 @@ print("here0")
 #middleware.robot_simulation.close()
 #middleware.robot_simulation.close()
 middleware.tick()
-#middleware.robot_simulation.reset()
+middleware.robot_simulation.reset()
 time.sleep(3)
 #middleware.robot_simulation.quit()
 
