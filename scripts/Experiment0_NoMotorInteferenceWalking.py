@@ -277,7 +277,7 @@ class MyModel(ACTR):
 
         #mm.fake_buffer.set('walk:true speed:slow')
         b_count.set('value:0')
-        motor_module.send('rotate_torso',axis=1,radians=math.radians(0))
+        #motor_module.send('rotate_torso',axis=1,radians=math.radians(0))
         #motor_module.send('compress_shoulder',bone='shoulder.L',radians=0.0)
         #motor_module.send('compress_shoulder',bone='shoulder.R',radians=0.53)
         #motor_module.increase_shoulder_compression(bone='shoulder.L',radians=0.1)

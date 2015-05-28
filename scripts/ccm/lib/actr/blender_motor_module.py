@@ -1,6 +1,7 @@
 #from pymorse import Morse
 
 from math import pi
+import math
 
 import ccm
 from ccm.lib.actr import Buffer
@@ -42,8 +43,8 @@ class BlenderMotorModule(ccm.Model):
         self.get_bones()
                                     #NAME      #min/max by axis: 0, 1, 2
         self._boneProperties = {'part.torso':[[0,0],[-pi/3,pi/3],[0,0]],
-                                'shoulder.L':[[0,0],[0,0],[-pi/6,pi/6]],
-                                'shoulder.R':[[0,0],[0,0],[pi/6,-pi/6]]}
+                                'shoulder.L':[[0,0],[0,0],[-math.radians(20),math.radians(20)]],
+                                'shoulder.R':[[0,0],[0,0],[math.radians(20),-math.radians(20)]]}
         #Tick
         self._internalChunks.append(ccm.Model(type='posture',
                                               standing='true',
@@ -544,7 +545,20 @@ class BlenderMotorModule(ccm.Model):
         matcher = Pattern(pattern)
         for obj in self._internalChunks:
             if matcher.match(obj) != None:
-                return obj.rotation0
+                r1 =  obj.rotation0
+        pattern = 'bone:shoulder.R'
+        matcher = Pattern(pattern)
+        for obj in self._internalChunks:
+            if matcher.match(obj) != None:
+                r2 = obj.rotation0
+        pattern = 'bone:shoulder.L'
+        matcher = Pattern(pattern)
+        for obj in self._internalChunks:
+            if matcher.match(obj) != None:
+                r3 = obj.rotation0
+
+        return r1 + r2 + r3 #Under the assumption that only one of the shoulder will be rotated
+
         return "Error"
 
     def get_shoulder_direction(self):
