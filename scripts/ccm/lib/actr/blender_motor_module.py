@@ -43,7 +43,7 @@ class BlenderMotorModule(ccm.Model):
                                     #NAME      #min/max by axis: 0, 1, 2
         self._boneProperties = {'part.torso':[[0,0],[-pi/3,pi/3],[0,0]],
                                 'shoulder.L':[[0,0],[0,0],[-pi/6,pi/6]],
-                                'shoulder.R':[[0,0],[0,0],[pi/6,-pi/6]]}
+                                'shoulder.R':[[0,0],[0,0],[-pi/6,pi/6]]}
         #Tick
         self._internalChunks.append(ccm.Model(type='posture',
                                               standing='true',
@@ -190,6 +190,16 @@ class BlenderMotorModule(ccm.Model):
             for y in x.__dict__:
                 if not '_' in y[0:2]:
                     print(y,x.__dict__[y])
+
+    def increase_shoulder_compression(self,bone,radians):
+        pattern='type:proprioception bone:' + bone
+        matcher=Pattern(pattern)
+        for obj in self._internalChunks:
+            if matcher.match(obj)!=None:
+                current_rotation=abs(float(obj.rotation0))
+
+                print("CRZ",current_rotation,current_rotation+radians)
+                return self.send('compress_shoulder',bone=bone,radians=current_rotation + radians)
 
 
     def increase_shoulder_rotation(self,direction,radians):
@@ -425,7 +435,7 @@ class BlenderMotorModule(ccm.Model):
 
         kwargs.update(self.function_map[function_name][1])
         if kwargs['bone'] == 'shoulder.R':
-            kwargs['radians'] = kwargs['radians'] * -1
+            kwargs['radians'] = kwargs['radians'] * 1
         if kwargs['bone'] == 'shoulder.L':
             kwargs['radians'] = kwargs['radians'] * -1
 
