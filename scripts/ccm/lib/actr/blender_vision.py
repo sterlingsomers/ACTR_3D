@@ -340,9 +340,9 @@ class BlenderVision(ccm.Model):
     def similar_depth(self,list1,list2,depth=0.0):
         '''Returns True if list1[2:] and list2[2:] have similar depths.
            Similarity is based on <= depth/5'''
-        #print("similar_depth")
+        print("similar_depth")
         #print("Depth/5",depth/5)
-        #print(list1,list2)
+        print("SD",list1,list2)
         #this function should suffer from the same issue, not specific (see within_depth)
         #dividend = 5
         #return abs(list1[2] - list2[2]) < depth/dividend or \
@@ -359,12 +359,12 @@ class BlenderVision(ccm.Model):
 
         linearDepth1 = float(self._objects[list1[0]][list1[1]][2+indices[0]]) * math.cos(math.radians(self._objects[list1[0]][list1[1]][4+indices[0]]))
         linearDepth2 = float(self._objects[list2[0]][list2[1]][2+indices[1]]) * math.cos(math.radians(self._objects[list2[0]][list2[1]][4+indices[1]]))
-        #print("linearDepth",linearDepth1,linearDepth2)
+        print("SD_linearDepth",linearDepth1,linearDepth2)
         #FDOprint("EX",list1,self._objects[list1[0]][list1[1]][2+indices[0]])
         #FDOprint("EX",list2,self._objects[list2[0]][list2[1]][2+indices[1]])
         #FDOprint("EX",abs(self._objects[list1[0]][list1[1]][2+indices[0]] - self._objects[list2[0]][list2[1]][2+indices[1]]))
         #FDOprint("EX",abs(self._objects[list1[0]][list1[1]][2+indices[0]] - self._objects[list2[0]][list2[1]][2+indices[1]]) < depth/5.0)
-
+        print("SD_conclusion",abs(linearDepth1-linearDepth2) < 0.50)
         return abs(linearDepth1-linearDepth2) < 0.50
         #return abs(self._objects[list1[0]][list1[1]][2+indices[0]] - self._objects[list2[0]][list2[1]][2+indices[1]]) < depth/4.5
 
@@ -470,7 +470,7 @@ class BlenderVision(ccm.Model):
             if len(self._objects[y].keys()) > 1:
                 similar_keys_minor = []
                 for ky,ty in rolling_window(numpy.array(sorted(self._objects[y],key=lambda lst: min(self._objects[y][lst][2:4]))),2):#self._objects[y]:
-                    #print("DDDDDD",y,ky,ty,similar_keys_minor)
+                    print("DDDDDD","y:",y,"ky:",ky,"ty:",ty,"similar:",similar_keys_minor)
                     if ky in self._ignoreLabels or ty in self._ignoreLabels:
                         continue
                     # if ky == 'target' or ty == 'target':
