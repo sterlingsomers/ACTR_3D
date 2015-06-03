@@ -180,6 +180,7 @@ robot.scale = scale#[1.05,1.0,1.0]
 # set 'fastmode' to True to switch to wireframe mode
 #env = Environment('../projects/ACTR_3D/Left_Hand_Traffic.blend')
 env = Environment('../projects/ACTR_3D/NOtarget_v3.blend')#, fastmode = True)
+#env = Environment('../projects/ACTR_3D/aperture_choice.blend')
 #env = Environment('indoors-1/indoor-1')
 
 #ROBOT VIEW
