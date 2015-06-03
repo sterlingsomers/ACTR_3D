@@ -203,6 +203,7 @@ class timeKeeper(ccm.Model):
         if not self.recorded:
             log.angle = math.degrees(self.parent.motor_module.get_shoulder_angle())
             log.direction = self.parent.motor_module.get_shoulder_direction()
+            log.rate = self.parent.mm.shoulder_rotation_rate
         self.recorded = True
         #pythonpylog.delta_time = now - self.start
 

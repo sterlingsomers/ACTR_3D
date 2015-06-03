@@ -1,5 +1,5 @@
-RadiusMultiplier=1.0
-VisionMultiplier=1.0
+RadiusMultiplier=1.4
+VisionMultiplier=1.1
 #Run with a morse environment already running.
 
 #import MiddleMorse
@@ -278,9 +278,10 @@ class MyModel(ACTR):
 
         #mm.fake_buffer.set('walk:true speed:slow')
         b_count.set('value:0')
+        #motor_module.send('lower_arms')
         #motor_module.send('rotate_torso',axis=1,radians=math.radians(0))
         #motor_module.send('compress_shoulder',bone='shoulder.L',radians=0.0)
-        #motor_module.send('compress_shoulder',bone='shoulder.R',radians=0.53)
+        #motor_module.send('compress_shoulder',bone='shoulder.R',radians=0.0)
         #motor_module.increase_shoulder_compression(bone='shoulder.L',radians=0.1)
         #motor_module.increase_shoulder_compression(bone='shoulder.L',radians=0.1)
         #motor_module.increase_shoulder_compression(bone='shoulder.L',radians=0.1)
@@ -705,7 +706,7 @@ model.middleware = middleware
 env = MyEnvironment()
 env.agent = model
 
-#ccm.log_everything(env)
+ccm.log_everything(env)
 model.goal.set('action:greet')
 
 #initialize ACT-R
