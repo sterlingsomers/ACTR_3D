@@ -65,7 +65,8 @@ class BlenderVision(ccm.Model):
         self._screenRight = numpy.arange(Decimal(0.0),Decimal(0.30),Decimal(0.002))
         #self._internalChunks.append(ccm.Model(isa='dial'))
 
-        self.function_map = {'scan':['scan_image_multi',{}]}
+        self.function_map = {'scan':['scan_image_multi',{}],
+                             'closest_scan':['closest_scan',{}]}
 
         #self._internalEnvironment = InternalEnvironment(self._b1)
         #self._internalEnvironment.doConvert(parent=self)
@@ -165,19 +166,58 @@ class BlenderVision(ccm.Model):
             print("keySize",keySize,depth,width)
             print(self._objects[openingsKey])
             for obj in self._objects[openingsKey]:
+
                 d1 = float(self._objects[openingsKey][obj][2])
                 d2 = float(self._objects[openingsKey][obj][3])
                 closer = 3
                 side = 'left'
                 if d1 <= d2:
                     closer = 2
-                if float(self._objects[openingsKey][obj][closer]) <= keySize * radius_multiplier:
-                    if float(self._objects[openingsKey][obj][closer -2]) < 0.50:
-                        side = 'right'
-                    self._internalChunks.append(ccm.Model(isa='obstacle',
-                                                          location=side,
-                                                          distance=repr(float(self._objects[openingsKey][obj][closer])),
-                                                          radians=repr(float(self._objects[openingsKey][obj][closer+2]))))
+                closer2 = 3
+
+                closest = None
+                closest = middleware.request(self.function_map['closest_scan'][0])[self.function_map['closest_scan'][0]]
+                print("checking closest")
+                for d in closest:
+                    if obj == d['hit']:
+                        print('angle',d['angle'],'distance',d['distance'],100 - math.degrees(math.acos(0.5/radius_multiplier)),keySize*radius_multiplier)
+                        if d['angle'] < 100 - math.degrees(math.acos(0.5/radius_multiplier)) and d['distance'] <= keySize * radius_multiplier:
+                            print("Added chunk second")
+                            self._internalChunks.append(ccm.Model(isa='obstacle',
+                                                                  location=side,
+                                                                  distance=repr(float(self._objects[openingsKey][obj][closer])),
+                                                                  radians=repr(float(self._objects[openingsKey][obj][closer+2]))))
+
+                # if float(self._objects[openingsKey][obj][4]) <= float(self._objects[openingsKey][obj][5]):
+                #     closer2 = 2
+                # if closer != closer2:
+                #     if self.sync:
+                #         raise Exception("This is not supported...")
+                #     else:
+                #         closest = middleware.request(self.function_map['closest_scan'][0])[self.function_map['closest_scan'][0]]
+                #
+                # if closest is None:
+                #     if float(self._objects[openingsKey][obj][closer]) <= keySize * radius_multiplier:
+                #         if float(self._objects[openingsKey][obj][closer -2]) < 0.50:
+                #             side = 'right'
+                #         print("abcdefg", self._objects[openingsKey][obj][closer+2],d1,d2,closer,obj)
+                #         if float(self._objects[openingsKey][obj][closer + 2]) <= 90 - math.degrees(math.acos(0.5/radius_multiplier)):
+                #             print("Added chunk first")
+                #             self._internalChunks.append(ccm.Model(isa='obstacle',
+                #                                                   location=side,
+                #                                                   distance=repr(float(self._objects[openingsKey][obj][closer])),
+                #                                                   radians=repr(float(self._objects[openingsKey][obj][closer+2]))))
+                # else:
+                #     print("checking closest")
+                #     for d in closest:
+                #         if obj == d['hit']:
+                #             print('angle',d['angle'],'distance',d['distance'])
+                #             if d['angle'] < 90 - math.degrees(math.acos(0.5/radius_multiplier)) and d['distance'] <= keySize * radius_multiplier:
+                #                 print("Added chunk second")
+                #                 self._internalChunks.append(ccm.Model(isa='obstacle',
+                #                                                       location=side,
+                #                                                       distance=repr(float(self._objects[openingsKey][obj][closer])),
+                #                                                       radians=repr(float(self._objects[openingsKey][obj][closer+2]))))
                     #obstacles.append([side,self._objects[openingsKey][obj][closer],self._objects[openingsKey][obj][closer + 2]])
                 # if float(self._objects[openingsKey][obj][2]) <= keySize * 3:
                 #     obstacles.append([self._objects[openingsKey][obj][2],self._objects[openingsKey][obj][4]])

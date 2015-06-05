@@ -93,6 +93,7 @@ class GeometricCamera(morse.sensors.camera.Camera):
         morse.sensors.camera.Camera.__init__(self, obj, parent)
         self.visual_objects = {}
         self.robot_parent.func_map['scan_image_multi'] = self
+        self.robot_parent.func_map['closest_scan'] = self
         # Locate the Blender camera object associated with this sensor
         main_obj = self.bge_object
         for obj in main_obj.children:
@@ -472,6 +473,80 @@ class GeometricCamera(morse.sensors.camera.Camera):
         print(repr(time.time() - beginning) +  " TIME ASDFADFAD")
         return objects
                                
+
+    def closest_scan(self,y=0.50,xstart=0.0,xstop=1.0,xyGrain=0.01,xyPrecision=0.002,depthGrain=0.01,minDepth=0.01,maxDepth=50,processes=8):
+        SmallGrain = Decimal(xyGrain).quantize(Decimal('.001'),rounding=ROUND_HALF_UP)
+        grain = float(SmallGrain)
+        xstart = xstart
+        xstop = xstop
+        results = []
+        closest = {'distance':10000,'hit':None,'angle':None}
+        results.append(closest)
+        x = xstart
+        y = y
+        while x < xstop:
+            print("X",x)
+            hit = repr(self.blender_cam.getScreenRay(x,y,2))
+            distance = self.distance_to_xy(x,y,minDepth,2,grainSize=depthGrain)
+            angle = self.getScreenVector(x,y)
+            entry = {'hit':hit,'distance':distance,'angle':angle}
+
+            if entry['distance'] <= closest['distance']:
+                results = [d for d in results if d['distance'] <= entry['distance']]
+                hits = 0
+                for d in results:
+                    if d['hit'] == entry['hit']:
+                        hits += 1
+                if not hits:
+                    results.append(entry)
+
+                #if entry['distance'] < closest['distance']:
+                #    results = [d for d in results if d['distance'] < entry['distance']]
+
+
+                #results.append(entry)
+                closest = entry
+            x+=grain
+        duplicateHits = []
+        removeHits = []
+
+        return results
+
+        # def worker(xstart,xstop,out_q):
+        # #return [123]
+        #     out_qu.put([])
+        #     x = xstart
+        #     while x < xstop:
+        #         hit = self.blender_cam.getScreenRay(x,y,2)
+        #         distance = self.distance_to_xy(x,y,minDepth,2,grainSize=depthGrain)
+        #         angle = self.getScreenVector(x,y)
+        #         entry = {'hit':hit,'distance':distance,'angle':angle}
+        #         if entry['distance'] <= closest['distance']:
+        #             results.append(entry)
+        #             closest['hit'] = entry['hit']
+        #             closest['angle'] = entry['angle']
+        #             closest['distance'] = entry['distance']
+        #         x+=grain
+        #
+        # out_q = mp.Queue()
+        # procs = []
+        #
+        # for i in range(processes):
+        #     p = mp.Process(target=worker,args=(i/processes,i/processes+(1/processes),out_q))
+        #     procs.append(p)
+        #     p.start()
+        #
+        # resultdict = {}
+        # for i in range(processes):
+        #     results.extend(out_q.get())
+        #
+        # for p in procs:
+        #     p.join()
+        # return results
+
+
+
+
     @service
     def scan_image_multi(self,ystart=0.0,ystop=1.0,xstart=0.0,xstop=1.0,xyGrain=0.01,xyPrecision=0.002,depthGrain=0.01,minDepth=0.01,maxDepth=50,processes=8):
         def worker(minY,maxY, out_q):

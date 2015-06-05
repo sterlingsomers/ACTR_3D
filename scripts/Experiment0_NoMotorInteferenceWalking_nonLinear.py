@@ -1,4 +1,4 @@
-RadiusMultiplier=1.0
+RadiusMultiplier=1.2
 VisionMultiplier=1.0
 #Run with a morse environment already running.
 
