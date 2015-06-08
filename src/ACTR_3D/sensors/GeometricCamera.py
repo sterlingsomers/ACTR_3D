@@ -485,9 +485,12 @@ class GeometricCamera(morse.sensors.camera.Camera):
         x = xstart
         y = y
         while x < xstop:
-            print("X",x)
-            hit = repr(self.blender_cam.getScreenRay(x,y,2))
-            distance = self.distance_to_xy(x,y,minDepth,2,grainSize=depthGrain)
+            #print("X",x)
+            hit = repr(self.blender_cam.getScreenRay(x,y,5))
+            if 'part' in hit:
+                x+=grain
+                continue
+            distance = self.distance_to_xy(x,y,minDepth,5,grainSize=depthGrain)
             angle = self.getScreenVector(x,y)
             entry = {'hit':hit,'distance':distance,'angle':angle}
 

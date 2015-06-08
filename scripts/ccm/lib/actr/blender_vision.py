@@ -180,8 +180,8 @@ class BlenderVision(ccm.Model):
                 print("checking closest")
                 for d in closest:
                     if obj == d['hit']:
-                        print('angle',d['angle'],'distance',d['distance'],100 - math.degrees(math.acos(0.5/radius_multiplier)),keySize*radius_multiplier)
-                        if d['angle'] < 100 - math.degrees(math.acos(0.5/radius_multiplier)) and d['distance'] <= keySize * radius_multiplier:
+                        print('angle',d['angle'],'distance',d['distance'],95 - math.degrees(math.acos(0.5/radius_multiplier)),keySize*radius_multiplier)
+                        if d['angle'] < 95 - math.degrees(math.acos(0.5/radius_multiplier)) and d['distance'] <= keySize * radius_multiplier:
                             print("Added chunk second")
                             self._internalChunks.append(ccm.Model(isa='obstacle',
                                                                   location=side,

@@ -1,4 +1,4 @@
-RadiusMultiplier=1.0
+RadiusMultiplier=1.7
 VisionMultiplier=1.0
 #Run with a morse environment already running.
 
@@ -160,11 +160,11 @@ class VisionMethods(ccm.ProductionSystem):
 
 
 class MotorMethods_legs(ccm.ProductionSystem):
-    production_time = 0.010
+    production_time = 0.01
 
     def slow_step(b_motor_command_legs='walk:true speed:slow', motor_module='busy:False'):
         print("producting move_forward")
-        motor_module.send('move_forward',amount=0.00645)
+        motor_module.send('move_forward',amount=0.0177)
         y_position = middleware.robot_simulation.robot.y_position().result()
         if y_position >= 3.8:
             self.parent.timeKeep.record_data(self.parent.now)
@@ -181,16 +181,16 @@ class MotorMethods(ccm.ProductionSystem):
         motor_module.increase_shoulder_rotation('left',self.shoulder_rotation_rate)
         motor_module.increase_shoulder_compression(bone='shoulder.R',radians=self.shoulder_rotation_rate)
         self.shoulder_rotation_rate = self.shoulder_rotation_rate + 0.005
-        if self.shoulder_rotation_rate >= self.maximum_rotation_rate:
-            self.shoulder_rotation_rate = self.maximum_rotation_rate
+        #if self.shoulder_rotation_rate >= self.maximum_rotation_rate:
+        #    self.shoulder_rotation_rate = self.maximum_rotation_rate
         #goal.set('stop')
 
     def increase_rotation_abdomen_right(b_motor_command_abdomen='rotate:true direction:right', motor_module='busy:False'):
         motor_module.increase_shoulder_rotation('right',self.shoulder_rotation_rate*-1)
         motor_module.increase_shoulder_compression(bone='shoulder.L',radians=self.shoulder_rotation_rate)
         self.shoulder_rotation_rate = self.shoulder_rotation_rate + 0.005
-        if self.shoulder_rotation_rate >= self.maximum_rotation_rate:
-            self.shoulder_rotation_rate = self.maximum_rotation_rate
+        #if self.shoulder_rotation_rate >= self.maximum_rotation_rate:
+        #    self.shoulder_rotation_rate = self.maximum_rotation_rate
         ##goal.set('stop')
 
     def increase_rotation_shoulders(b_motor_command_shoulders='rotate:true direction:?d', motor_module='busy:False'):
