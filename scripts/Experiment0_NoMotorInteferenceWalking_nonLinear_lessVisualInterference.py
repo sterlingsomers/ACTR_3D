@@ -97,11 +97,11 @@ class BottomUpVision(ccm.ProductionSystem):
     production_time=0.050
 
     def detect_obstacles_one_alert(b_vision_command='scan:obstacles get:body_dimensions alert_status:alert',motor_module='busy:False'):
-        motor_module.request('type:proprioception feature:bounding_box width:? depth:?',delay=0.02)
+        motor_module.request('type:proprioception feature:bounding_box width:? depth:?',delay=0.01)
         b_vision_command.set('scan:obstacles get:visual_obstacles alert_status:alert')
 
     def detect_obstacles_one(b_vision_command='scan:obstacles get:body_dimensions alert_status:none',motor_module='busy:False'):
-        motor_module.request('type:proprioception feature:bounding_box width:? depth:?',delay=0.02)
+        motor_module.request('type:proprioception feature:bounding_box width:? depth:?',delay=0.01)
         b_vision_command.set('scan:obstacles get:visual_obstacles alert_status:none')
 
     def detect_obstacles_two_alert(b_vision_command='scan:obstacles get:visual_obstacles alert_status:alert',
@@ -166,8 +166,11 @@ class MotorMethods_legs(ccm.ProductionSystem):
         print("producting move_forward")
         motor_module.send('move_forward',amount=0.0177)
         y_position = middleware.robot_simulation.robot.y_position().result()
+        print("Y position", y_position)
         if y_position >= 3.8:
             self.parent.timeKeep.record_data(self.parent.now)
+            self.parent.goal.set('stop')
+            self.parent.b_operator.clear()
 
 class MotorMethods(ccm.ProductionSystem):
     production_time = 0.010
@@ -404,10 +407,63 @@ class MyModel(ACTR):
 
         vision_module.find_feature(feature='opening', width=float(w)*self.VisionMultiplier, depth=d)
         vision_module.request('isa:opening',delay=0.05)
+        b_motor.clear()
         b_operator.set('operator:check_opening')
 
+    def start_experiment_large_opening_found(b_plan_unit='planning_unit:walk_through_aperture',
+                                             b_unit_task='unit_task:walk posture:standing',
+                                             b_operator='operator:check_opening',
+                                             b_vision1='isa:opening'):
+        pass
+
+    def start_experiment_no_large_opening_found(b_plan_unit='planning_unit:walk_through_aperture',
+                                             b_unit_task='unit_task:walk posture:standing',
+                                             b_operator='operator:check_opening',
+                                             vision_module='error:True'):
+        DM.request('type:posture standing:true minimal_width:true width:? depth:?')
+        b_operator.set('operator:recall_posture')
 
 
+
+    def start_experiment_no_large_opening_found_recall(b_plan_unit='planning_unit:walk_through_aperture',
+                                             b_unit_task='unit_task:walk posture:standing',
+                                             b_operator='operator:recall_posture',
+                                             DMbuffer='width:?w depth:?d'):
+        vision_module.find_feature(feature='opening', width=float(w)*self.VisionMultiplier, depth=d)
+        vision_module.request('isa:opening',delay=0.05)
+        b_operator.set('operator:smallest_seen')
+        #b_vision_command.set('scan:obstacles get:body_dimensions alert_status:none')
+        #b_plan_unit.clear()
+        #b_unit_task.clear()
+        #b_operator.clear()
+
+    def start_experiment_smallest_seen(b_plan_unit='planning_unit:walk_through_aperture',
+                                       b_unit_task='unit_task:walk posture:standing',
+                                       b_operator='operator:smallest_seen',
+                                       b_vision1='isa:opening'):
+        b_vision_command.set('scan:obstacles get:body_dimensions alert_status:none')
+        b_plan_unit.clear()
+        b_unit_task.clear()
+        b_operator.clear()
+
+
+    def start_experiment_smallest_seen_failed(b_plan_unit='planning_unit:walk_through_aperture',
+                                       b_unit_task='unit_task:walk posture:standing',
+                                       b_operator='operator:smallest_seen',
+                                       vision_module='error:True'):
+        goal.set('stop')
+        b_plan_unit.clear()
+        b_unit_task.clear()
+        b_operator.clear()
+
+    def start_experiment_no_large_opening_found_recall_fail(b_plan_unit='planning_unit:walk_through_aperture',
+                                             b_unit_task='unit_task:walk posture:standing',
+                                             b_operator='operator:recall_posture',
+                                             DM='error:True'):
+        goal.set('stop')
+        b_plan_unit.clear()
+        b_unit_task.clear()
+        b_operator.clear()
 
 
     def start_experiment_rescan(b_plan_unit='planning_unit:walk_through_aperture',
