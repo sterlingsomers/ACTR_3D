@@ -783,7 +783,7 @@ model.middleware = middleware
 env = MyEnvironment()
 env.agent = model
 
-ccm.log_everything(env)
+#ccm.log_everything(env)
 model.goal.set('action:greet')
 
 #initialize ACT-R
