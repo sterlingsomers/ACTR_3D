@@ -391,11 +391,23 @@ class MyModel(ACTR):
                          b_operator='operator:start_walking'):
 
         b_motor_command_legs.set('walk:true speed:slow')
-        vision_module.find_feature(feature='opening', depth=0, width=0, delay=0.05)
-        vision_module.request('isa:opening centre:? left:? right:?')
-        timeKeep.record_start(self.now())
+        motor_module.get_bounding_box()
+        motor_module.request_bounding_box()
+        motor_module.request('type:proprioception feature:bounding_box width:? depth:?',delay=0.01)
+        b_operator.set('operator:look_for_aperture')
 
-        b_operator.set('operator:vision_result')
+
+    def start_experiment_look(b_plan_unit='planning_unit:walk_through_aperture',
+                              b_unit_task='unit_task:walk posture:standing',
+                              b_operator='operator:look_for_aperture',
+                              b_motor='width:?w depth:?d'):
+
+        vision_module.find_feature(feature='opening', width=float(w)*self.VisionMultiplier, depth=d)
+        vision_module.request('isa:opening',delay=0.05)
+        b_operator.set('operator:check_opening')
+
+
+
 
 
     def start_experiment_rescan(b_plan_unit='planning_unit:walk_through_aperture',
@@ -410,11 +422,12 @@ class MyModel(ACTR):
                                        b_unit_task='unit_task:walk posture:standing',
                                        b_operator='operator:vision_result',
                                        b_vision1='centre:true'):
+        pass
 
-        b_vision_command.set('scan:obstacles get:body_dimensions alert_status:none')
-        b_plan_unit.set('planning_unit:walk_through_aperture')
-        b_unit_task.set('unit_task:manage_rotation')
-        b_operator.set('operator:retrieve_width')
+        #b_vision_command.set('scan:obstacles get:body_dimensions alert_status:none')
+        #b_plan_unit.set('planning_unit:walk_through_aperture')
+        #b_unit_task.set('unit_task:manage_rotation')
+        #b_operator.set('operator:retrieve_width')
         #b_vision1.clear()
         #b_operator.set('operator:start_rescan')
 
@@ -714,7 +727,7 @@ model.middleware = middleware
 env = MyEnvironment()
 env.agent = model
 
-#ccm.log_everything(env)
+ccm.log_everything(env)
 model.goal.set('action:greet')
 
 #initialize ACT-R
