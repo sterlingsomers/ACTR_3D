@@ -1,4 +1,4 @@
-RadiusMultiplier=1.0
+RadiusMultiplier=1.8
 VisionMultiplier=1.0
 #Run with a morse environment already running.
 
@@ -94,7 +94,7 @@ class VisionScanner(ccm.ProductionSystem):
         self.parent.vision_module.scan()
 
 class BottomUpVision(ccm.ProductionSystem):
-    production_time=0.050
+    production_time=0.010
 
     def detect_obstacles_one_alert(b_vision_command='scan:obstacles get:body_dimensions alert_status:alert',motor_module='busy:False'):
         motor_module.request('type:proprioception feature:bounding_box width:? depth:?',delay=0.01)
