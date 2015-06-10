@@ -1,4 +1,4 @@
-RadiusMultiplier=1.8
+RadiusMultiplier=1.0
 VisionMultiplier=1.0
 #Run with a morse environment already running.
 
@@ -414,7 +414,10 @@ class MyModel(ACTR):
                                              b_unit_task='unit_task:walk posture:standing',
                                              b_operator='operator:check_opening',
                                              b_vision1='isa:opening'):
-        pass
+        b_vision_command.set('scan:obstacles get:body_dimensions alert_status:none')
+        b_plan_unit.clear()
+        b_unit_task.clear()
+        b_operator.clear()
 
     def start_experiment_no_large_opening_found(b_plan_unit='planning_unit:walk_through_aperture',
                                              b_unit_task='unit_task:walk posture:standing',
