@@ -180,6 +180,7 @@ class BlenderVision(ccm.Model):
                 print("checking closest")
                 for d in closest:
                     if obj == d['hit']:
+                        print(radius_multiplier)
                         print('angle',d['angle'],'distance',d['distance'],95 - math.degrees(math.acos(0.5/radius_multiplier)),keySize*radius_multiplier)
                         if d['angle'] < 95 - math.degrees(math.acos(0.5/radius_multiplier)) and d['distance'] <= keySize * radius_multiplier:
                             print("Added chunk second")
@@ -776,7 +777,7 @@ class BlenderVision(ccm.Model):
             self.error=True
             self.busy=False
 
-    def request(self,pattern='',delay=0.0,delay_sd=0.0):
+    def request(self,pattern='',buffer=1,delay=0.0,delay_sd=0.0):
         print("REQUEST")
         if self.busy:
             print("Motor request busy")
@@ -806,13 +807,19 @@ class BlenderVision(ccm.Model):
 
         self.busy=False
         if len(r) == 0:
-            self._b1.clear()
+            if buffer == 1:
+                self._b1.clear()
+            if buffer == 2:
+                self._b2.clear()
             self.error = True
         else:
             #print("RRR",r)
             #random.shuffle(r)
             obj=self.random.choice(r)
-            self._b1.set(obj)
+            if buffer == 1:
+                self._b1.set(obj)
+            if buffer == 2:
+                self._b1.set(obj)
         #self._internalEnvironment.__convert()
         #print(dir(self._internalEnvironment), "InternalEnvironment")
         #print(self._internalEnvironment.poop.isa,"poooooooop")

@@ -545,11 +545,11 @@ class MyModel(ACTR):
         b_operator.set('operator:retrieve_width')
         #goal.set('stop')
 
-    def number_test(b_plan_unit='planning_unit:walk_through_aperture',
-                                  b_unit_task='unit_task:walk posture:standing',
-                                  b_operator='number:3.12'):
-        goal.set('stop')
-        b_plan_unit.clear()
+    # def number_test(b_plan_unit='planning_unit:walk_through_aperture',
+    #                               b_unit_task='unit_task:walk posture:standing',
+    #                               b_operator='number:3.12'):
+    #     goal.set('stop')
+    #     b_plan_unit.clear()
 
 
     def manage_rotation_check_width(b_plan_unit='planning_unit:walk_through_aperture',
@@ -568,6 +568,7 @@ class MyModel(ACTR):
         print("BBWIDTH",w)
         vision_module.find_feature(feature='opening', width=float(w)*self.VisionMultiplier, depth=d)
         vision_module.request('isa:opening',delay=0.05)
+        b_motor.clear()
         b_operator.set('operator:check_opening')
         #goal.set('stop')
         #b_plan_unit.clear()
@@ -578,6 +579,7 @@ class MyModel(ACTR):
                                     b_vision1='isa:opening'):
         b_motor_command_shoulders.clear()
         b_motor_command_abdomen.clear()
+        b_vision1.clear()
         b_unit_task.set('unit_task:passing_aperture')
         b_operator.set('operator:check_for_aperture')
 
@@ -589,11 +591,13 @@ class MyModel(ACTR):
                                     b_unit_task='unit_task:manage_rotation',
                                     b_operator='operator:check_opening',
                                     vision_module='error:True'):
+        b_operator.set('operator:retrieve_width')
+        b_vision1.clear()
         #b_operator.set('operator:retrieve_width')
         #Have I passed the aperture?
-        b_operator.set('operator:check_passed_aperture')
-        vision_module.find_feature(feature='opening', width=0, depth=0)
-        vision_module.request('isa:opening',delay=0.05)
+        #b_operator.set('operator:check_passed_aperture')
+        #vision_module.find_feature(feature='opening', width=0, depth=0)
+        #vision_module.request('isa:opening',delay=0.05)
 
     def manage_rotation_opening_not_found_still_aperture(b_plan_unit='planning_unit:walk_through_aperture',
                                     b_unit_task='unit_task:manage_rotation',

@@ -1,5 +1,6 @@
 RadiusMultiplier=1.0
 VisionMultiplier=1.0
+MaximumRotationRate=0.080
 #Run with a morse environment already running.
 
 #import MiddleMorse
@@ -140,7 +141,6 @@ class BottomUpVision(ccm.ProductionSystem):
         #b_vision_command.clear()
         #goal.set('stop')
 
-
     def detect_obstacles_three(b_vision_command='scan:obstacles get:obstacle_found alert_status:none',
                              b_motor='type:proprioception feature:bounding_box width:?w depth:?d',
                              b_vision1='isa:obstacle location:?l distance:? radians:?'):
@@ -150,6 +150,33 @@ class BottomUpVision(ccm.ProductionSystem):
         self.parent.b_operator.set('operator:react isa:obstacle location:' + l)
         b_vision_command.clear()
         #goal.set('stop')
+
+
+    def monitor_ap_retrieve_width(b_vision_command='scan:opening get:motor'):
+        motor_module.get_bounding_box()
+        motor_module.request_bounding_box()
+        motor_module.request('type:proprioception feature:bounding_box width:? depth:?',delay=0.01)
+        b_vision_command.modify(get='vision')
+
+    def monitor_ap_retrieve_vision(b_vision_command='scan:opening get:vision',
+                                   b_motor='width:?w depth:?d'):
+         vision_module.find_feature(feature='opening', width=float(w)*self.parent.VisionMultiplier, depth=d)
+         vision_module.request('isa:opening',delay=0.02)
+         b_motor.clear()
+         b_vision_command.modify(get='result')
+
+
+    def monitor_ap_retrieve_result(b_vision_command='scan:opening get:result',
+                                   b_vision1='isa:opening'):
+        b_motor_command_shoulders.clear()
+        b_motor_command_abdomen.clear()
+        b_vision1.clear()
+
+    def monitor_ap_retrieve_result_fail(b_vision_command='scan:opening get:result',
+                                   vision_module='error:True'):
+        b_vision_command.modify(get='motor')
+
+
 
 class VisionMethods(ccm.ProductionSystem):
     production_time = 0.10
@@ -176,7 +203,7 @@ class MotorMethods(ccm.ProductionSystem):
     production_time = 0.010
     #fake_buffer = Buffer()
     shoulder_rotation_rate = 0.01745
-    maximum_rotation_rate = 0.045 #near 3 degrees
+    maximum_rotation_rate = MaximumRotationRate #near 3 degrees
 
 
 
@@ -184,16 +211,16 @@ class MotorMethods(ccm.ProductionSystem):
         motor_module.increase_shoulder_rotation('left',self.shoulder_rotation_rate)
         motor_module.increase_shoulder_compression(bone='shoulder.R',radians=self.shoulder_rotation_rate)
         self.shoulder_rotation_rate = self.shoulder_rotation_rate + 0.005
-        #if self.shoulder_rotation_rate >= self.maximum_rotation_rate:
-        #    self.shoulder_rotation_rate = self.maximum_rotation_rate
+        if self.shoulder_rotation_rate >= self.maximum_rotation_rate:
+            self.shoulder_rotation_rate = self.maximum_rotation_rate
         #goal.set('stop')
 
     def increase_rotation_abdomen_right(b_motor_command_abdomen='rotate:true direction:right', motor_module='busy:False'):
         motor_module.increase_shoulder_rotation('right',self.shoulder_rotation_rate*-1)
         motor_module.increase_shoulder_compression(bone='shoulder.L',radians=self.shoulder_rotation_rate)
         self.shoulder_rotation_rate = self.shoulder_rotation_rate + 0.005
-        #if self.shoulder_rotation_rate >= self.maximum_rotation_rate:
-        #    self.shoulder_rotation_rate = self.maximum_rotation_rate
+        if self.shoulder_rotation_rate >= self.maximum_rotation_rate:
+            self.shoulder_rotation_rate = self.maximum_rotation_rate
         ##goal.set('stop')
 
     def increase_rotation_shoulders(b_motor_command_shoulders='rotate:true direction:?d', motor_module='busy:False'):
@@ -524,11 +551,11 @@ class MyModel(ACTR):
         #b_operator.set('number:' + repr(3.12))
         b_motor_command_shoulders.set('rotate:true direction:left')
         b_motor_command_abdomen.set('rotate:true direction:left')
-        #b_vision_command.set('scan:obstacles get:body_dimensions alert_status:alert')
+        b_vision_command.set('scan:opening get:motor')
         #b_plan_unit.clear()
-        b_plan_unit.set('planning_unit:walk_through_aperture')
-        b_unit_task.set('unit_task:manage_rotation')
-        b_operator.set('operator:retrieve_width')
+        #b_plan_unit.set('planning_unit:walk_through_aperture')
+        #b_unit_task.set('unit_task:manage_rotation')
+        #b_operator.set('operator:retrieve_width')
         #goal.set('stop')
 
     def vision_scan_obstacle_right(b_plan_unit='planning_unit:walk_through_aperture',
@@ -538,18 +565,14 @@ class MyModel(ACTR):
         #b_operator.set('number:' + repr(3.12))
         b_motor_command_shoulders.set('rotate:true direction:right')
         b_motor_command_abdomen.set('rotate:true direction:right')
-        #b_vision_command.set('scan:obstacles get:body_dimensions alert_status:alert')
-        #b_plan_unit.clear()
-        b_plan_unit.set('planning_unit:walk_through_aperture')
-        b_unit_task.set('unit_task:manage_rotation')
-        b_operator.set('operator:retrieve_width')
-        #goal.set('stop')
+        b_vision_command.set('scan:opening get:motor')
 
-    def number_test(b_plan_unit='planning_unit:walk_through_aperture',
-                                  b_unit_task='unit_task:walk posture:standing',
-                                  b_operator='number:3.12'):
-        goal.set('stop')
-        b_plan_unit.clear()
+
+    # def number_test(b_plan_unit='planning_unit:walk_through_aperture',
+    #                               b_unit_task='unit_task:walk posture:standing',
+    #                               b_operator='number:3.12'):
+    #     goal.set('stop')
+    #     b_plan_unit.clear()
 
 
     def manage_rotation_check_width(b_plan_unit='planning_unit:walk_through_aperture',
@@ -568,6 +591,7 @@ class MyModel(ACTR):
         print("BBWIDTH",w)
         vision_module.find_feature(feature='opening', width=float(w)*self.VisionMultiplier, depth=d)
         vision_module.request('isa:opening',delay=0.05)
+        b_motor.clear()
         b_operator.set('operator:check_opening')
         #goal.set('stop')
         #b_plan_unit.clear()
@@ -578,6 +602,7 @@ class MyModel(ACTR):
                                     b_vision1='isa:opening'):
         b_motor_command_shoulders.clear()
         b_motor_command_abdomen.clear()
+        b_vision1.clear()
         b_unit_task.set('unit_task:passing_aperture')
         b_operator.set('operator:check_for_aperture')
 
@@ -589,11 +614,13 @@ class MyModel(ACTR):
                                     b_unit_task='unit_task:manage_rotation',
                                     b_operator='operator:check_opening',
                                     vision_module='error:True'):
+        b_operator.set('operator:retrieve_width')
+        b_vision1.clear()
         #b_operator.set('operator:retrieve_width')
         #Have I passed the aperture?
-        b_operator.set('operator:check_passed_aperture')
-        vision_module.find_feature(feature='opening', width=0, depth=0)
-        vision_module.request('isa:opening',delay=0.05)
+        #b_operator.set('operator:check_passed_aperture')
+        #vision_module.find_feature(feature='opening', width=0, depth=0)
+        #vision_module.request('isa:opening',delay=0.05)
 
     def manage_rotation_opening_not_found_still_aperture(b_plan_unit='planning_unit:walk_through_aperture',
                                     b_unit_task='unit_task:manage_rotation',
