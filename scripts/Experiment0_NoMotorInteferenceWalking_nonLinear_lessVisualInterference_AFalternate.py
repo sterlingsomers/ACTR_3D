@@ -51,7 +51,7 @@ class MyEnvironment(ccm.Model):
 
 
 class CollisionScanner(ccm.ProductionSystem):
-    production_time = 0.007
+    production_time = 0.01
     fake_buffer = Buffer()
 
     def init():
@@ -168,8 +168,9 @@ class BottomUpVision(ccm.ProductionSystem):
 
     def monitor_ap_retrieve_result(b_vision_command='scan:opening get:result',
                                    b_vision1='isa:opening'):
-        b_motor_command_shoulders.clear()
-        b_motor_command_abdomen.clear()
+        self.parent.b_oprator.set('operator:stop_rotation')
+        #b_motor_command_shoulders.clear()
+        #b_motor_command_abdomen.clear()
         b_vision1.clear()
 
     def monitor_ap_retrieve_result_fail(b_vision_command='scan:opening get:result',
@@ -191,7 +192,7 @@ class MotorMethods_legs(ccm.ProductionSystem):
 
     def slow_step(b_motor_command_legs='walk:true speed:slow', motor_module='busy:False'):
         print("producting move_forward")
-        motor_module.send('move_forward',amount=0.0128)
+        motor_module.send('move_forward',amount=0.0177)
         y_position = middleware.robot_simulation.robot.y_position().result()
         print("Y position", y_position)
         if y_position >= 3.8:
@@ -609,6 +610,9 @@ class MyModel(ACTR):
         #goal.set('stop')
         #b_plan_unit.clear()
 
+    def stop_rotation(b_operator='operator:stop_rotation'):
+        b_motor_command_shoulders.clear()
+        b_motor_command_abdomen.clear()
 
     def manage_rotation_opening_not_found(b_plan_unit='planning_unit:walk_through_aperture',
                                     b_unit_task='unit_task:manage_rotation',
