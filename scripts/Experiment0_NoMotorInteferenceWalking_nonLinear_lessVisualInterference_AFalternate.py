@@ -168,7 +168,7 @@ class BottomUpVision(ccm.ProductionSystem):
 
     def monitor_ap_retrieve_result(b_vision_command='scan:opening get:result',
                                    b_vision1='isa:opening'):
-        self.parent.b_oprator.set('operator:stop_rotation')
+        self.parent.b_operator.set('operator:stop_rotation')
         #b_motor_command_shoulders.clear()
         #b_motor_command_abdomen.clear()
         b_vision1.clear()
