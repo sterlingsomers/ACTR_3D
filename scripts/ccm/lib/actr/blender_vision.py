@@ -181,8 +181,8 @@ class BlenderVision(ccm.Model):
                 for d in closest:
                     if obj == d['hit']:
                         print(radius_multiplier)
-                        print('angle',d['angle'],'distance',d['distance'],95 - math.degrees(math.acos(0.5/radius_multiplier)),keySize*radius_multiplier)
-                        if d['angle'] < 95 - math.degrees(math.acos(0.5/radius_multiplier)) and d['distance'] <= keySize * radius_multiplier:
+                        print('angle',d['angle'],'distance',d['distance'],100 - math.degrees(math.acos(0.5/radius_multiplier)),keySize*radius_multiplier)
+                        if d['angle'] < 100 - math.degrees(math.acos(0.5/radius_multiplier)) and d['distance'] <= keySize * radius_multiplier:
                             print("Added chunk second")
                             self._internalChunks.append(ccm.Model(isa='obstacle',
                                                                   location=side,
@@ -230,7 +230,8 @@ class BlenderVision(ccm.Model):
              #   chunkValues.add('true')
 
 
-
+        #elif 'feature' in kwargs and kwargs['feature'] == 'opening_size':
+         #   openings = self.find_opening
         elif 'feature' in kwargs and kwargs['feature'] == 'opening':
             openings = self.find_opening(depth=float(kwargs['depth']))
             if openings == {}:
@@ -293,7 +294,10 @@ class BlenderVision(ccm.Model):
             #
             #     #print("openings..................")
             #
+            print("so many openings...", openings)
             for key in sorted(openings.keys()):
+                if key != Decimal('0.500'):
+                    continue
                 #print("PC",key,openings[key])
                 #indices = self.indices_of_smallest_angle(self._objects[key][openings[key][0]][4:6],
                 #                                         self._objects[key][openings[key][1]][4:6])
@@ -306,7 +310,11 @@ class BlenderVision(ccm.Model):
                 xs = [x1,x2]
                 xs.sort()
                 #FDOprint("DT",xs)
-
+                a = self._objects[Decimal(openingsKey)][self._openings[openingsKey][0]][2+indices[0]]
+                b = self._objects[Decimal(openingsKey)][self._openings[openingsKey][1]][2+indices[1]]
+                c = math.sqrt(float(a)**2 - 2*float(a)*float(b)*math.cos(float(math.radians(y)))+float(b)**2)
+                print("width calculation a:", a, "b:",b, "c:",c)
+                openingChunks.add('width:' + repr(c))
 
                 if numpy.intersect1d(self._screenCenter,numpy.arange(xs[0],xs[1])).any():
                     openingChunks.add('centre:true')
