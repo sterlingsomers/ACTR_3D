@@ -164,7 +164,7 @@ class MotorMethods_legs(ccm.ProductionSystem):
 
     def slow_step(b_motor_command_legs='walk:true speed:slow', motor_module='busy:False'):
         print("producting move_forward")
-        motor_module.send('move_forward',amount=0.0177)
+        motor_module.send('move_forward',amount=0.0129)
         y_position = middleware.robot_simulation.robot.y_position().result()
         print("Y position", y_position)
         if y_position >= 3.8:

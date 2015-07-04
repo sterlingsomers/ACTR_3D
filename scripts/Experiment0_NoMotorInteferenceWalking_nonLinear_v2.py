@@ -28,8 +28,8 @@ if not os.path.isfile('check.ck'):
     Popen(['gnome-terminal', '--command=morse run ACTR_3D'], stdin=PIPE)
     time.sleep(3)
     os.chdir('/home/sterling/morse/projects/ACTR_3D/scripts')
-    f = open('check.ck', 'w')
-    f.close()
+    #f = open('check.ck', 'w')
+    #f.close()
 
 
 
@@ -368,7 +368,7 @@ class MyModel(ACTR):
         print('ADDING:','width:'+w + ' depth:' + d + ' type:posture minimal_width:true' + ' standing:'+s)
         DM.add('width:'+w + ' depth:' + d + ' type:posture minimal_width:true' + ' standing:'+s)
         b_count.modify(value=repr(int(v)+1))
-        goal.set('setup:zero')
+        goal.set('stop')
 
     def setup_six_failure(goal='setup:six',b_cue='width:?w depth:?d',b_motor='type:posture minimal_width:false standing:?s',
                   b_count='value:?v'):
@@ -469,7 +469,7 @@ class MyModel(ACTR):
     def vision_scan_obstacle_left_confirm2(b_plan_unit='planning_unit:walk_through_aperture',
                                   b_unit_task='unit_task:walk posture:standing',
                                   b_operator='operator:react isa:obstacle location:left confirmed:confirming',
-                                  b_vision='isa:opening'):
+                                  b_vision1='isa:opening'):
         b_plan_unit.set('planning_unit:walk_through_aperture')
         b_unit_task.set('unit_task:manage_rotation')
         b_operator.set('operator:retrieve_width')
@@ -782,9 +782,10 @@ print("here0")
 #middleware.robot_simulation.close()
 #middleware.robot_simulation.close()
 middleware.tick()
-middleware.robot_simulation.reset()
+#middleware.robot_simulation.reset()
 time.sleep(3)
-#middleware.robot_simulation.quit()
+del ccm
+middleware.robot_simulation.quit()
 
 
 #del ccm

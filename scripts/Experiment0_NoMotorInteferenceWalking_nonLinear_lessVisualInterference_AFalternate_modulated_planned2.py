@@ -1,6 +1,6 @@
-RadiusMultiplier=1.9
+RadiusMultiplier=1.0
 VisionMultiplier=1.0
-MaximumRotationRate=0.080
+MaximumRotationRate=0.13
 #Run with a morse environment already running.
 
 #import MiddleMorse
@@ -192,7 +192,8 @@ class MotorMethods_legs(ccm.ProductionSystem):
 
     def slow_step(b_motor_command_legs='walk:true speed:slow', motor_module='busy:False'):
         print("producting move_forward")
-        motor_module.send('move_forward',amount=0.0129)
+        motor_module.send('move_forward',amount=0.0161)
+
         y_position = middleware.robot_simulation.robot.y_position().result()
         print("Y position", y_position)
         if y_position >= 3.8:
@@ -203,7 +204,7 @@ class MotorMethods_legs(ccm.ProductionSystem):
 class MotorMethods(ccm.ProductionSystem):
     production_time = 0.010
     #fake_buffer = Buffer()
-    shoulder_rotation_rate = 0.01745
+    shoulder_rotation_rate = 0.0174
     increase_rate = 0.0
     maximum_rotation_rate = MaximumRotationRate #near 3 degrees
 
@@ -215,12 +216,56 @@ class MotorMethods(ccm.ProductionSystem):
         difference = w - mW
         print("little difference ", difference)
 
+        ratio = mW/w
+        inverse = 1/ratio
+        #amount = 0.1 - difference
+        amount = 1-difference
+        print("amount", amount)
+        if amount > 0:
+            print('wAmount',w)
+            self.increase_rate = 0.041#((-2.9*(10**-4))*((w*100)**2)) + ((2.685*(10**-2))*(w*100)) - 0.59428
+            print("increaseAmount",self.increase_rate)
+            self.shoulder_rotation_rate = 0.01#(amount/(0.177**0.5))/200
+
+            #self.shoulder_rotation_rate = (amount**1/4)*((0.0128*10)**1)
+
+            #self.increase_rate = (((amount * 10)**(0.3))*(0.0128*100)**1)/22
+            print("amount passed")
+            #self.shoulder_rotation_rate = (amount**1/1)*((0.0128*10)**1)
+            #self.increase_rate = (((amount * 10)**(0.1))*(0.0128*100)**1)/250
+
+            ##self.shoulder_rotation_rate = 0.021#(0.0177**0.97)*(amount**6)#((1/(amount))**3)*(0.0177)
+            ##self.increase_rate = 0.007 * amount
+            #self.increase_rate = ((amount**10)*0.0161)*3
+
+        print("shoulder_rotation_rate", self.shoulder_rotation_rate)
+        print("increase rate", self.increase_rate)
+        b_motor_command_abdomen.modify(rotate='true_set')
         motor_module.increase_shoulder_rotation('left',self.shoulder_rotation_rate)
-        motor_module.increase_shoulder_compression(bone='shoulder.R',radians=self.shoulder_rotation_rate)
-        self.shoulder_rotation_rate = self.shoulder_rotation_rate + (0.2825*0.0129)
+        motor_module.increase_shoulder_compression(bone='shoulder.R', radians=self.shoulder_rotation_rate)
+        self.shoulder_rotation_rate = self.shoulder_rotation_rate + self.increase_rate
+
+        #if 0.1 - difference > 0:
+        #    self.increase_rate = 0.02 + ((0.1 - difference) * 0.0161 * 40)
+        #else:
+        #    self.increase_rate = 0.02
+        #
+        #if 0.1 - difference > 0:
+        #    motor_module.increase_shoulder_rotation('left',0.1 - difference)
+        #    motor_module.increase_shoulder_compression(bone='shoulder.R',radians=0.1 - difference)
+        ##self.shoulder_rotation_rate = self.shoulder_rotation_rate + self.increase_rate
+        #b_motor_command_abdomen.modify(rotate='true_set')
         #if self.shoulder_rotation_rate >= self.maximum_rotation_rate:
         #    self.shoulder_rotation_rate = self.maximum_rotation_rate
         #goal.set('stop')
+
+    def increase_rotation_abdomen_left_loop(b_motor_command_abdomen='rotate:true_set direction:left', motor_module='busy:False'):
+        motor_module.increase_shoulder_rotation('left',self.shoulder_rotation_rate)
+        motor_module.increase_shoulder_compression(bone='shoulder.R',radians=self.shoulder_rotation_rate)
+        self.shoulder_rotation_rate = self.shoulder_rotation_rate + self.increase_rate
+        if self.shoulder_rotation_rate > self.maximum_rotation_rate:
+            self.shoulder_rotation_rate = self.maximum_rotation_rate
+
 
     def increase_rotation_abdomen_right(b_motor_command_abdomen='rotate:true direction:right', motor_module='busy:False'):
         motor_module.increase_shoulder_rotation('right',self.shoulder_rotation_rate*-1)
@@ -831,7 +876,7 @@ model.middleware = middleware
 env = MyEnvironment()
 env.agent = model
 
-ccm.log_everything(env)
+#ccm.log_everything(env)
 model.goal.set('action:greet')
 
 #initialize ACT-R

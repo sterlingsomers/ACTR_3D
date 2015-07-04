@@ -192,7 +192,7 @@ class MotorMethods_legs(ccm.ProductionSystem):
 
     def slow_step(b_motor_command_legs='walk:true speed:slow', motor_module='busy:False'):
         print("producting move_forward")
-        motor_module.send('move_forward',amount=0.0129)
+        motor_module.send('move_forward',amount=0.0128)
         y_position = middleware.robot_simulation.robot.y_position().result()
         print("Y position", y_position)
         if y_position >= 3.8:
@@ -211,7 +211,7 @@ class MotorMethods(ccm.ProductionSystem):
     def increase_rotation_abdomen_left(b_motor_command_abdomen='rotate:true direction:left', motor_module='busy:False'):
         motor_module.increase_shoulder_rotation('left',self.shoulder_rotation_rate)
         motor_module.increase_shoulder_compression(bone='shoulder.R',radians=self.shoulder_rotation_rate)
-        self.shoulder_rotation_rate = self.shoulder_rotation_rate + (0.2825*0.0129)
+        self.shoulder_rotation_rate = self.shoulder_rotation_rate + (0.2825*0.0128)
         #if self.shoulder_rotation_rate >= self.maximum_rotation_rate:
         #    self.shoulder_rotation_rate = self.maximum_rotation_rate
         #goal.set('stop')
@@ -219,7 +219,7 @@ class MotorMethods(ccm.ProductionSystem):
     def increase_rotation_abdomen_right(b_motor_command_abdomen='rotate:true direction:right', motor_module='busy:False'):
         motor_module.increase_shoulder_rotation('right',self.shoulder_rotation_rate*-1)
         motor_module.increase_shoulder_compression(bone='shoulder.L',radians=self.shoulder_rotation_rate)
-        self.shoulder_rotation_rate = self.shoulder_rotation_rate + (0.2825*0.0129)
+        self.shoulder_rotation_rate = self.shoulder_rotation_rate + (0.2825*0.0128)
         #if self.shoulder_rotation_rate >= self.maximum_rotation_rate:
         #    self.shoulder_rotation_rate = self.maximum_rotation_rate
         ##goal.set('stop')
