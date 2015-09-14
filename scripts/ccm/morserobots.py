@@ -43,6 +43,7 @@ class morse_middleware():
                         'move_forward':False,
                         'set_rotation':False,
                         'lower_arms':True,
+                        'set_walls':True,
                         'set_rotation_ribs':False} #{function_name:blocking?}
 
         self.request_dict = {'scan_imageD':True,
@@ -53,12 +54,13 @@ class morse_middleware():
                 'getBoundingBox':True,
                 'get_image':True,
                 'scan_image':True,
-                'get_bones':True
+                'get_bones':True,
                 }
             
         self.action_dict = {'set_rotation_ribs':['self.robot_simulation.robot.torso','.set_rotation'],
                             'get_image':['self.robot_simulation.robot.GeometricCamerav1','.get_image'],
                             'scan_image':['self.robot_simulation.robot.GeometricCamerav1','.scan_image_multi'],
+                            'set_walls':['self.robot_simulation.robot.GeometricCamerav1','.set_walls'],
                             'scan_sub_image':['self.robot_simulation.robot.GeometricCamerav1','.scan_sub_image'],
                             'getBoundingBox':['self.robot_simulation.robot','.getBoundingBox'],
                             'lower_arms':['self.robot_simulation.robot.torso','.lower_arms'],
@@ -175,7 +177,7 @@ class morse_middleware():
 
     def request(self,function_name,**kwargs):
         if self.sync:
-            print("requesting...")
+            #print("requesting...")
             self.completed = False
             self.return_data = {}
             self.request_queue.append([function_name,kwargs])
@@ -189,15 +191,15 @@ class morse_middleware():
                 pass
 
 
-            print("RETURN DATA",self.return_data)
+            #print("RETURN DATA",self.return_data)
             return self.return_data
         else:
-            print("Function name:",function_name,kwargs)
+            #print("Function name:",function_name,kwargs)
             x = None
             x =  self.robot_simulation.robot.accept_data_request([[function_name,kwargs]]).result()
             while x == None:
                 print("waiting...")
-            print("Recieved x", x)
+            #print("Recieved x", x)
             return x
 
 

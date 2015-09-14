@@ -10,26 +10,38 @@ import bpy
 import math
 from morse.builder import *
 import morse.sensors.camera
-
 #from ACTR_3D.builer.robots import Mannequin
 from ACTR_3D.builder.robots import Manny
 from ACTR_3D.builder.robots import Car
-import numpy.random
+
 from ACTR_3D.builder.sensors import GeometricCamera
+#from ACT_v1.builder.actuators import Mannyactuator
+#from ACT_v1.builder.sensors.Collision import Collision as LocalCollision
+#from ACT_v1.builder.actuators import Torso
+
+
+#from ACT_v1.builder.actuators import Draw1
 #from ACT_v1.builder.sensors import SemanticCamera#Geometriccamerav1
 from morse.core.morse_time import TimeStrategies
 
-
-
-
-
-sizeSetting = 'large'
-sizes = {'large':[48.4,0.7],'small':[40.4,2.0]}
-
 bpymorse.set_speed(fps=200,logic_step_max=0,physics_step_max=0)
 
+# Add the MORSE mascott, MORSY.
+# Out-the-box available robots are listed here:
+# http://www.openrobots.org/morse/doc/stable/components_library.html
+#
+# 'morse add robot <name> ACT_v1' can help you to build custom robots.
+#robot = Morsy()
+##robot = Human()
+##robot.use_world_camera()
 ##robot.disable_keyboard_control()
 
+
+#car = Car()
+#car.rotate(z=math.radians(0))
+#keyboard = Keyboard()
+#car.append(keyboard)
+#keyboard.properties(ControlType = 'Position')
 #going to try manny
 robot = Manny()
 
@@ -116,10 +128,7 @@ torso.add_service('socket')
 #TopViewCamera = Camera('TopViewCamera')
 #TopViewCamera.location = [0, 4, 8]
 #TopViewCamera.rotate(math.radians(0), math.radians(180), math.radians(180))
-
-wDim = numpy.random.normal(sizes[sizeSetting][0],sizes[sizeSetting][1])
-scale = [wDim/44.5,1.0,wDim/44.5]
-#scale = [48.4/44.5,1.0,48.4/44.5]
+scale = [48.4/44.5,1.0,48.4/44.5]
 #scale = [40.4/44.5,1.0,40.4/44.5]
 #Geometric camera
 GeometricCamerav1 = GeometricCamera()

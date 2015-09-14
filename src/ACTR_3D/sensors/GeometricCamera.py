@@ -88,12 +88,14 @@ class GeometricCamera(morse.sensors.camera.Camera):
         The second parameter should be the name of the object's parent.
         """
         logger.info('%s initialization' % obj.name)
+        logging.disable(logging.CRITICAL)
         #self.timeService = morse.
         # Call the constructor of the parent class
         morse.sensors.camera.Camera.__init__(self, obj, parent)
         self.visual_objects = {}
         self.robot_parent.func_map['scan_image_multi'] = self
         self.robot_parent.func_map['closest_scan'] = self
+        self.robot_parent.func_map['set_walls'] = self
         # Locate the Blender camera object associated with this sensor
         main_obj = self.bge_object
         for obj in main_obj.children:
@@ -1112,6 +1114,21 @@ class GeometricCamera(morse.sensors.camera.Camera):
         #    
         #return help(polyzero.material)
         
+    @service
+    def set_walls(self,value):
+        sce = bge.logic.getCurrentScene()
+        current = 35
+        difference = abs(current-value)
+        subtract = difference/2.0/100.00
+
+        for obj in sce.objects:
+            print(obj.name, obj.worldPosition, current, difference, subtract)
+            if "LeftWall" in obj.name:
+                obj.worldPosition[0] = obj.position[0] - subtract
+            if "RightWall" in obj.name:
+                obj.worldPosition[0] = obj.position[0] + subtract
+
+
     @service
     def use_keys_for_stuff(self):
         

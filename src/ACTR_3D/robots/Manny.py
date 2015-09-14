@@ -112,7 +112,7 @@ class Manny(morse.core.robot.Robot):
 
     @service
     def accept_send_request(self,queue):
-        print("QUEUE...", queue)
+        #print("QUEUE...", queue)
         x = None
         for item in queue:
             meth = getattr(self.func_map[item[0]],item[0])
@@ -136,18 +136,18 @@ class Manny(morse.core.robot.Robot):
     @service
     def accept_data_request(self,queue):
 
-        print("ACCEPT DATA REQUEST", queue)
+        #print("ACCEPT DATA REQUEST", queue)
         response = {}
 
         for item in queue:
-            print(item[0])
+            #print(item[0])
             meth = getattr(self.func_map[item[0]],item[0])
             try:
                 with time_limit(2):
-                    print("FUNC MAP",self.func_map[item[0]])
+                    #print("FUNC MAP",self.func_map[item[0]])
 
                     response[item[0]] = meth(**item[1])
-                    print("RESPONSE...",response)
+                    #print("RESPONSE...",response)
             except TimeoutException:
                 print("Timeout in accept_data_request()")
         return response
