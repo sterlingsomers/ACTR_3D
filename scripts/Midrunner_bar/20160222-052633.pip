@@ -1,0 +1,17 @@
+APRatio=0.9
+AgentWidth=0.4453247570255764
+AgentWithBarWidth=1.113311892563941
+ApertureWidth=100.19807033075469
+BarRatio=2.5
+ProductionSpeed=0.01
+RadiusMultiplier=3
+VisionMultiplier=1.139
+WalkingRate=0.0128
+angle=87.20015714283178
+collision=None
+direction=none
+distance=0.5224000811576843
+rate=0.020944
+stop=10.119999999999955
+time=10.129999999999828
+width=1.1141

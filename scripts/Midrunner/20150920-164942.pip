@@ -1,0 +1,11 @@
+ApertureWidth=40
+RadiusMultiplier=1.9
+VisionMultiplier=1.125
+WalkingRate=0.0128
+angle=80.0
+collision=None
+direction=none
+rate=0.033
+stop=10.769999999999884
+time=10.779999999999815
+width=0.4833

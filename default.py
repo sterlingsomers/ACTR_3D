@@ -14,17 +14,17 @@ import morse.sensors.camera
 #from ACTR_3D.builer.robots import Mannequin
 from ACTR_3D.builder.robots import Manny
 from ACTR_3D.builder.robots import Car
-import numpy.random
+
 from ACTR_3D.builder.sensors import GeometricCamera
 #from ACT_v1.builder.sensors import SemanticCamera#Geometriccamerav1
 from morse.core.morse_time import TimeStrategies
 
+import pickle
 
 
 
 
-sizeSetting = 'large'
-sizes = {'large':[48.4,0.7],'small':[40.4,2.0]}
+
 
 bpymorse.set_speed(fps=200,logic_step_max=0,physics_step_max=0)
 
@@ -62,8 +62,7 @@ torso.rotate(z=math.radians(90))
 #torso.append(collision)
 #collision.add_stream('socket')
 
-#for obj in bpy.context.scene.objects:
-#    print("obj",obj)
+
 
 #armproximity = Proximity()
 #armproximity.properties(Track = 'obstacle')
@@ -116,18 +115,27 @@ torso.add_service('socket')
 #TopViewCamera = Camera('TopViewCamera')
 #TopViewCamera.location = [0, 4, 8]
 #TopViewCamera.rotate(math.radians(0), math.radians(180), math.radians(180))
-
-wDim = numpy.random.normal(sizes[sizeSetting][0],sizes[sizeSetting][1])
+#wDim = pickle.load(open('/home/sterling/morse/projects/ACTR_3D/params.par','rb'))
+wDim,barRatio = pickle.load(open('/home/sterling/morse/projects/ACTR_3D/params.par','rb'))
 scale = [wDim/44.5,1.0,wDim/44.5]
 #scale = [48.4/44.5,1.0,48.4/44.5]
 #scale = [40.4/44.5,1.0,40.4/44.5]
+
+for obj in bpy.context.scene.objects:
+    print("obj",obj)
+    if "bar" in obj.name:
+        #print(wDim, barRatio)
+        obj.dimensions=(wDim*barRatio/100,0.05,0.05)
+
+
+
 #Geometric camera
 GeometricCamerav1 = GeometricCamera()
 
 GeometricCamerav1.translate(x=0.13,y=-0.0,z=1.25)
 GeometricCamerav1.properties(Object=False)
 GeometricCamerav1.properties(cam_width=2048,cam_height=2048)
-GeometricCamerav1.properties(cam_focal=14)
+GeometricCamerav1.properties(cam_focal=14)#14
 
 GeometricCamerav1.rotate(math.radians(180),math.radians(180),math.radians(00))
 robot.append(GeometricCamerav1)

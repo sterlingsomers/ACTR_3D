@@ -4,43 +4,32 @@
 
 Feel free to edit this template as you like!
 """
-import pdb
+#import pdb
 
 import bpy
 import math
 from morse.builder import *
+import morse.sensors.camera
+
 #from ACTR_3D.builer.robots import Mannequin
 from ACTR_3D.builder.robots import Manny
 from ACTR_3D.builder.robots import Car
 
 from ACTR_3D.builder.sensors import GeometricCamera
-#from ACT_v1.builder.actuators import Mannyactuator
-#from ACT_v1.builder.sensors.Collision import Collision as LocalCollision
-#from ACT_v1.builder.actuators import Torso
-
-
-#from ACT_v1.builder.actuators import Draw1
 #from ACT_v1.builder.sensors import SemanticCamera#Geometriccamerav1
 from morse.core.morse_time import TimeStrategies
 
-bpymorse.set_speed(fps=200,logic_step_max=1,physics_step_max=1)
+import pickle
 
-# Add the MORSE mascott, MORSY.
-# Out-the-box available robots are listed here:
-# http://www.openrobots.org/morse/doc/stable/components_library.html
-#
-# 'morse add robot <name> ACT_v1' can help you to build custom robots.
-#robot = Morsy()
-##robot = Human()
-##robot.use_world_camera()
+
+
+
+
+
+bpymorse.set_speed(fps=200,logic_step_max=0,physics_step_max=0)
+
 ##robot.disable_keyboard_control()
 
-
-#car = Car()
-#car.rotate(z=math.radians(0))
-#keyboard = Keyboard()
-#car.append(keyboard)
-#keyboard.properties(ControlType = 'Position')
 #going to try manny
 robot = Manny()
 
@@ -49,7 +38,7 @@ robot = Manny()
 
 # The list of the main methods to manipulate your components
 # is here: http://www.openrobots.org/morse/doc/stable/user/builder_overview.html
-robot.translate(0.0, 0.0, 0.0)
+robot.translate(0.0, -3.1, 0.0)
 
 
 torso = Armature(model_name='ACTR_3D/actuators/Torso.blend', armature_name='Armature')
@@ -69,8 +58,11 @@ torso.rotate(z=math.radians(90))
 
 
 #collision = Collision()
-#collision.properites(collision_property="obstacle")
-#armature.append(collision)
+#collision.properties(collision_property="obstacle")
+#torso.append(collision)
+#collision.add_stream('socket')
+
+
 
 #armproximity = Proximity()
 #armproximity.properties(Track = 'obstacle')
@@ -120,13 +112,30 @@ torso.add_service('socket')
 # actuator.
 
 
+#TopViewCamera = Camera('TopViewCamera')
+#TopViewCamera.location = [0, 4, 8]
+#TopViewCamera.rotate(math.radians(0), math.radians(180), math.radians(180))
+#wDim = pickle.load(open('/home/sterling/morse/projects/ACTR_3D/params.par','rb'))
+wDim,barRatio = pickle.load(open('/home/sterling/morse/projects/ACTR_3D/params.par','rb'))
+scale = [wDim/44.5,1.0,wDim/44.5]
+#scale = [48.4/44.5,1.0,48.4/44.5]
+#scale = [40.4/44.5,1.0,40.4/44.5]
+
+for obj in bpy.context.scene.objects:
+    print("obj",obj)
+    if "bar" in obj.name:
+        #print(wDim, barRatio)
+        obj.dimensions=(wDim*barRatio/100,0.05,0.05)
+
+
+
 #Geometric camera
 GeometricCamerav1 = GeometricCamera()
 
-GeometricCamerav1.translate(x=0.13,y=-0.0,z=1.22)
+GeometricCamerav1.translate(x=0.13,y=-0.0,z=1.25)
 GeometricCamerav1.properties(Object=False)
 GeometricCamerav1.properties(cam_width=2048,cam_height=2048)
-GeometricCamerav1.properties(cam_focal=14)
+GeometricCamerav1.properties(cam_focal=8)#14
 
 GeometricCamerav1.rotate(math.radians(180),math.radians(180),math.radians(00))
 robot.append(GeometricCamerav1)
@@ -164,23 +173,25 @@ robot.add_service('socket')
 # Check here: http://www.openrobots.org/morse/doc/stable/user/integration.html 
 # the other available interfaces (like ROS, YARP...)
 robot.add_default_interface('socket')
+robot.scale = scale#[1.05,1.0,1.0]
 
 
 # set 'fastmode' to True to switch to wireframe mode
 #env = Environment('../projects/ACTR_3D/Left_Hand_Traffic.blend')
-env = Environment('../projects/ACTR_3D/NOtarget_v2.blend')#, fastmode = True)
+env = Environment('../projects/ACTR_3D/NOtarget_v3.blend')#, fastmode = True)
+#env = Environment('../projects/ACTR_3D/aperture_choice.blend')
 #env = Environment('indoors-1/indoor-1')
 
 #ROBOT VIEW
 import math
-env.set_camera_location([0, -10, 7])
+env.set_camera_location([0, -15, 7])
 env.set_camera_rotation([math.radians(80), 0, math.radians(00)])
 env.select_display_camera(GeometricCamerav1)
 
 
 #pdb.set_trace()
 #env.set_time_strategy(TimeStrategies.FixedSimulationStepExternalTrigger)
-env.configure_stream_manager('socket',time_sync=True,sync_port=5000)
+#env.configure_stream_manager('socket',time_sync=True,sync_port=5000)
 env.show_framerate(True)
 #env.show_physics(True)
 

@@ -1,0 +1,1151 @@
+commit b70e281d3e084bb5ee1adc08e5be19ebefd9cfac
+Merge: 60f6dfa 0281d65
+Author: Sterling Somers <sterlingsomers@gmail.com>
+Date:   Tue Sep 15 19:10:12 2015 -0400
+
+    WIP on async: 60f6dfa Changed the default.py so that it selects a size from an appropriate distribution.  Used GeometricCamera to shut off logging (memory leak?).  Need to find the memory leak (that was not it). Also added a service to geometricCamera to accommodate different wallSize parameters. Renamed and added LinearModel_Planned_LowLevel (also spits out localtime at end so I can have a sense how long to wait). Added everything I needed to support the wallSize service.  Added ExperimentRunnerSeptember14 which is now the proper runner. It also sets the speed parameter so that I can run it all.  All files should be copied out of their folders when finished into one main folder. All the data on speed and size are in there, making it much easier to read the files (no folder name nonesense).  Need to try updating blender at school and see if morse still run (It should).
+
+commit 0281d65b64cc4e998a6559df2617c2727a1ab7a6
+Author: Sterling Somers <sterlingsomers@gmail.com>
+Date:   Tue Sep 15 19:10:12 2015 -0400
+
+    index on async: 60f6dfa Changed the default.py so that it selects a size from an appropriate distribution.  Used GeometricCamera to shut off logging (memory leak?).  Need to find the memory leak (that was not it). Also added a service to geometricCamera to accommodate different wallSize parameters. Renamed and added LinearModel_Planned_LowLevel (also spits out localtime at end so I can have a sense how long to wait). Added everything I needed to support the wallSize service.  Added ExperimentRunnerSeptember14 which is now the proper runner. It also sets the speed parameter so that I can run it all.  All files should be copied out of their folders when finished into one main folder. All the data on speed and size are in there, making it much easier to read the files (no folder name nonesense).  Need to try updating blender at school and see if morse still run (It should).
+
+commit 60f6dfaac14f5ee2daaf8598c45d218ca8058b17
+Author: Sterling Somers <sterlingsomers@gmail.com>
+Date:   Mon Sep 14 16:58:01 2015 -0400
+
+    Changed the default.py so that it selects a size from an appropriate distribution.  Used GeometricCamera to shut off logging (memory leak?).  Need to find the memory leak (that was not it). Also added a service to geometricCamera to accommodate different wallSize parameters. Renamed and added LinearModel_Planned_LowLevel (also spits out localtime at end so I can have a sense how long to wait). Added everything I needed to support the wallSize service.  Added ExperimentRunnerSeptember14 which is now the proper runner. It also sets the speed parameter so that I can run it all.  All files should be copied out of their folders when finished into one main folder. All the data on speed and size are in there, making it much easier to read the files (no folder name nonesense).  Need to try updating blender at school and see if morse still run (It should).
+
+commit 6c6714419db5dc969c14dd70425306578ff92cc7
+Author: Sterling <sterlingsomers@gmail.com>
+Date:   Sat Jul 4 11:00:01 2015 -0400
+
+    modified what happens it finds a large enough aperture. this should not effect the parameters but needs to be updated for the experiments.
+
+commit c946ceb5e0a10c875713de579efe6378da04c96a
+Author: Sterling Somers <sterlingsomers@gmail.com>
+Date:   Mon Jun 29 07:58:50 2015 -0400
+
+    Added a lot of different things for trying to get both speed and size.  AFalternate_planned2 should do it now.
+
+commit 42098826af60369cca49144c22e3465a2e70e81b
+Author: Sterling Somers <sterlingsomers@gmail.com>
+Date:   Wed Jun 24 17:31:23 2015 -0400
+
+    Added one that is modulated to speed. No cognition involved though
+
+commit f9d2dbf6ae72197193c79917f4486224420804ee
+Author: Sterling Somers <sterlingsomers@gmail.com>
+Date:   Fri Jun 19 22:29:22 2015 -0400
+
+    added the alternate_alternate which has only bottom-up
+
+commit 0c83e757a7b16162307ac2343a557711cce5d6ab
+Author: Sterling Somers <sterlingsomers@gmail.com>
+Date:   Mon Jun 15 23:35:41 2015 -0400
+
+    added a stop_rotation to the productions, triggers by the bottom up vision system. the hope is that it will help the funkyness in the large agent where it sometimes misses by a bit... this might delay the rotation stop by a small margin, allowing the agent to rotate extra - fixed a spelling mistake
+
+commit 944e6b8aa897bc0fd30bf7c6d104326073dc6729
+Author: Sterling Somers <sterlingsomers@gmail.com>
+Date:   Mon Jun 15 23:30:38 2015 -0400
+
+    added a stop_rotation to the productions, triggers by the bottom up vision system. the hope is that it will help the funkyness in the large agent where it sometimes misses by a bit... this might delay the rotation stop by a small margin, allowing the agent to rotate extra
+
+commit e9facab8d38dad5ab924e63340f5e3050704c36d
+Author: Sterling Somers <sterlingsomers@gmail.com>
+Date:   Sun Jun 14 15:00:38 2015 -0400
+
+    Added an AFalternate and a regular alternate.  Need to do a parameter search for the MaximumRotationRate, use Exp3Runner
+
+commit d167aa2d4c53d0460a58c874e79975eb68f839c5
+Author: Sterling <sterlingsomers@gmail.com>
+Date:   Wed Jun 10 17:12:26 2015 -0400
+
+    modified what happens it finds a large enough aperture. this should not effect the parameters but needs to be updated for the experiments.
+
+commit a2e126528cf5ef0f7642d6677e55fd40934f0b26
+Author: Sterling <sterlingsomers@gmail.com>
+Date:   Tue Jun 9 21:26:29 2015 -0400
+
+    changedbottom up producatin rate
+
+commit 41e78daa8abeb24689d21a33f1154b8b9fa6760e
+Author: Sterling <sterlingsomers@gmail.com>
+Date:   Tue Jun 9 19:39:26 2015 -0400
+
+    changed to not log everything
+
+commit 609fa9bb2130f9dfb3965283b07df579eb7f4236
+Author: Sterling <sterlingsomers@gmail.com>
+Date:   Tue Jun 9 19:36:36 2015 -0400
+
+    A new model with less interference during the walk. I think this is closer to correct. needs testing
+
+commit 35737283e3388c917dd72231c81ff2647f84f0b1
+Author: Sterling Somers <sterlingsomers@gmail.com>
+Date:   Tue Jun 9 10:42:10 2015 -0400
+
+    A new object detection system that needs testing on the large agent
+
+commit 7a808467dd7fc06802137aea389ab25870274b70
+Author: Sterling <sterlingsomers@gmail.com>
+Date:   Mon Jun 8 19:28:17 2015 -0400
+
+    changed the default back to 1.0 (won't use...)
+
+commit 190aa3e81c929a35a5afa0a9ba398d06ba9ff4e9
+Author: Sterling <sterlingsomers@gmail.com>
+Date:   Mon Jun 8 18:25:23 2015 -0400
+
+    Some updates to account for the faster walking pace. This includes a much higher radius multiplier and a angle tollerance decrease for obstacles by 5deg. 95-acos(x)...
+
+commit b884519536e418402963b7fbc43a6f84bf72f67e
+Author: Sterling <sterlingsomers@gmail.com>
+Date:   Fri Jun 5 17:51:03 2015 -0400
+
+    reset defaults for parameter search
+
+commit 9cf7f27cee38a785f564662c4f970df388a94e08
+Author: Sterling <sterlingsomers@gmail.com>
+Date:   Fri Jun 5 17:49:36 2015 -0400
+
+    implemented a maximum rotation rate
+
+commit 3b3fb895e7cd02a19490222b7ddcc47245ce642b
+Author: Sterling Somers <sterlingsomers@gmail.com>
+Date:   Fri Jun 5 17:06:47 2015 -0400
+
+    A new object detection system that needs testing on the large agent
+
+commit cf4e0898f3c10832cdcb0250baf8c5482b5ebafa
+Author: Sterling Somers <sterlingsomers@gmail.com>
+Date:   Thu Jun 4 22:40:52 2015 -0400
+
+    half a fix for nonlinear version2
+
+commit 3737fc4dbc5e44fa5738c5d8eaa92e00549fa52b
+Author: Sterling Somers <sterlingsomers@gmail.com>
+Date:   Wed Jun 3 19:35:58 2015 -0400
+
+    updated the environment back to 4.175. Need to run that too!
+
+commit 3fb7c8338eb7a96988d1861730e0a932ff850653
+Author: Sterling <sterlingsomers@gmail.com>
+Date:   Wed Jun 3 14:33:09 2015 -0400
+
+    Aperture size 2(+5cm), also recording rotation rate in non-linear
+
+commit 4265227d342b7ac1218781e477b827e43b85a5c3
+Author: Sterling Somers <sterlingsomers@gmail.com>
+Date:   Mon Jun 1 13:12:33 2015 -0400
+
+    Added a new parameter: VisionMultiplier
+
+commit 51658cde415c21aec917d86711fc006f5d5b370c
+Author: Sterling Somers <sterlingsomers@gmail.com>
+Date:   Thu May 28 19:02:03 2015 -0400
+
+    Added a new parameter: VisionMultiplier
+
+commit d90895d4a571060b7b76b27962ce4a4a0b29a29b
+Author: Sterling Somers <sterlingsomers@gmail.com>
+Date:   Thu May 28 18:26:33 2015 -0400
+
+    Added a new parameter: VisionMultiplier
+
+commit 8c0186c0e6f3255ad13ec96e281c055946568ff3
+Author: Sterling Somers <sterlingsomers@gmail.com>
+Date:   Thu May 28 00:02:38 2015 -0400
+
+    set the shoulder rotation to 2deg per 0.1
+
+commit 70bff15cf122e084d8150641c5c2ff555ce3a0a9
+Author: Sterling Somers <sterlingsomers@gmail.com>
+Date:   Wed May 27 23:43:26 2015 -0400
+
+    Fixed the max and mins which were still wrong.
+
+commit efbb4b70b06c3c646f47879f11c53b832eb8f4fe
+Author: Sterling Somers <sterlingsomers@gmail.com>
+Date:   Wed May 27 23:10:55 2015 -0400
+
+    Added the clavical rotation and also had to change the clavical rotation values.had to switch the max/min values for shoulder.R and had to change the sign for compress_shoulder (when shoulder.R)
+
+commit 2c872cb251b74517fd00c3c42c3f5dec0a3c2023
+Author: Sterling Somers <sterlingsomers@gmail.com>
+Date:   Tue May 26 22:52:31 2015 -0400
+
+    change to rotation rate. 2 degrees per
+
+commit 7150177bf69558b592aaf3ff1c9faef45409eb18
+Author: Sterling Somers <sterlingsomers@gmail.com>
+Date:   Tue May 26 22:46:56 2015 -0400
+
+    change to rotation rate. 2 degrees per
+
+commit 9ded1b23eb38bcbf0f8e3bdd24742fa597f792ee
+Author: Sterling Somers <sterlingsomers@gmail.com>
+Date:   Sat May 23 11:32:21 2015 -0400
+
+    This should be everything to run it.
+
+commit ba16aa8d6cfb1fcf16cb346f16164ca5e9ec5bbf
+Author: Sterling Somers <sterlingsomers@gmail.com>
+Date:   Fri May 22 15:20:13 2015 -0400
+
+    Added also the backup of the environment
+
+commit 61a1bfac281d687a4521576ecdaed5c11dd43e65
+Author: Sterling Somers <sterlingsomers@gmail.com>
+Date:   Fri May 22 15:13:10 2015 -0400
+
+    Might all be working now. Walks through apertures big enough with or without rotation. Added a default.bk before I modify the robot to make it the approximate size
+
+commit 798528f870c4ac08fcd2d5c6d92794e93deff0b4
+Author: Sterling <sterlingsomers@gmail.com>
+Date:   Thu May 21 17:38:37 2015 -0400
+
+    Keeps walking past aperture
+
+commit 56545f2a300421ef79a8e50c35e1cba554d0265c
+Author: Sterling <sterlingsomers@gmail.com>
+Date:   Thu May 21 16:30:28 2015 -0400
+
+    There is a none alert status.
+
+commit ce80bfd8aaed8bde9b339c7c12c51651169b1235
+Author: Sterling <sterlingsomers@gmail.com>
+Date:   Thu May 21 11:04:04 2015 -0400
+
+    Added the environment and locked the walls in place
+
+commit 3b2a6592e40b09786cb704a1406efe6a06f49ec7
+Author: Sterling <sterlingsomers@gmail.com>
+Date:   Fri May 15 16:27:49 2015 -0400
+
+    New collision sensors made in blender seem better. Not sure why it returns None.  There also seems to be a problem in the productions that ends the simulation a bit too early.  Should add a thing so it waits until the agent is past the aperture.
+
+commit 0717cebd88a9cb8924bc0aabcfd934ed1c2d3d00
+Author: Sterling <sterlingsomers@gmail.com>
+Date:   Thu May 14 18:16:58 2015 -0400
+
+    As can be seen from the physics, there is a giant red bounding box around the agent. This seems to be causing the early collision detection but its a product of the Collision sensor.... what to do...
+
+commit 09935abe92d43c7b27c426a923f4baa50c2b5899
+Author: Sterling <sterlingsomers@gmail.com>
+Date:   Wed May 13 18:15:25 2015 -0400
+
+    Added collision but it sucks big balls.
+
+commit c07f725348d4850f29e5a0b12bec8e2db5803efc
+Author: Sterling <sterlingsomers@gmail.com>
+Date:   Tue May 12 17:38:05 2015 -0400
+
+    Made sure the interference and no interference model are different.
+
+commit 944eb46533cd548ed7243ddfd17e6f8122f4101c
+Author: Sterling <sterlingsomers@gmail.com>
+Date:   Tue May 12 17:32:10 2015 -0400
+
+    Added another motor methods just for walking so that it can do it in parallel
+
+commit 50915705a0cbe379db8fde6ff2407708f5d56670
+Author: Sterling <sterlingsomers@gmail.com>
+Date:   Tue May 12 13:27:30 2015 -0400
+
+    The model works but is unrealistic in its movement. Should consider a complete handoff to the simulator and let the simulator carry it out as async.
+
+commit 978db94b25d5a5f289182b252966819cf35962b7
+Author: Sterling <sterlingsomers@gmail.com>
+Date:   Mon May 11 18:25:21 2015 -0400
+
+    Probably fixed most of it. the two to look at, I think, are _three and _three_alert....  The motor modul stops when it starts rotating.  Also, it should be alerting on the three_fail_alert
+
+commit dbdb510a119305b92408b73b0bb0f4cb9b413a7a
+Author: Sterling <sterlingsomers@gmail.com>
+Date:   Mon May 11 18:15:55 2015 -0400
+
+    Probably fixed most of it. the two to look at, I think, are _three and _three_alert
+
+commit 3b78fb1cad3fdbe92aceaaf48e5cd11e31e119cd
+Author: Sterling <sterlingsomers@gmail.com>
+Date:   Mon May 11 17:50:02 2015 -0400
+
+    There is a problem with the alert_status that I need to fix very soon. You can output the text of a runing program in linux with > operator.  python3 Experiment1_ALLTOPDOWN.py > current.txt, for example.
+
+commit be09c72e94046189bcca4a2c1ff037139c546fe3
+Author: Sterling Somers <sterlingsomers@gmail.com>
+Date:   Thu May 7 23:06:26 2015 -0400
+
+    Almost there!
+
+commit 2f28280b3c8dd71548c98fb715a038b64eaa2634
+Author: Sterling Somers <sterlingsomers@gmail.com>
+Date:   Mon May 4 14:07:39 2015 -0400
+
+    I think what I need to do is use the internal chunk in the vision system and then require a request for retrieval.  I can alway rollback here if its not working by end of day
+
+commit 333e72dd28cc66d85881d2a4b0b1499c284a602a
+Author: Sterling Somers <sterlingsomers@gmail.com>
+Date:   Sat May 2 23:09:55 2015 -0400
+
+    Working on a new model.  Also had to update the motor module because the max and mins for the rotations were not working right.  That might have been since I replaced some parts with lower poly versions.  Seems to be fixed now.
+
+commit a0d259d0a3c58ccc294db14e8dae80f5ce45e92a
+Author: Sterling Somers <sterlingsomers@gmail.com>
+Date:   Thu Apr 30 22:41:40 2015 -0400
+
+    Working on the model but the upper upper level chunks need to be retrieved and so do the other chunks... need to overcome that.
+
+commit 8937e6e0f5e55272d3b949db3c1d62eea357a6cc
+Author: Sterling <sterlingsomers@gmail.com>
+Date:   Tue Apr 28 17:36:29 2015 -0400
+
+    Trying to add a camera to record the top view when it exits.
+
+commit e49f60694042355bdcb4b27d80bae3fe9b8d37b0
+Author: Sterling <sterlingsomers@gmail.com>
+Date:   Mon Apr 27 12:54:10 2015 -0400
+
+    Fixed the logging and multiple running thing.  It adds a file check.ck.  The send_request in Manny returns 1 (because sometimes it returned None, which lead to an infinite loop). The log has been tested.  Morse now resets instead of quits (that's why I need the file). Note that this doesn't put the agent back into the original posture.
+
+commit 399fdc61f2a5e21fd6df91bb7cab58ee84c789e4
+Author: Sterling <sterlingsomers@gmail.com>
+Date:   Fri Apr 24 14:41:37 2015 -0400
+
+    This seems to work perfectly. Not sync'ed but the timing seems abour right for walking speed (7m in 5.45ish seconds).  All commands seem to get processed. runs in a new window (without crashing).
+
+commit 4fa86b3043f0565d17135fe3057acd4333189fb3
+Merge: f1a7b22 c3fa0b2
+Author: Sterling <sterlingsomers@gmail.com>
+Date:   Fri Apr 24 11:42:33 2015 -0400
+
+    Merge branch 'middleware_issue' into async
+
+commit c3fa0b2220a1d976edc509227215b775cc541d76
+Author: Sterling Somers <sterlingsomers@gmail.com>
+Date:   Thu Apr 23 23:29:38 2015 -0400
+
+    I cannot get it to work...
+
+commit 29b0ea4f1bc23a98b6c8b8a2543e23dd4be1435a
+Author: Sterling <sterlingsomers@gmail.com>
+Date:   Thu Apr 23 19:11:09 2015 -0400
+
+    I think this is pretty close.  I should double check the .completed bit to make sure it's working.  This is back to running morse seperately for the moment.
+
+commit f1a7b2242085811772570ce72aeff26697b320d4
+Merge: eecab1d 3617b0c
+Author: Sterling <sterlingsomers@gmail.com>
+Date:   Wed Apr 22 13:17:08 2015 -0400
+
+    Merge branch 'middleware_issue'
+
+commit 3617b0cf31821c01011e3e21959a49b23db95966
+Author: Sterling <sterlingsomers@gmail.com>
+Date:   Wed Apr 22 13:15:56 2015 -0400
+
+    changed the time limit to 1 sec (instead of 2).
+
+commit eecab1da2f4d1e7dae48dd9c6f95841a3b847c8e
+Merge: 23b6ec1 fd9c4ec
+Author: Sterling <sterlingsomers@gmail.com>
+Date:   Wed Apr 22 13:03:18 2015 -0400
+
+    Merge branch 'master' of https://github.com/sterlingsomers/ACTR_3D
+
+commit 587d2a1d56ebd1ee8ac27d12ef4b60fe0141c43d
+Author: Sterling <sterlingsomers@gmail.com>
+Date:   Wed Apr 22 13:02:43 2015 -0400
+
+    This isn't perfect but, I guess it works
+
+commit 089f783b83ae979baaf12e7d469976ce68fda871
+Author: Sterling <sterlingsomers@gmail.com>
+Date:   Wed Apr 22 12:55:18 2015 -0400
+
+    This is not pretty but it uses the timeout to just keep relaunching until it works.  It seems after a number of tests it will EVENTUALLY work.
+
+commit d83edbe63ab982e9d355b9b332d182dacba26587
+Author: Sterling Somers <sterlingsomers@gmail.com>
+Date:   Tue Apr 21 23:16:47 2015 -0400
+
+    not fixed.
+
+commit fd9c4ec2a11c1fe29f586defef94d32b8ae70550
+Author: Sterling Somers <sterlingsomers@gmail.com>
+Date:   Tue Apr 21 16:56:54 2015 -0400
+
+    Basic model seems to work, need a new connection.  Test by running vision a lot.
+
+commit 43933339c53775a293b833139730e7c906b3510b
+Author: Sterling Somers <sterlingsomers@gmail.com>
+Date:   Tue Apr 21 12:01:00 2015 -0400
+
+    added the no target version
+
+commit 4c328efee199618dd8ae0b7890202d7df4dd342a
+Author: Sterling Somers <sterlingsomers@gmail.com>
+Date:   Tue Apr 21 11:58:28 2015 -0400
+
+    just making sure the blender file is there.
+
+commit 5c9e2e4ebee6bff4d743d7f86129b5cf5e3c7b61
+Author: Sterling Somers <sterlingsomers@gmail.com>
+Date:   Tue Apr 21 11:56:45 2015 -0400
+
+    opens and closes and saves data (as html for now)
+
+commit efd5c4478e2a8197b98f6fcb561ea9b4c4ea383f
+Author: Sterling Somers <sterlingsomers@gmail.com>
+Date:   Mon Apr 20 23:48:38 2015 -0400
+
+    the logger is fixed.
+
+commit 4dd65db0bd49fc5f4562a19d3ca9f0c239d4fb0a
+Author: Sterling Somers <sterlingsomers@gmail.com>
+Date:   Mon Apr 20 18:16:28 2015 -0400
+
+    Last commit before merging to master
+
+commit 9f7de5fcbf8109b07a007314491e8524588dd503
+Author: Sterling Somers <sterlingsomers@gmail.com>
+Date:   Mon Apr 20 18:14:00 2015 -0400
+
+    Task one seems to work.  The productions appear to fire correctly.
+
+commit 2adaf816e1cb48f0068ffc51b44aa26ab7b5bff1
+Author: Sterling Somers <sterlingsomers@gmail.com>
+Date:   Sat Apr 18 12:38:53 2015 -0400
+
+    Changed extend_shoulder (and the max mins of shoulder.R).  Added the if for the shoulder.R in and it seems to work better.  Also changed the maximum physics etc to 1 in the default.py. This also makes it update as it is supposed to.  If the framerate drops though, the program will likely crash (hang).  Still need a fix for slow frame rates.
+
+commit 64c54a52ae6356406db91f44b355b59976795878
+Author: Sterling <sterlingsomers@gmail.com>
+Date:   Wed Apr 15 14:27:01 2015 -0400
+
+    added design2
+
+commit 2d5ce00ddee778c7fb1bc8d5674c0ec11f9e77d1
+Author: Sterling <sterlingsomers@gmail.com>
+Date:   Tue Apr 14 17:01:19 2015 -0400
+
+    Added two postures and they seem to work
+
+commit 739af54c6dfe5856ebffa6fcfd3c15c78c4b165f
+Author: Sterling <sterlingsomers@gmail.com>
+Date:   Mon Apr 13 16:26:37 2015 -0400
+
+    Going to add a posture system that updates itself with every movement.  This will summarize the details of the body posture into 1 simple chunk set that can be combined with bounding_box and encoded in memory.
+
+commit 2922df773638bf6e6d52ab0a5ffc8eab90f98a54
+Author: Sterling <sterlingsomers@gmail.com>
+Date:   Mon Apr 13 14:58:46 2015 -0400
+
+    There are still bugs in the vision system but I have a way around it that will work for now.  Ideally this work around will be fixed. Uses _oldopenings if there's a keyError.
+
+commit 2c452bc56caf9ccce7f5c6caf1c8cb6928a0b0b0
+Author: Sterling Somers <sterlingsomers@gmail.com>
+Date:   Sun Apr 12 22:03:45 2015 -0400
+
+    When up close, it doesn't work.  Make sure that when you fint a new object, step INSIDE, then take depth.  When at the edge of an object, step BACK, then take depth.
+
+commit fc50d7566ebccea7ce6ec0792c61750cf6866053
+Author: Sterling Somers <sterlingsomers@gmail.com>
+Date:   Thu Apr 9 13:58:39 2015 -0400
+
+    Added 0.495 and 0.501 as optional. Realize I only need the ANGLE. Also, returns error if openings is {}
+
+commit 452da9eac0618278d0d67d48770c43b7e2b484e6
+Author: Sterling Somers <sterlingsomers@gmail.com>
+Date:   Mon Apr 6 23:41:06 2015 -0400
+
+    There is still some errors when it is really close to the wall. Sometimes those errors are resolved.  I Can't find any bug, however. One idea might be with the depth thing. take 3 readings, one on either side of the actual value. Take the average of the two most similar.
+
+commit 15be5cb9d5d21bc9642b4c6178325dac193e6652
+Author: Sterling Somers <sterlingsomers@gmail.com>
+Date:   Sun Apr 5 12:20:43 2015 -0400
+
+    Commit just before merge. Nothing special added.
+
+commit 608745148c43ed0e0d04fe1f20a3e50030f0117f
+Author: Sterling Somers <sterlingsomers@gmail.com>
+Date:   Sat Apr 4 22:02:22 2015 -0400
+
+    I think the vision system might be passable.
+
+commit 1083461c6647467c2616cd42d76331112d93ffa4
+Author: Sterling Somers <sterlingsomers@gmail.com>
+Date:   Sat Apr 4 13:23:25 2015 -0400
+
+    There is a width estimation and it seems PRETTY accurate. But it does not correspond to the .blend file.  The blend file says the two walls are 8m apart.  The camera says they're 47-48cm apart...  BUT in the simulator, it's near the width of the agent who just barely hits the wall (agent's width with arms down is 44cm). Suggests its CLOSE!
+    I need to add a representation to the buffer if an opening is found. I need to add maybe 20% error on the width estimation to account for the perceptual error.
+
+commit 1740ebb12512d923071a7e0e3d2e034cc9a3a0ed
+Author: Sterling <sterlingsomers@gmail.com>
+Date:   Thu Apr 2 17:00:58 2015 -0400
+
+    Uhh, I forget. Just some updates.
+
+commit ae662ebbc1c37c5b7c55ebb2bdd69ddd6fa95602
+Author: Sterling Somers <sterlingsomers@gmail.com>
+Date:   Wed Apr 1 23:08:18 2015 -0400
+
+    Replaced screen coordinates for the opening with the keys of the objects for the opening.  Then it should be pretty simple to find the vector to the "objects" which match at a certain Y. The vectors are stored as [4:5].  Just choose the smallest angle, and that's the angle of the opening (A). the distances are (b) and (c), so, just need to calculate for (a)
+
+commit b06e24558cffe75343150b9c41ee4cb94230d333
+Author: Sterling <sterlingsomers@gmail.com>
+Date:   Wed Apr 1 15:53:05 2015 -0400
+
+    A mid-progress update.  Issue is that _openings has the wrong information in it now.  It would be better if it had the vectors.
+
+commit d6be66c625783adfdef8d9c08774c02ae4542e6c
+Author: Sterling Somers <sterlingsomers@gmail.com>
+Date:   Tue Mar 17 22:27:24 2015 -0400
+
+    need to push this.
+
+commit 23b6ec1f7b92ebf58f1af55faa33995472fbfedb
+Merge: cb5fa4c c36c5d1
+Author: Sterling <sterlingsomers@gmail.com>
+Date:   Tue Mar 17 11:18:42 2015 -0400
+
+    Merge branch 'master' of https://github.com/sterlingsomers/ACTR_3D
+
+commit c36c5d101574477a752aea4e4bdef82bba27b4d6
+Author: Sterling Somers <sterlingsomers@gmail.com>
+Date:   Mon Mar 16 15:17:19 2015 -0400
+
+    fixed a minor change since new_motor. But this appears to be fine.
+
+commit d34b8895fcdfdcd66bce3e45f54caf1bbfdf07d7
+Author: Sterling Somers <sterlingsomers@gmail.com>
+Date:   Mon Mar 16 15:16:20 2015 -0400
+
+    fixed a minor change since new_motor. But this appears to be fine.
+
+commit 0fa04e01cb99221f36f0432d5237d8a85674943d
+Author: Sterling Somers <sterlingsomers@gmail.com>
+Date:   Mon Mar 16 15:12:50 2015 -0400
+
+    commiting before merging
+
+commit 7a53ed96661fcfdbe8d1de19be6a6fed6d0497ff
+Author: Sterling Somers <sterlingsomers@gmail.com>
+Date:   Mon Mar 16 15:11:55 2015 -0400
+
+    The new representation system is fine (so far). The mins and maxs are correct.  Requirements for 'left' and 'right' in thesis programming notebook.
+
+commit 54105427e190cc099645e7c0a32a6c9129b99cd5
+Author: Sterling Somers <sterlingsomers@gmail.com>
+Date:   Sun Mar 15 21:46:50 2015 -0400
+
+    Working on the representation for the extension/compression for min/max. The output that was added to request can help diagnose.
+
+commit e20a209b75999b08a78e134080be22cae70e710b
+Author: Sterling Somers <sterlingsomers@gmail.com>
+Date:   Sat Mar 14 15:45:29 2015 -0400
+
+    Added extend shoulder, bone properties for the shoulders, and a function map for the shoulders.
+
+commit d0885c543c38679d11f6e19606108a57e80eadd6
+Author: Sterling <sterlingsomers@gmail.com>
+Date:   Fri Mar 13 17:38:06 2015 -0400
+
+    Updates for lower_arms. also updated the respresentation to include arms: lowered
+
+commit 057966a8ab255bd0d89cf919226252861be78abf
+Author: Sterling <sterlingsomers@gmail.com>
+Date:   Wed Mar 11 17:57:25 2015 -0400
+
+    Manually merged. Can delete the older motor_state_issue_thirteen
+
+commit cb5fa4cc7a774b715589d8fdf7ddc6b7ad82a5a4
+Author: Sterling <sterlingsomers@gmail.com>
+Date:   Wed Mar 11 17:15:30 2015 -0400
+
+    send_update commit
+
+commit d038636aeef3a656563240396d5c400b5ba0b4e0
+Author: Sterling <sterlingsomers@gmail.com>
+Date:   Wed Mar 11 15:27:55 2015 -0400
+
+    just committing before merging
+
+commit f407bec32b0d5037bc3a91f814b1db67add9aab5
+Author: Sterling <sterlingsomers@gmail.com>
+Date:   Wed Mar 11 15:26:19 2015 -0400
+
+    More updates. Mostly to the motor module. Each function should take care of what to send to the middleware (like rotate_torso) so that it can handle any ACTR stuff first.  Currently rotate_torso does this properly.  The others should copy as well.
+
+commit 101c3827b464788abbaa6d840ca9f26e183b9399
+Author: Sterling Somers <sterlingsomers@gmail.com>
+Date:   Tue Mar 10 23:24:06 2015 -0400
+
+    Added function map. The example works properly.
+
+commit cf7f73eda8104f7358f4af9799abe41ecaee31f9
+Author: Sterling <sterlingsomers@gmail.com>
+Date:   Tue Mar 10 17:47:54 2015 -0400
+
+    Changed the middleware.  Needs more updates. See commend on design1 setup_zero
+
+commit 8eb3b166b5a78be9ef41227c50cc50fb1877aefb
+Author: Sterling Somers <sterlingsomers@gmail.com>
+Date:   Sun Mar 8 23:27:35 2015 -0400
+
+    Just added another test to make sure that I can do multiple calls.  Seems like the new idea will work just fine.
+
+commit feecc7b9b2d4a193b995b9ce16fa892fc2fd6d89
+Author: Sterling Somers <sterlingsomers@gmail.com>
+Date:   Sun Mar 8 23:13:37 2015 -0400
+
+    Just added another test to make sure that I can do multiple calls.  Seems like the new idea will work just fine.
+
+commit 3e6915af412a5d6918dd798ee389096251c22ca4
+Author: Sterling Somers <sterlingsomers@gmail.com>
+Date:   Sun Mar 8 23:12:29 2015 -0400
+
+    used the Torso.py __init__ to register itself to the Manny.py .robot_children.  I can then use that to find the right child and seems I can send as many commands as I want from there...
+
+commit ecc325b2336abba299eee471f0eb8aa5aeaac7a1
+Author: Sterling Somers <sterlingsomers@gmail.com>
+Date:   Sun Mar 8 23:12:01 2015 -0400
+
+    used the Torso.py __init__ to register itself to the Manny.py .robot_children.  I can then use that to find the right child and seems I can send as many commands as I want from there...
+
+commit f6cb715d131bc6df1f64baa83f094c0e2dd2fab1
+Author: Sterling Somers <sterlingsomers@gmail.com>
+Date:   Sun Mar 8 15:11:57 2015 -0400
+
+    mid update. See onenote for notes up to march 7
+
+commit dad5705d6382b3fc0d8cabf4ce523d9ebcf3745f
+Author: Sterling Somers <sterlingsomers@gmail.com>
+Date:   Fri Mar 6 00:37:09 2015 -0500
+
+    Adding max and min to the rotate_torso.  Also doing the compression/extension thing.
+
+commit 8af21a7c5e08159379de9f94db0c55fec434b84f
+Author: Sterling Somers <sterlingsomers@gmail.com>
+Date:   Thu Mar 5 11:58:01 2015 -0500
+
+    I need to pause working on the motor system for now. Was going to implement a .busy but I see I need to fix the middleware so that it a send and a retrieve in one tick.
+
+commit 5fc70870550f6aa79d0d5f2696f6bbebcb0ca593
+Merge: 5960bce d85d979
+Author: Sterling Somers <sterlingsomers@gmail.com>
+Date:   Thu Mar 5 11:17:33 2015 -0500
+
+    updating to master. so the tick is implemented
+
+commit d85d9797e728ef488b97762068ffdbbc8ad9a09e
+Author: Sterling Somers <sterlingsomers@gmail.com>
+Date:   Thu Mar 5 10:54:01 2015 -0500
+
+    Fixes issue #9.  Put the tick back in pymorse.Morse() (see one note).  This iss is not closed though
+
+commit 5960bce2aaeca40c1fb2616babfe19c8faef4d65
+Author: Sterling Somers <sterlingsomers@gmail.com>
+Date:   Tue Mar 3 23:30:31 2015 -0500
+
+    Added a motor monitor that will run every 10 ms.  Just one option but not a bad one fo monitoring the max,min things.
+
+commit 0fee6fced9694a461baa3d7e736e3e5f5358dd57
+Author: Sterling <sterlingsomers@gmail.com>
+Date:   Mon Mar 2 15:37:20 2015 -0500
+
+    added Model ..._design1.  added a dictionary for _boneProperties, implemented 1 use of it in rotate_shoulders.
+
+commit 381ba5c9ea8a81f89c955be547dbd2f4e2b9d091
+Author: Sterling Somers <sterlingsomers@gmail.com>
+Date:   Sun Mar 1 15:47:20 2015 -0500
+
+    Need a new way of handling the bones.  C started with some way to get the bone names.
+
+commit 5c8f82bb1f3455b7e21e996c2379cfbb15afb97b
+Author: Sterling Somers <sterlingsomers@gmail.com>
+Date:   Fri Feb 27 11:18:34 2015 -0500
+
+    Workign on a simulator now.  I can only afford to spend the weekend on it.
+
+commit d041446bdbc21da3c0006b7a5b14ffbe6d60ef53
+Author: Sterling Somers <sterlingsomers@gmail.com>
+Date:   Fri Feb 27 10:18:35 2015 -0500
+
+    LearningA works fine for now... but the logic is messgtd up.  Working on a simulator for a copule days.
+
+commit 806202a17b59f917aed5e5c72c75f8911579e7e2
+Author: Sterling <sterlingsomers@gmail.com>
+Date:   Thu Feb 26 17:45:28 2015 -0500
+
+    Some updates on the model.
+
+commit 13795182667bd0c31c6ab1e2da23407122e4e5f4
+Author: Sterling Somers <sterlingsomers@gmail.com>
+Date:   Wed Feb 25 22:41:22 2015 -0500
+
+    Addinga setup to the model so that the DM encodes the relevant information.It is working up to setup_four
+
+commit 0cc6e7bce79f76e3377b4a19fceafd9f8d9e2e64
+Author: Sterling Somers <sterlingsomers@gmail.com>
+Date:   Wed Feb 25 10:12:58 2015 -0500
+
+    Commented out the print statements.
+
+commit 81348d3cebbf29e39a58c6692595e96545440bd6
+Merge: 2dc24cd 6fd17c0
+Author: sterlingsomers <sterlingsomers@gmail.com>
+Date:   Wed Feb 25 10:06:36 2015 -0500
+
+    Merge pull request #11 from sterlingsomers/opening_issue_eight
+    
+    Opening issue eight
+
+commit 6fd17c04a5f54d8421b9bffa6a806635b603820b
+Author: Sterling Somers <sterlingsomers@gmail.com>
+Date:   Wed Feb 25 10:04:46 2015 -0500
+
+    Ok. Works well enough when facing the wall. Screws up if the NOne is on the edge... But I'm gonig to ignore that for now. I'll open an issue. Fixxdes Issue #8
+
+commit d243b322f0f492b202469753e723ce45a69c697b
+Author: Sterling Somers <sterlingsomers@gmail.com>
+Date:   Wed Feb 25 10:03:31 2015 -0500
+
+    Ok. Works well enough when facing the wall. Screws up if the NOne is on the edge... But I'm gonig to ignore that for now. I'll open an issue.
+
+commit 059500e9bf9018d2c1b2052ff6cd05d7d05c333c
+Author: Sterling <sterlingsomers@gmail.com>
+Date:   Tue Feb 24 14:58:04 2015 -0500
+
+    The chunking is right but there still might be a decimal error.  For example, i thinks leftwall starts at 0. which probably means arange is not erasing 0.0.  This is an issue.
+
+commit 2d21432f603ae9624f3e576ad793c1fe7c31c8dc
+Author: Sterling Somers <sterlingsomers@gmail.com>
+Date:   Mon Feb 23 22:52:51 2015 -0500
+
+    I know where the opening is now. All that's left is to chunky, I thil.  There are some problems where I'm not sure what to do but those can be fixed later. I'll open an issue right away.
+
+commit b63d9aabe439f88b44fe1740f4a16f7a1b7711a4
+Author: Sterling Somers <sterlingsomers@gmail.com>
+Date:   Mon Feb 23 00:15:46 2015 -0500
+
+    minor updates.
+
+commit 084ff027c1a09cfeea3f173f6b2e8793a9e315d8
+Author: Sterling Somers <sterlingsomers@gmail.com>
+Date:   Fri Feb 20 16:31:35 2015 -0500
+
+    No fix yet. The depth profile is a good idea but for now I'm going to ignore the Ground and None.
+
+commit 2dc24cdc60bc6c38988731de020f6ffef51243a0
+Merge: 285a0ab 523ccfd
+Author: sterlingsomers <sterlingsomers@gmail.com>
+Date:   Thu Feb 19 14:42:28 2015 -0500
+
+    Merge pull request #6 from sterlingsomers/depth_speed_fix
+    
+    This update makes things a lot faster with a new depth_to_xy function.  ...
+
+commit 523ccfdf7a739ac76248dc90ee6ab125e6b673ee
+Author: Sterling <sterlingsomers@gmail.com>
+Date:   Thu Feb 19 14:39:31 2015 -0500
+
+    This update makes things a lot faster with a new depth_to_xy function.  Looks just as accurate as it was before.
+
+commit 285a0abe2a1cdc4fe913de9c9ebc81ae06c790e9
+Merge: 4b3f9b1 1786c5a
+Author: sterlingsomers <sterlingsomers@gmail.com>
+Date:   Wed Feb 18 23:11:07 2015 -0500
+
+    Merge pull request #5 from sterlingsomers/fix_depth_issue
+    
+    Updated default_scan_image and the scan_image_multi. It works right now ...
+
+commit 1786c5a25b933551fad9308d0fcccb2cd9148b3d
+Author: Sterling Somers <sterlingsomers@gmail.com>
+Date:   Wed Feb 18 23:07:03 2015 -0500
+
+    Updated default_scan_image and the scan_image_multi. It works right now but it's a bit slow. I'll open an new issue for that. Fixes issue #3
+
+commit 4b3f9b14fb3b1b630d45e3f118a238108654cac9
+Author: Sterling <sterlingsomers@gmail.com>
+Date:   Fri Feb 13 18:37:38 2015 -0500
+
+    There is something wrong, see issue #3. Need to Fix scan_image_multi
+
+commit 9b4cdf6bcbe85d6996343f2584aa25a5279a9870
+Author: Sterling Somers <sterlingsomers@gmail.com>
+Date:   Wed Feb 11 22:49:13 2015 -0500
+
+    I think I added multiprocessing successfully to the vision system. Fixes #2
+
+commit 7f65c79aacb73fe175eb96fb9a23388be1e5df7c
+Author: Sterling Somers <sterlingsomers@gmail.com>
+Date:   Wed Feb 11 12:42:08 2015 -0500
+
+    going to use the default_old, (now in default) for now. Fixes #1
+
+commit 30958dc279b08291bfa2ea8a680b2ad93acadac7
+Author: Sterling Somers <sterlingsomers@gmail.com>
+Date:   Tue Feb 10 18:34:49 2015 -0500
+
+    merging to the master, I will go back to making proper branches
+
+commit f044051d0e0cbc063d32d39fe595f8a1f8bbb8b2
+Author: Sterling Somers <sterlingsomers@gmail.com>
+Date:   Tue Feb 10 17:46:02 2015 -0500
+
+    Changed the default.py, and updated new_agent so it should work right out of the box when copied over to the default.
+
+commit a133c2d054784a2184b659b4504909711fb3e77f
+Author: Sterling Somers <sterlingsomers@gmail.com>
+Date:   Mon Jan 26 00:56:24 2015 -0500
+
+    forgot to omake sure i added all fliels
+
+commit 8075ce8f2f4373c01eb14edc6c2b90753eb2fe33
+Author: Sterling Somers <sterlingsomers@gmail.com>
+Date:   Mon Jan 26 00:56:07 2015 -0500
+
+    changed the environment to a new version whicih should have detectable rails. can't do the vision stuff.. but one sweep for rails should be sufficient for this model. so, it should be quite fast.
+
+commit cc9672348e56055f0afbc92828e5978b2b4731f1
+Author: Sterling Somers <sterlingsomers@gmail.com>
+Date:   Sun Jan 25 23:48:55 2015 -0500
+
+    was working on trying to get some image processing out of the geometric camera
+
+commit 61e03b500399522b8a6f70a79d92be1fd424bd31
+Author: Sterling Somers <sterlingsomers@gmail.com>
+Date:   Sun Jan 25 21:44:57 2015 -0500
+
+    The clavical does not follow but I think it should. Going to post a question about it. In the meantime, going to work on the car
+
+commit a8634443f0ef06559b00cee62fc9fd89b3d6fb7b
+Author: Sterling Somers <sterlingsomers@gmail.com>
+Date:   Sun Jan 25 21:30:23 2015 -0500
+
+    So, the Torso rotates properly but the clavical does not follow...
+
+commit 24d1d6861a7f8fb50972792cccde771372b02ff1
+Author: Sterling Somers <sterlingsomers@gmail.com>
+Date:   Sun Jan 25 21:09:35 2015 -0500
+
+    commented out the tick from the morserobots.py. working on rotate_torso but might have to make the armature properties, so I can add the set_rotation method for each armature
+
+commit dc1a3e4268a1ff9319e20565df34cfca4c577159
+Author: Sterling Somers <sterlingsomers@gmail.com>
+Date:   Sat Jan 24 08:56:41 2015 -0500
+
+    Have the minimum parts to see if I can even finish this robot. Attached the clavical to torso but it's a different armature. Either that buys me something or it doesn't but it has to move with the torso when the torso moves.
+
+commit 607f42239c7c575cdd38581f5fe60306fbf0055f
+Author: Sterling Somers <sterlingsomers@gmail.com>
+Date:   Fri Jan 23 22:13:27 2015 -0500
+
+    Fixing the new robot.. should have made a new branch. anyway, arms, legs, torso, all separate armatures
+
+commit 34f9dba9bfcb6b57ffc74357053a728258fbaa7a
+Author: Sterling Somers <sterlingsomers@gmail.com>
+Date:   Thu Jan 22 22:20:41 2015 -0500
+
+    making all the parts for the robot, saving files not just as default, but new_robot, car, etc.
+
+commit b17d77903c9b0cdeb4be7398173cca2c6000dad1
+Author: Sterling Somers <sterlingsomers@gmail.com>
+Date:   Wed Jan 21 23:06:51 2015 -0500
+
+    changed default, added the caravan :) simulator. It shouldn't be too hard to outfit this as a robot
+
+commit 9f2d57a9a246b05def4158356239fa7f7555e694
+Author: Sterling <sterlingsomers@gmail.com>
+Date:   Wed Jan 21 17:40:29 2015 -0500
+
+    some changes
+
+commit 7945553ab4695395c99904446ed243252ad2f210
+Author: Sterling Somers <sterlingsomers@gmail.com>
+Date:   Wed Jan 21 00:14:16 2015 -0500
+
+    going to try a new robot, with multiple armatures.
+
+commit 1e404b078efe2b9b758ee4e9e80dec2d1fbdf462
+Author: Sterling Somers <sterlingsomers@gmail.com>
+Date:   Sun Jan 18 23:24:29 2015 -0500
+
+    just some minor changes for the new morse branch
+
+commit 2b0d92415d3ec37ec9459d06824fe9acfa0f4d1a
+Author: Sterling Somers <sterlingsomers@gmail.com>
+Date:   Sun Jan 18 12:14:09 2015 -0500
+
+    This includes the changes before using the different branch.
+
+commit ce8ad4328037771157ce3a19ace8116554f5feff
+Author: Sterling <sterlingsomers@gmail.com>
+Date:   Fri Jan 16 18:07:29 2015 -0500
+
+    Checking out synchrony
+
+commit a856e2d84d079c1c2a7e6766421762fac0d4f301
+Author: Sterling <sterlingsomers@gmail.com>
+Date:   Mon Jan 12 17:02:44 2015 -0500
+
+    some minor changes to find_model.py. Need to finish vision request so that it parses the scan output and puts into chunks
+
+commit 02c855d7ee710efdadf2f7e5cbf4f5b0f2269910
+Author: Sterling <sterlingsomers@gmail.com>
+Date:   Mon Jan 12 15:44:49 2015 -0500
+
+    added the new environment. made some changes to the physics there. collision works.Also made some minor changes to the middleware. See notes in Notes, Jan 12 11:34, + 8 lines
+
+commit e608941c4c7a0c503fd129d905424fb90e22a457
+Author: Sterling <sterlingsomers@gmail.com>
+Date:   Sun Jan 11 23:19:18 2015 -0500
+
+    Just some changes to physics
+
+commit 057e694ec9f9980195fc44d49d79b5ebf316f31c
+Author: Sterling <sterlingsomers@gmail.com>
+Date:   Sun Jan 11 10:37:32 2015 -0500
+
+    current torso works fine, bounding box works fine. going to fold this branch to master
+
+commit bc5719a89caf77493af8fbabae5f36d525a18a41
+Author: Sterling <sterlingsomers@gmail.com>
+Date:   Fri Jan 9 23:27:55 2015 -0500
+
+    Looks like the bounding box calculations are fine. It would be good to refine it so that it's relative to the normal of the objects in question. This will do for the model, though
+
+commit 2b2e61fe370696d0126d736d87c4e54bb8be0e13
+Author: Sterling <sterlingsomers@gmail.com>
+Date:   Fri Jan 9 15:45:22 2015 -0500
+
+    The new robot looks like it's complete. The physics seems to account for it. Next will be to re-write the bounding box stuff.
+
+commit 2f4dde338cf33a0e14ac0030a2a3e308ec61656b
+Author: Sterling <sterlingsomers@gmail.com>
+Date:   Tue Jan 6 15:50:21 2015 -0500
+
+    going to see if I can find another way. This bounding box does not work
+
+commit 79906c495b2e96714e4c26ca7bd06c6096a76397
+Author: Sterling <sterlingsomers@gmail.com>
+Date:   Mon Jan 5 23:36:07 2015 -0500
+
+    Added a bounding box calculation using meshes on the robot. Still don't know how to figure out if it is forward facing or not. Should add a try to distinguish male from female
+
+commit d11d46523becabd7158c31256c91255026055b6a
+Author: Sterling <sterlingsomers@gmail.com>
+Date:   Mon Jan 5 13:44:44 2015 -0500
+
+    Added methods for finding the edges. These can then be used to find which edges matter. Next commit to find the bounding box dimensions
+
+commit dc2f1792559094593de954582232583baefee2a2
+Author: Sterling <sterlingsomers@gmail.com>
+Date:   Tue Dec 30 22:16:46 2014 -0500
+
+    added a __getitem__ to model.py to fix the pattern matcher. in pattern.py it was using x=a[key] (line 20). Not sure why this is is but the getitem seems to fix it.
+
+commit 87eeffc52d66d03c0ebd87b57ba89f4f3b8a3dc3
+Author: Sterling <sterlingsomers@gmail.com>
+Date:   Tue Dec 30 16:42:57 2014 -0500
+
+    Things are working again but there are still going to be some actR stuff (like SOS) that aren't working yet. Too bad.
+
+commit 005916cd91a04ec550eeee5cd79e4a87ef620546
+Author: Sterling <sterlingsomers@gmail.com>
+Date:   Sun Dec 28 19:39:25 2014 -0500
+
+    mid update update.
+
+commit 9ba968fd45ad20156356f900229b27ba42768ad4
+Author: Sterling <sterlingsomers@gmail.com>
+Date:   Mon Dec 15 12:34:07 2014 -0500
+
+    Going to add ScanBetweenY for when its doing the active. That way it only has to look at approximately shoulder height + minor changes + DM.request does not work
+
+commit cadea8ddb6e4b74dd785160e53d43b4cbbe0cda9
+Author: Sterling <sterlingsomers@gmail.com>
+Date:   Mon Dec 15 12:17:01 2014 -0500
+
+    Going to add ScanBetweenY for when its doing the active. That way it only has to look at approximately shoulder height + minor changes
+
+commit fbfde1bfc282133d0758a8efcfd802b291c6e400
+Author: Sterling <sterlingsomers@gmail.com>
+Date:   Mon Dec 15 11:56:03 2014 -0500
+
+    Going to add ScanBetweenY for when its doing the active. That way it only has to look at approximately shoulder height
+
+commit b2933ac7165497029d761e2625d64af1a410810e
+Author: Sterling <sterlingsomers@gmail.com>
+Date:   Wed Dec 10 17:25:27 2014 -0500
+
+    just some minor changes to the xScan
+
+commit 7b3dbc01e4350d4a97a8159e1536c5879c29b84e
+Author: Sterling <sterlingsomers@gmail.com>
+Date:   Tue Dec 9 17:44:53 2014 -0500
+
+    some updates, changing the dimensions, and the accurate in geometricCamera
+
+commit 117f3d0666f26501f3e8d6fcbff637f3d3a71e5c
+Author: Sterling <sterlingsomers@gmail.com>
+Date:   Thu Dec 4 22:24:32 2014 -0500
+
+    It seems like it's working alright but it's quite slow. At a lower focal length, you might not need numbers so accurate because the image would be zoomed in
+
+commit f60f78bc82aa1027a84b5787ebe2aade50a63578
+Author: Sterling <sterlingsomers@gmail.com>
+Date:   Wed Dec 3 17:37:30 2014 -0500
+
+    there's an error in here in the geometric camera, it's not increasing right
+
+commit f4d97682413edfbf121a4b36716955fd933d114d
+Author: Sterling <sterlingsomers@gmail.com>
+Date:   Sun Nov 30 21:55:10 2014 -0500
+
+    set up the model more accurately. Intention to work on the geometric camera to have a distance sensitive system. Currently model1.py includes a print of the distance to x,y=0.5,0.5 (~10m)
+
+commit 2d0a62df721fa3a809e8f71e5e332d66f92bd489
+Author: Sterling <sterlingsomers@gmail.com>
+Date:   Sun Nov 30 15:26:01 2014 -0500
+
+    Worked on the room2 file. Also worked on the geometriccamera a bit. Trying to figure out what to do with vision.
+
+commit 0c4c2946a380a2940c46bcb1ead1fca72ea6216a
+Author: Sterling <sterlingsomers@gmail.com>
+Date:   Fri Nov 28 19:59:59 2014 -0500
+
+    small updates to the model.
+
+commit 00baf27c694b34e07c8119946b1f6b568c90fc28
+Author: Sterling <sterlingsomers@gmail.com>
+Date:   Fri Nov 28 19:56:32 2014 -0500
+
+    Working ont the model and the vision module.
+
+commit e27229c568706d572065fcfee1620da351d4189e
+Author: Sterling <sterlingsomers@gmail.com>
+Date:   Thu Nov 27 22:42:20 2014 -0500
+
+    Made some small changes as I test this branch. Moved the camera forward by a little bit because it seems the camera was also seeing the body of the agent. I also noticed that sometimes that it seems that it crashes, it continues many seconds later. I think I can more or less keep it as is.
+
+commit 8183d61c5fab74bc94b9b3ed57e713d9d595bad9
+Author: Sterling <sterlingsomers@gmail.com>
+Date:   Thu Nov 27 21:18:32 2014 -0500
+
+    A minor change to the model so that the vision occurs int he production cycle. It does not seem to hang when I do that. I'm imaging the issue has to do with threading
+
+commit cf177aba04f942ed529de80e74e79c1ad1544d4b
+Author: Sterling <sterlingsomers@gmail.com>
+Date:   Thu Nov 27 21:10:41 2014 -0500
+
+    New syncing. Works... better?  It still seems to crash if I use vision...scan() in the loop. It might be the fact that it's in the loop that it crashes, though
+
+commit 8268292cdd023f7c38020a17bfd410ddc03532d7
+Author: Sterling <sterlingsomers@gmail.com>
+Date:   Thu Nov 27 11:52:06 2014 -0500
+
+    Not sure why this is a commit... it should be the same branch as on the origin.
+
+commit 49103655d4bc43f4a3bace00a7967d48262f12a6
+Author: Sterling <sterlingsomers@gmail.com>
+Date:   Wed Nov 26 22:13:04 2014 -0500
+
+    Fixed the geometric camera. Also fixed a small bug in making the queue. Would be a good idea to prioritize requests.
+
+commit 2a721d9025fc07315134540fa11dfc23257883b8
+Author: Sterling <sterlingsomers@gmail.com>
+Date:   Wed Nov 26 17:36:07 2014 -0500
+
+    Worked ont he middle ware to block, etc. Need to test if it's working alright. The output of the current test model is odd. It also gets really slow?
+
+commit f9e934179b4af76d1a01bee57fb3a16cfa07cd12
+Author: Sterling <sterlingsomers@gmail.com>
+Date:   Tue Nov 25 17:25:15 2014 -0500
+
+    added async_test2 for torso into the middleware and complied with the toros.default_action. also added async_test2 to the motor module. Did that to test the async stuff, which doesn't seem to work. both commands are received. I'll e-mail about it, but I might have to turn the simulation time up to 1000x, then i can make a best effor system that will run the tick multiple times, clearing the stack. I'll make a branch for that
+
+commit 9921fddb6b8ad57e40fa13e676a820c54e86f020
+Author: Sterling <sterlingsomers@gmail.com>
+Date:   Mon Nov 24 21:43:16 2014 -0500
+
+    changes to the middleware. Some changes to the test_module. Changes to Manny so that set_speed is async.
+
+commit 12ebb8bae5233874fd93838dda5fdf67f352c60c
+Author: Sterling <sterlingsomers@gmail.com>
+Date:   Mon Nov 24 17:08:40 2014 -0500
+
+    Adding back mistaken untracked files
+
+commit b884e1bc881134b236263cbdd4590aed41fb6b1d
+Author: Sterling <sterlingsomers@gmail.com>
+Date:   Sun Nov 23 22:17:20 2014 -0500
+
+    Update
+
+commit fd1d7bbfceac06ab170670bf0192cff99268c892
+Author: Sterling <sterlingsomers@gmail.com>
+Date:   Sun Nov 23 17:00:39 2014 -0500
+
+    updated
+
+commit d76195a9e09f662eb276649f86f747f25a52171f
+Author: Sterling <sterlingsomers@gmail.com>
+Date:   Sun Nov 23 16:52:11 2014 -0500
+
+    test_model.py changed to use the middleware. blenderVision in ccm also uses the middleware. Also fixed GeometricCamera as a re-implementation of semantic camera, with my further functionality. Tested at home.
+
+commit 3b158b064e57477115679dbf9448c11357a40f73
+Author: Sterling <sterlingsomers@gmail.com>
+Date:   Sun Nov 23 14:21:23 2014 -0500
+
+    some changes to the ccm stuff. Not yet tested at home because pymorse was not installed properly.
+
+commit 80962dd5990e6252f547092ef3be542fc04e342e
+Author: Sterling <sterlingsomers@gmail.com>
+Date:   Sun Nov 23 13:47:37 2014 -0500
+
+    Made GeometricCamera in this project as child of SemanticCamera.
+
+commit 9c35c64164217e77bf7a8aa70d2385a8127afbfa
+Author: Sterling <sterlingsomers@gmail.com>
+Date:   Sun Nov 23 12:45:01 2014 -0500
+
+    Cleaned up a lot of stuff and made all the changes for the name change.
+
+commit 61c05d1b8cf89da96c024015206a72a0db158f2c
+Author: Sterling <sterlingsomers@gmail.com>
+Date:   Sat Nov 22 16:43:09 2014 -0500
+
+    Minor changes so it's using ACT_v1 stuff
+
+commit 81f89e4b6d1057385d7b7ab54590987b96696be4
+Author: Sterling <sterlingsomers@gmail.com>
+Date:   Fri Nov 14 13:52:51 2014 -0500
+
+    Slowly adding the middleware in.
+    in model_vision.py, import ccm.morserobots
+    	that library will handle all the communcation
+
+commit 7e4b5250faa976179c241e139d789d03dc053f43
+Author: Sterling <sterlingsomers@gmail.com>
+Date:   Wed Nov 12 13:12:42 2014 -0500
+
+    Initial everything
+
+commit 09eb9ecd625560b9fa343421b6f2907fc61b0788
+Author: Sterling <sterlingsomers@gmail.com>
+Date:   Wed Nov 12 13:03:37 2014 -0500
+
+    Initial
+
+commit 6991e6c4764213705ade4c20a30e96a4151e3f36
+Author: sterlingsomers <sterlingsomers@gmail.com>
+Date:   Wed Nov 12 12:34:54 2014 -0500
+
+    Initial commit

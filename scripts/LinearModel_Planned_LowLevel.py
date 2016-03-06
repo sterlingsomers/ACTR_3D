@@ -1,7 +1,7 @@
-RadiusMultiplier=1.0
-VisionMultiplier=1.0
-ApertureWidth=35
-WalkingRate=0.0128
+#RadiusMultiplier=1.0
+#VisionMultiplier=1.0
+#ApertureWidth=35
+#WalkingRate=0.0128
 #Run with a morse environment already running.
 
 #import MiddleMorse
@@ -20,18 +20,18 @@ import math
 
 
 
-if not os.path.isfile('check.ck'):
-    os.chdir('/home/sterling/morse/projects')
-    #subprocess.Popen('morse run ACTR_3D', shell=True, creationflags=subprocess.CREATE_NEW_CONSOLE)
-    #p = subprocess.Popen('ls', shell=True, stdout=subprocess.STDOUT, stderr=subprocess.STDOUT)
-    #p.communicate()[0]
-    #subprocess.Popen(shlex.split('morse run ACTR_3D'), stdout=subprocess.PIPE,shell=True)
-    #call(['morse','run','ACTR_3D'])
-    Popen(['gnome-terminal', '--command=morse run ACTR_3D'], stdin=PIPE)
-    time.sleep(3)
-    os.chdir('/home/sterling/morse/projects/ACTR_3D/scripts')
-    f = open('check.ck', 'w')
-    f.close()
+# if not os.path.isfile('check.ck'):
+#     os.chdir('/home/sterling/morse/projects')
+#     #subprocess.Popen('morse run ACTR_3D', shell=True, creationflags=subprocess.CREATE_NEW_CONSOLE)
+#     #p = subprocess.Popen('ls', shell=True, stdout=subprocess.STDOUT, stderr=subprocess.STDOUT)
+#     #p.communicate()[0]
+#     #subprocess.Popen(shlex.split('morse run ACTR_3D'), stdout=subprocess.PIPE,shell=True)
+#     #call(['morse','run','ACTR_3D'])
+#     Popen(['gnome-terminal', '--command=morse run ACTR_3D'], stdin=PIPE)
+#     time.sleep(3)
+#     os.chdir('/home/sterling/morse/projects/ACTR_3D/scripts')
+#     f = open('check.ck', 'w')
+#     f.close()
 
 
 
@@ -151,6 +151,7 @@ class BottomUpVision(ccm.ProductionSystem):
         self.parent.b_unit_task.set('unit_task:walk posture:standing')
         self.parent.b_operator.set('operator:react isa:obstacle location:' + l)
         b_vision_command.clear()
+        self.parent.timeKeep.record_distance()
         #goal.set('stop')
 
 class VisionMethods(ccm.ProductionSystem):
@@ -162,11 +163,15 @@ class VisionMethods(ccm.ProductionSystem):
 
 
 class MotorMethods_legs(ccm.ProductionSystem):
-    production_time = 0.01
+    production_time = ProductionSpeed
+    WalkingRate = WalkingRate
+    ProductionSpeed = ProductionSpeed
 
     def slow_step(b_motor_command_legs='walk:true speed:slow', motor_module='busy:False'):
         print("producting move_forward")
-        motor_module.send('move_forward',amount=0.0128)
+        #global WalkingRate
+        #global ProductionSpeed
+        motor_module.send('move_forward',amount=WalkingRate * (ProductionSpeed/0.01))
         y_position = middleware.robot_simulation.robot.y_position().result()
         print("Y position", y_position)
         if y_position >= 3.8:
@@ -175,9 +180,9 @@ class MotorMethods_legs(ccm.ProductionSystem):
             self.parent.b_operator.clear()
 
 class MotorMethods(ccm.ProductionSystem):
-    production_time = 0.010
+    production_time = ProductionSpeed
     #fake_buffer = Buffer()
-    shoulder_rotation_rate = 0.033
+    shoulder_rotation_rate = ShoulderRotationRate * (ProductionSpeed/0.01)
     #increase_rate = 0.0161**1.1
     #maximum_rotation_rate = 0.045 #near 3 degrees
 
@@ -221,9 +226,12 @@ class timeKeeper(ccm.Model):
             log.VisionMultiplier = VisionMultiplier
             log.ApertureWidth = ApertureWidth
             log.WalkingRate = WalkingRate
+            log.ProductionSpeed = ProductionSpeed
         self.recorded = True
         #pythonpylog.delta_time = now - self.start
 
+    def record_distance(self):
+        log.distance = middleware.robot_simulation.robot.y_position().result()
 
     def record_bbox(self,bbox):
         log.width = ("%.4f" % bbox[0])
@@ -421,7 +429,7 @@ class MyModel(ACTR):
                               b_operator='operator:look_for_aperture',
                               b_motor='width:?w depth:?d'):
 
-        vision_module.find_feature(feature='opening', width=float(w)*self.VisionMultiplier, depth=d)
+        vision_module.find_feature(feature='opening', width=float(w), depth=d)
         vision_module.request('isa:opening',delay=0.05)
         b_motor.clear()
         b_operator.set('operator:check_opening')
@@ -448,7 +456,7 @@ class MyModel(ACTR):
                                              b_unit_task='unit_task:walk posture:standing',
                                              b_operator='operator:recall_posture',
                                              DMbuffer='width:?w depth:?d'):
-        vision_module.find_feature(feature='opening', width=float(w)*self.VisionMultiplier, depth=d)
+        vision_module.find_feature(feature='opening', width=float(w), depth=d)
         vision_module.request('isa:opening',delay=0.05)
         b_operator.set('operator:smallest_seen')
         #b_vision_command.set('scan:obstacles get:body_dimensions alert_status:none')
@@ -855,9 +863,10 @@ print(time.localtime())
 #middleware.robot_simulation.close()
 #middleware.robot_simulation.close()
 middleware.tick()
-middleware.robot_simulation.reset()
-time.sleep(3)
-#middleware.robot_simulation.quit()
+#middleware.robot_simulation.reset()
+time.sleep(2)
+middleware.robot_simulation.quit()
+
 
 
 #del ccm

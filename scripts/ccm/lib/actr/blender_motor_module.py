@@ -42,7 +42,7 @@ class BlenderMotorModule(ccm.Model):
         self.get_bounding_box()
         self.get_bones()
                                     #NAME      #min/max by axis: 0, 1, 2
-        self._boneProperties = {'part.torso':[[0,0],[-pi/3,pi/3],[0,0]],
+        self._boneProperties = {'part.torso':[[0,0],[-pi/2,pi/2],[0,0]],
                                 'shoulder.L':[[0,0],[0,0],[-math.radians(20),math.radians(20)]],
                                 'shoulder.R':[[0,0],[0,0],[math.radians(20),-math.radians(20)]]}
         #Tick

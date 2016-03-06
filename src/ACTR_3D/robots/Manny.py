@@ -193,6 +193,7 @@ class Manny(morse.core.robot.Robot):
 
                 #print(max(vxlist),min(vxlist),max(vylist),min(vylist),max(vzlist),min(vzlist))
                 #return self.bge_object.worldOrientation
+                #input("Whatever" + repr([max(vxlist)-min(vxlist),max(vylist)-min(vylist),max(vzlist)-min(vzlist)]))
                 return [max(vxlist)-min(vxlist),max(vylist)-min(vylist),max(vzlist)-min(vzlist)]
         except TimeoutException:
             return self.getBoundingBox()
